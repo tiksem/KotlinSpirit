@@ -5,8 +5,8 @@ class RuleParseCallbackWrapper<T>(
     private val callback: (T) -> Unit,
     private val errorCallback: (() -> Unit)? = null
 ) : Rule<T> {
-    override fun parse(state: ParseState) {
-        rule.parse(state)
+    override fun parse(state: ParseState, requireResult: Boolean) {
+        rule.parse(state, true)
         if (state.hasError) {
             errorCallback?.invoke()
         } else {
@@ -14,7 +14,7 @@ class RuleParseCallbackWrapper<T>(
         }
     }
 
-    override fun getResult(state: ParseState): T {
-        return rule.getResult(state)
+    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): T {
+        return rule.getResult(array, seekBegin, seekEnd)
     }
 }

@@ -3,19 +3,14 @@ package com.example.kotlinspirit
 class SequenceRule(
     private val a: Rule<*>,
     private val b: Rule<*>
-) : Rule<String> {
+) : StringRule() {
     private var seekBegin = -1
 
-    override fun parse(state: ParseState) {
+    override fun parse(state: ParseState, requireResult: Boolean) {
         seekBegin = state.seek
-        a.parse(state)
+        a.parse(state, false)
         if (!state.hasError) {
-            b.parse(state)
+            b.parse(state, false)
         }
-    }
-
-    override fun getResult(state: ParseState): String {
-        assert(seekBegin >= 0)
-        return String(state.array, seekBegin, state.seek)
     }
 }

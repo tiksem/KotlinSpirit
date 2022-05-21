@@ -7,8 +7,8 @@ class CharsSetStringRule internal constructor(
     minimumLength: Int,
     maximumLength: Int,
     private val chars: CharArray,
-) : BaseStringRule(minimumLength, maximumLength) {
-    override operator fun get(range: IntRange): BaseStringRule {
+) : MatchStringRule(minimumLength, maximumLength) {
+    override operator fun get(range: IntRange): MatchStringRule {
         return CharsSetStringRule(
             minimumLength = range.first,
             maximumLength = range.last,
@@ -25,8 +25,8 @@ class CharStringRule internal constructor(
     minimumLength: Int,
     maximumLength: Int,
     private val char: Char
-) : BaseStringRule(minimumLength, maximumLength) {
-    override operator fun get(range: IntRange): BaseStringRule {
+) : MatchStringRule(minimumLength, maximumLength) {
+    override operator fun get(range: IntRange): MatchStringRule {
         return CharStringRule(
             minimumLength = range.first,
             maximumLength = range.last,
@@ -43,8 +43,8 @@ class CharRangeStringRule internal constructor(
     minimumLength: Int,
     maximumLength: Int,
     private val range: CharRange
-) : BaseStringRule(minimumLength, maximumLength)  {
-    override operator fun get(range: IntRange): BaseStringRule {
+) : MatchStringRule(minimumLength, maximumLength)  {
+    override operator fun get(range: IntRange): MatchStringRule {
         return CharRangeStringRule(
             minimumLength = range.first,
             maximumLength = range.last,
@@ -61,8 +61,8 @@ class CharRangesStringRule internal constructor(
     minimumLength: Int,
     maximumLength: Int,
     private val ranges: Array<out CharRange>
-) : BaseStringRule(minimumLength, maximumLength) {
-    override operator fun get(range: IntRange): BaseStringRule {
+) : MatchStringRule(minimumLength, maximumLength) {
+    override operator fun get(range: IntRange): MatchStringRule {
         return CharRangesStringRule(
             minimumLength = range.first,
             maximumLength = range.last,
@@ -82,12 +82,12 @@ class SingleCharAndSingleRangeStringRule internal constructor(
     maximumLength: Int,
     private val char: Char,
     private val range: CharRange
-) : BaseStringRule(minimumLength, maximumLength) {
+) : MatchStringRule(minimumLength, maximumLength) {
     override fun isValidChar(char: Char): Boolean {
         return this.char == char || range.contains(char)
     }
 
-    override fun get(range: IntRange): BaseStringRule {
+    override fun get(range: IntRange): MatchStringRule {
         return SingleCharAndSingleRangeStringRule(
             minimumLength = range.first,
             maximumLength = range.last,
@@ -102,14 +102,14 @@ class SingleCharAndRangesStringRule internal constructor(
     maximumLength: Int,
     private val char: Char,
     private val ranges: Array<CharRange>
-) : BaseStringRule(minimumLength, maximumLength) {
+) : MatchStringRule(minimumLength, maximumLength) {
     override fun isValidChar(char: Char): Boolean {
         return this.char == char || ranges.find {
             it.contains(char)
         } != null
     }
 
-    override fun get(range: IntRange): BaseStringRule {
+    override fun get(range: IntRange): MatchStringRule {
         return SingleCharAndRangesStringRule(
             minimumLength = range.first,
             maximumLength = range.last,
@@ -124,12 +124,12 @@ class CharsAndRangeStringRule internal constructor(
     maximumLength: Int,
     private val chars: CharArray,
     private val range: CharRange
-) : BaseStringRule(minimumLength, maximumLength) {
+) : MatchStringRule(minimumLength, maximumLength) {
     override fun isValidChar(char: Char): Boolean {
         return range.contains(char) || Arrays.binarySearch(chars, char) >= 0
     }
 
-    override fun get(range: IntRange): BaseStringRule {
+    override fun get(range: IntRange): MatchStringRule {
         return CharsAndRangeStringRule(
             minimumLength = range.first,
             maximumLength = range.last,
@@ -144,14 +144,14 @@ class CharsAndRangesStringRule internal constructor(
     maximumLength: Int,
     private val chars: CharArray,
     private val ranges: Array<CharRange>
-) : BaseStringRule(minimumLength, maximumLength) {
+) : MatchStringRule(minimumLength, maximumLength) {
     override fun isValidChar(char: Char): Boolean {
         return Arrays.binarySearch(chars, char) >= 0 || ranges.find {
             it.contains(char)
         } != null
     }
 
-    override fun get(range: IntRange): BaseStringRule {
+    override fun get(range: IntRange): MatchStringRule {
         return CharsAndRangesStringRule(
             minimumLength = range.first,
             maximumLength = range.last,
@@ -161,7 +161,7 @@ class CharsAndRangesStringRule internal constructor(
     }
 }
 
-fun str(vararg chars: Char): BaseStringRule {
+fun str(vararg chars: Char): MatchStringRule {
     assert(chars.isNotEmpty())
     return if (chars.size == 1) {
         CharStringRule(1, Int.MAX_VALUE, chars[0])
@@ -170,7 +170,7 @@ fun str(vararg chars: Char): BaseStringRule {
     }
 }
 
-fun str(vararg charRange: CharRange): BaseStringRule {
+fun str(vararg charRange: CharRange): MatchStringRule {
     return if (charRange.size == 1) {
         CharRangeStringRule(1, Int.MAX_VALUE, charRange[0])
     } else {
@@ -181,7 +181,7 @@ fun str(vararg charRange: CharRange): BaseStringRule {
 fun str(
     ranges: Array<CharRange>,
     chars: CharArray
-) : BaseStringRule {
+) : MatchStringRule {
     assert(ranges.isNotEmpty() || chars.isNotEmpty())
     return when {
         ranges.isEmpty() -> str(*chars)

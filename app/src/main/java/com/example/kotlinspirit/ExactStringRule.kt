@@ -5,7 +5,7 @@ private const val MATCH_NOT_FOUND = "exact match not found"
 internal class ExactStringRule(
     private val string: String
 ) : Rule<String> {
-    override fun parse(state: ParseState) {
+    override fun parse(state: ParseState, requireResult: Boolean) {
         state.startParseToken()
         if (state.seek + string.length > state.array.size) {
             state.seek = state.array.size
@@ -20,7 +20,7 @@ internal class ExactStringRule(
         }
     }
 
-    override fun getResult(state: ParseState): String {
+    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): String {
         return string
     }
 }

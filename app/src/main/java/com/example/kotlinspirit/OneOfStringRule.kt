@@ -4,19 +4,15 @@ private const val NOT_FOUND = "not found"
 
 class OneOfStringRule(
     strings: List<String>
-) : Rule<String> {
+) : StringRule() {
     private val tree = TernaryStringTree(strings)
 
-    override fun parse(state: ParseState) {
+    override fun parse(state: ParseState, requireResult: Boolean) {
         state.startParseToken()
         val node = tree.search(state)
         if (node == null) {
             state.errorReason = NOT_FOUND
         }
-    }
-
-    override fun getResult(state: ParseState): String {
-        return state.getToken()
     }
 }
 

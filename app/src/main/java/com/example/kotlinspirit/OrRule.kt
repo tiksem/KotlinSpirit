@@ -6,20 +6,20 @@ class OrRule<T>(
 ) : Rule<T> {
     private var aFailed = false
 
-    override fun parse(state: ParseState) {
+    override fun parse(state: ParseState, requireResult: Boolean) {
         aFailed = false
-        a.parse(state)
+        a.parse(state, false)
         if (state.hasError) {
             aFailed = true
-            b.parse(state)
+            b.parse(state, false)
         }
     }
 
-    override fun getResult(state: ParseState): T {
+    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): T {
         return if (aFailed) {
-            b.getResult(state)
+            b.getResult(array, seekBegin, seekEnd)
         } else {
-            a.getResult(state)
+            a.getResult(array, seekBegin, seekEnd)
         }
     }
 }

@@ -8,8 +8,8 @@ private const val DOES_NOT_MATCH = "required char was not found"
 abstract class CharRule : Rule<Char> {
 }
 
-internal open class AnyCharRule : Rule<Char> {
-    override fun parse(state: ParseState) {
+internal open class AnyCharRule : CharRule() {
+    override fun parse(state: ParseState, requireResult: Boolean) {
         if (state.checkEof()) {
             return
         }
@@ -18,15 +18,15 @@ internal open class AnyCharRule : Rule<Char> {
         state.seek++
     }
 
-    override fun getResult(state: ParseState): Char {
-        return state.array[state.seekTokenBegin]
+    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): Char {
+        return array[seekBegin]
     }
 }
 
-internal abstract class CharMatch : Rule<Char> {
+internal abstract class CharMatch : CharRule() {
     abstract fun isValid(char: Char): Boolean
 
-    override fun parse(state: ParseState) {
+    override fun parse(state: ParseState, requireResult: Boolean) {
         if (state.checkEof()) {
             return
         }
@@ -37,8 +37,8 @@ internal abstract class CharMatch : Rule<Char> {
         }
     }
 
-    override fun getResult(state: ParseState): Char {
-        return state.array[state.seekTokenBegin]
+    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): Char {
+        return array[seekBegin]
     }
 }
 

@@ -8,7 +8,7 @@ private const val DOES_NOT_MATCH = "int does not match"
 private open class IntRule : Rule<Int> {
     private var result: Int = 0
 
-    override fun parse(state: ParseState) {
+    override fun parse(state: ParseState, requireResult: Boolean) {
         state.startParseToken()
         result = 0
 
@@ -57,7 +57,7 @@ private open class IntRule : Rule<Int> {
         }
     }
 
-    override fun getResult(state: ParseState): Int {
+    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): Int {
         return result
     }
 }
@@ -66,8 +66,8 @@ private class IntRangeRule(
     val a: Int,
     val b: Int
 ): IntRule() {
-    override fun parse(state: ParseState) {
-        super.parse(state)
+    override fun parse(state: ParseState, requireResult: Boolean) {
+        super.parse(state, false)
 
         if (!state.hasError) {
             val result = getResult(state)
@@ -84,8 +84,8 @@ fun int(value: Int): Rule<Int> {
     return object : Rule<Int> {
         val rule = ExactStringRule(value.toString())
 
-        override fun parse(state: ParseState) {
-            rule.parse(state)
+        override fun parse(state: ParseState, requireResult: Boolean) {
+            rule.parse(state, false)
             if (!state.hasError) {
                 if (rule.getResult(state).toIntOrNull() != value) {
                     state.errorReason = DOES_NOT_MATCH
@@ -93,7 +93,7 @@ fun int(value: Int): Rule<Int> {
             }
         }
 
-        override fun getResult(state: ParseState): Int {
+        override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): Int {
             return value
         }
     }
