@@ -7,12 +7,8 @@ class OneOfStringRule(
 ) : StringRule() {
     private val tree = TernaryStringTree(strings)
 
-    override fun parse(state: ParseState, requireResult: Boolean) {
-        state.startParseToken()
-        val node = tree.search(state)
-        if (node == null) {
-            state.errorReason = NOT_FOUND
-        }
+    override fun createParseIterator(): ParseIterator<CharSequence> {
+        return tree.getIterator()
     }
 }
 

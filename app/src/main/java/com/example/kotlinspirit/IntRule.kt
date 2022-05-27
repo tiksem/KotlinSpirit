@@ -1,104 +1,296 @@
 package com.example.kotlinspirit
 
-private const val NUMBER_STARTED_WITH_ZERO = "number started with zero"
-private const val INVALID_NUMBER = "invalid number"
-private const val NOT_IN_RANGE = "int not in range"
-private const val DOES_NOT_MATCH = "int does not match"
+private class IntRuleIterator
+    : BaseParseIterator<Int>()
+{
+    private var value: Int = -1
+    private var sign = 1
 
-private open class IntRule : Rule<Int> {
-    private var result: Int = 0
-
-    override fun parse(state: ParseState, requireResult: Boolean) {
-        state.startParseToken()
-        result = 0
-
-        if (state.checkEof()) {
-            return
-        }
-
-        val minus = state.getChar() == '-'
-        if (minus) {
-            state.seek++
-            if (state.checkEof()) {
-                return
-            }
-        }
-
-        val firstDigit = state.readChar()
-        if (firstDigit.isDigit()) {
-            result = firstDigit.digitToInt()
-            if (result == 0) {
-                if (state.isEof() || !state.getChar().isDigit()) {
-                    result = 0
-                    return
-                } else {
-                    state.errorReason = NUMBER_STARTED_WITH_ZERO
-                    return
-                }
+    override fun next(): Int {
+        if (isEof()) {
+            return if (value < 0) {
+                StepCode.EOF
             } else {
-                while (state.seek < state.array.size) {
-                    val digit = state.readChar()
-                    if (!digit.isDigit()) {
-                        state.seek--
-                        break
-                    } else {
-                        result *= 10
-                        result += digit - '0'
-                    }
-                }
+                StepCode.COMPLETE
             }
-        } else {
-            state.errorReason = INVALID_NUMBER
-            return
         }
 
-        if (minus) {
-            result = -result
+        val char = readChar()
+        return when {
+            char == '-' -> {
+                if (seek != seekBegin) {
+                    StepCode.INVALID_NUMBER
+                } else {
+                    sign = -1
+                    StepCode.HAS_NEXT
+                }
+            }
+            char == '0' && value < 0 -> {
+                if (isEof() || !getChar().isDigit()) {
+                    value = 0
+                    StepCode.COMPLETE
+                } else {
+                    StepCode.NUMBER_STARTED_FROM_ZERO
+                }
+            }
+            char.isDigit() -> {
+                if (value < 0) {
+                    value = 0
+                }
+
+                value *= 10
+                value += char - '0'
+                StepCode.HAS_NEXT_MAY_COMPLETE
+            }
+            else -> {
+                return if (value < 0) {
+                    StepCode.INVALID_NUMBER
+                } else {
+                    seek--
+                    StepCode.COMPLETE
+                }
+            }
         }
     }
 
-    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): Int {
-        return result
+    override fun prev() {
+        super.prev()
+        value -= getChar() - '0'
+        value /= 10
+    }
+
+    override fun getResult(): Int {
+        return value * sign
     }
 }
 
-private class IntRangeRule(
-    val a: Int,
-    val b: Int
-): IntRule() {
-    override fun parse(state: ParseState, requireResult: Boolean) {
-        super.parse(state, false)
+private class IntRangeRuleIterator(
+    private val range: IntRange
+)
+    : BaseParseIterator<Int>()
+{
+    private var value: Int = -1
+    private var sign = 1
 
-        if (!state.hasError) {
-            val result = getResult(state)
-            if (result !in a..b) {
-                state.errorReason = NOT_IN_RANGE
+    override fun next(): Int {
+        if (isEof()) {
+            return if (value < 0) {
+                StepCode.EOF
+            } else {
+                StepCode.COMPLETE
             }
         }
+
+        val char = readChar()
+        return when {
+            char == '-' -> {
+                if (seek != seekBegin) {
+                    StepCode.INVALID_NUMBER
+                } else {
+                    sign = -1
+                    StepCode.HAS_NEXT
+                }
+            }
+            char == '0' && value < 0 -> {
+                if (isEof() || !getChar().isDigit()) {
+                    value = 0
+                    StepCode.COMPLETE
+                } else {
+                    StepCode.NUMBER_STARTED_FROM_ZERO
+                }
+            }
+            char.isDigit() -> {
+                if (value < 0) {
+                    value = 0
+                }
+
+                value *= 10
+                value += char - '0'
+                if (range.contains(value * sign)) {
+                    StepCode.HAS_NEXT
+                } else {
+                    StepCode.INT_NOT_IN_REQUESTED_RANGE
+                }
+            }
+            else -> {
+                return if (value < 0) {
+                    StepCode.INVALID_NUMBER
+                } else {
+                    seek--
+                    StepCode.COMPLETE
+                }
+            }
+        }
+    }
+
+    override fun prev() {
+        super.prev()
+        value -= getChar() - '0'
+        value /= 10
+    }
+
+    override fun getResult(): Int {
+        return value * sign
+    }
+}
+
+private class UnsignedIntRuleIterator
+    : BaseParseIterator<Int>()
+{
+    private var value: Int = -1
+
+    override fun next(): Int {
+        if (isEof()) {
+            return if (value < 0) {
+                StepCode.EOF
+            } else {
+                StepCode.COMPLETE
+            }
+        }
+
+        val char = readChar()
+        return when {
+            char == '0' && value < 0 -> {
+                if (isEof() || !getChar().isDigit()) {
+                    value = 0
+                    StepCode.COMPLETE
+                } else {
+                    StepCode.NUMBER_STARTED_FROM_ZERO
+                }
+            }
+            char.isDigit() -> {
+                if (value < 0) {
+                    value = 0
+                }
+
+                value *= 10
+                value += char - '0'
+                StepCode.HAS_NEXT
+            }
+            else -> {
+                return if (value < 0) {
+                    StepCode.INVALID_NUMBER
+                } else {
+                    seek--
+                    StepCode.COMPLETE
+                }
+            }
+        }
+    }
+
+    override fun prev() {
+        super.prev()
+        value -= getChar() - '0'
+        value /= 10
+    }
+
+    override fun getResult(): Int {
+        return value
+    }
+}
+
+private class UnsignedIntRangeRuleIterator(
+    private val range: IntRange
+)
+    : BaseParseIterator<Int>()
+{
+    private var value: Int = -1
+
+    override fun next(): Int {
+        if (isEof()) {
+            return if (value < 0) {
+                StepCode.EOF
+            } else {
+                StepCode.COMPLETE
+            }
+        }
+
+        val char = readChar()
+        return when {
+            char == '-' -> {
+                if (seek != seekBegin) {
+                    StepCode.INVALID_NUMBER
+                } else {
+                    StepCode.HAS_NEXT
+                }
+            }
+            char == '0' && value < 0 -> {
+                if (isEof() || !getChar().isDigit()) {
+                    value = 0
+                    StepCode.COMPLETE
+                } else {
+                    StepCode.NUMBER_STARTED_FROM_ZERO
+                }
+            }
+            char.isDigit() -> {
+                if (value < 0) {
+                    value = 0
+                }
+
+                value *= 10
+                value += char - '0'
+                if (range.contains(value)) {
+                    StepCode.HAS_NEXT
+                } else {
+                    StepCode.INT_NOT_IN_REQUESTED_RANGE
+                }
+            }
+            else -> {
+                return if (value < 0) {
+                    StepCode.INVALID_NUMBER
+                } else {
+                    seek--
+                    StepCode.COMPLETE
+                }
+            }
+        }
+    }
+
+    override fun prev() {
+        super.prev()
+        value -= getChar() - '0'
+        value /= 10
+    }
+
+    override fun getResult(): Int {
+        return value
     }
 }
 
 val int: Rule<Int> = IntRule()
 
-fun int(value: Int): Rule<Int> {
-    return object : Rule<Int> {
-        val rule = ExactStringRule(value.toString())
-
-        override fun parse(state: ParseState, requireResult: Boolean) {
-            rule.parse(state, false)
-            if (!state.hasError) {
-                if (rule.getResult(state).toIntOrNull() != value) {
-                    state.errorReason = DOES_NOT_MATCH
-                }
-            }
-        }
-
-        override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): Int {
-            return value
-        }
+private class IntRule : BaseRule<Int>() {
+    override fun createParseIterator(): ParseIterator<Int> {
+        return IntRuleIterator()
     }
 }
 
-fun int(a: Int, b: Int): Rule<Int> {
-    return IntRangeRule(a, b)
+private class UnsignedIntRule : BaseRule<Int>() {
+    override fun createParseIterator(): ParseIterator<Int> {
+        return UnsignedIntRuleIterator()
+    }
+}
+
+private class IntRangeRule(
+    private val range: IntRange
+): BaseRule<Int>() {
+    override fun createParseIterator(): ParseIterator<Int> {
+        return IntRangeRuleIterator(range)
+    }
+}
+
+private class UnsignedIntRangeRule(
+    private val range: IntRange
+): BaseRule<Int>() {
+    override fun createParseIterator(): ParseIterator<Int> {
+        return UnsignedIntRangeRuleIterator(range)
+    }
+}
+
+fun int(range: IntRange): Rule<Int> {
+    if (range.first < 0 || range.last < 0) {
+        return IntRangeRule(range)
+    } else {
+        return UnsignedIntRangeRule(range)
+    }
 }

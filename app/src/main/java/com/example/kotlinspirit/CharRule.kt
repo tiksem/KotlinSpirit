@@ -1,161 +1,75 @@
 package com.example.kotlinspirit
 
-import java.lang.IllegalStateException
-import java.util.*
+abstract class CharRule : BaseRule<Char>()
 
-private const val DOES_NOT_MATCH = "required char was not found"
-
-abstract class CharRule : Rule<Char> {
+abstract class BaseCharParseIterator : BaseParseIterator<Char>() {
+    override fun getResult(): Char {
+        return string[seek - 1]
+    }
 }
 
 internal open class AnyCharRule : CharRule() {
-    override fun parse(state: ParseState, requireResult: Boolean) {
-        if (state.checkEof()) {
-            return
-        }
+    override fun createParseIterator(): ParseIterator<Char> {
+        return object : BaseCharParseIterator() {
+            override fun next(): Int {
+                if (isEof()) {
+                    return StepCode.EOF
+                }
 
-        state.startParseToken()
-        state.seek++
-    }
-
-    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): Char {
-        return array[seekBegin]
-    }
-}
-
-internal abstract class CharMatch : CharRule() {
-    abstract fun isValid(char: Char): Boolean
-
-    override fun parse(state: ParseState, requireResult: Boolean) {
-        if (state.checkEof()) {
-            return
-        }
-
-        state.startParseToken()
-        if (!isValid(state.readChar())) {
-            state.errorReason = DOES_NOT_MATCH
+                seek++
+                return StepCode.COMPLETE
+            }
         }
     }
+}
 
-    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): Char {
-        return array[seekBegin]
+class CharMatchIterator(
+    private val predicate: (Char) -> Boolean
+) : BaseCharParseIterator() {
+    override fun next(): Int {
+        if (isEof()) {
+            return StepCode.EOF
+        }
+
+        val char = readChar()
+        return if (predicate(char)) {
+            StepCode.COMPLETE
+        } else {
+            StepCode.CHAR_DOES_NOT_MATCH
+        }
     }
 }
 
-internal class ExactCharRule(
-    private val char: Char
-) : CharMatch() {
-    override fun isValid(char: Char): Boolean {
-        return this.char == char
-    }
-}
-
-internal class OneOfCharRule(
-    private val chars: CharArray
-) : CharMatch() {
-    override fun isValid(char: Char): Boolean {
-        return Arrays.binarySearch(chars, char) >= 0
-    }
-}
-
-internal open class RangeCharRule(
-    private val range: CharRange
-): CharMatch() {
-    override fun isValid(char: Char): Boolean {
-        return range.contains(char)
-    }
-}
-
-internal open class RangesCharRule(
-    private val ranges: Array<CharRange>
-): CharMatch() {
-    override fun isValid(char: Char): Boolean {
-        return ranges.find {
-            it.contains(char)
-        } != null
-    }
-}
-
-internal class RangesAndCharMatchCharRule(
-    private val char: Char,
-    ranges: Array<CharRange>
-) : RangesCharRule(ranges) {
-    override fun isValid(char: Char): Boolean {
-        return this.char == char || super.isValid(char)
-    }
-}
-
-internal class RangesAndCharsMatchCharRule(
-    private val chars: CharArray,
-    ranges: Array<CharRange>
-) : RangesCharRule(ranges) {
-    override fun isValid(char: Char): Boolean {
-        return super.isValid(char) || Arrays.binarySearch(chars, char) >= 0
-    }
-}
-
-internal class RangeAndCharsMatchCharRule(
-    private val chars: CharArray,
-    range: CharRange
-) : RangeCharRule(range) {
-    override fun isValid(char: Char): Boolean {
-        return super.isValid(char) || Arrays.binarySearch(chars, char) >= 0
-    }
-}
-
-internal class RangeAndCharMatchCharRule(
-    private val char: Char,
-    private val range: CharRange
-) : CharMatch() {
-    override fun isValid(char: Char): Boolean {
-        return this.char == char || range.contains(char)
+class CharMatchRule(
+    private val predicate: (Char) -> Boolean
+) : CharRule() {
+    override fun createParseIterator(): ParseIterator<Char> {
+        return CharMatchIterator(predicate)
     }
 }
 
 val char: Rule<Char> = AnyCharRule()
 
-fun char(vararg chars: Char): Rule<Char> {
+fun char(vararg chars: Char): CharRule {
     assert(chars.isNotEmpty())
-    return if (chars.size == 1) {
-        ExactCharRule(chars[0])
-    } else {
-        OneOfCharRule(chars.sortedArray())
-    }
+    return CharMatchRule(CharPredicates.from(*chars))
 }
 
-fun char(vararg ranges: CharRange): Rule<Char> {
+fun char(vararg ranges: CharRange): CharRule {
     assert(ranges.isNotEmpty())
-    return if (ranges.size == 1) {
-        RangeCharRule(ranges[0])
-    } else {
-        RangesCharRule(ranges as Array<CharRange>)
-    }
+    return CharMatchRule(CharPredicates.from(*ranges))
 }
 
 fun char(
     ranges: Array<CharRange>,
     chars: CharArray
-) : Rule<Char> {
+) : CharRule {
     assert(ranges.isNotEmpty() || chars.isNotEmpty())
-    return when {
-        ranges.isEmpty() -> char(*chars)
-        chars.isEmpty() -> char(*ranges)
-        ranges.size == 1 && chars.size == 1 -> RangeAndCharMatchCharRule(
-            chars[0], ranges[0]
-        )
-        ranges.size > 1 && chars.size > 1 -> RangesAndCharsMatchCharRule(
-            chars.sortedArray(), ranges
-        )
-        ranges.size > 1 && chars.size == 1 -> {
-            RangesAndCharMatchCharRule(
-                chars[0], ranges
-            )
-        }
-        ranges.size == 1 && chars.size > 1 -> {
-            RangeAndCharsMatchCharRule(
-                chars.sortedArray(), ranges[0]
-            )
-        }
-        else -> throw IllegalStateException("Unexpected behaviour")
-    }
+    return CharMatchRule(
+        CharPredicates.from(ranges, chars)
+    )
+}
+
+fun char(predicate: (Char) -> Boolean) : CharRule {
+    return CharMatchRule(predicate)
 }

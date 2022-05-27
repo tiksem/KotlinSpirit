@@ -9,8 +9,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val numbers = int % ','
-        val result = numbers.parseOrThrow("123,3443,443,1234,5454,232323")
+        val name = str('a'..'z')
+        val rule = (name - str("eblo")) % "eblo"
+        val result = rule.parseOrThrow("privetebloprivet")
         Log.d("yoyoyo", result.joinToString(","))
     }
 }

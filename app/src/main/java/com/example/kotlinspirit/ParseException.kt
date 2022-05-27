@@ -3,57 +3,23 @@ package com.example.kotlinspirit
 import java.lang.Exception
 
 class ParseState(
-    val array: CharArray
+    var beginSeek: Int = 0,
+    var seek: Int = 0,
+    var parseCode: Int = StepCode.HAS_NEXT
 ) {
-    internal var seekTokenBegin: Int = -1
-    internal var seek: Int = 0
-
-    var errorReason: String? = null
-        internal set
-
-    val hasError: Boolean
-        get() = errorReason != null
-
-    companion object {
-        const val EOF = "eof"
-    }
-
-    fun readChar(): Char {
-        return array[seek++]
-    }
-
-    fun getChar(): Char {
-        return array[seek]
-    }
-
     fun startParseToken() {
-        seekTokenBegin = seek
+        beginSeek = seek
     }
 
-    fun checkEof(): Boolean {
-        if (isEof()) {
-            errorReason = EOF
-            return true
-        }
-
-        return false
-    }
-
-    fun isEof(): Boolean {
-        return seek >= array.size
-    }
-
-    fun getToken(): String {
-        return String(
-            array, seekTokenBegin,
-            seek - seekTokenBegin
-        )
-    }
+    val errorDescription: String get() = parseCode.getErrorDescription()
+    val hasError: Boolean get() = parseCode.isError()
+    val tokenLength: Int get() = seek - beginSeek
 }
 
 class ParseException(
+    string: CharSequence,
     state: ParseState,
     tokenName: String
-) : Exception("Failed to parse $tokenName in range: [${state.seekTokenBegin}, ${state.seek}), " +
-        "token: ${state.getToken()}, " +
-        "reason: ${state.errorReason}")
+) : Exception("Failed to parse $tokenName in range: [${state.beginSeek}, ${state.seek}), " +
+        "token: ${string.subSequence(state.beginSeek, state.seek)}, " +
+        "reason: ${state.errorDescription}")

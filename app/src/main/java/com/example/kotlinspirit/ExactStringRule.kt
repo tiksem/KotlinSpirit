@@ -1,30 +1,43 @@
 package com.example.kotlinspirit
 
-private const val MATCH_NOT_FOUND = "exact match not found"
+private class ExactStringRuleIterator(
+    private val value: CharSequence
+) : BaseParseIterator<CharSequence>() {
+    override fun getResult(): CharSequence {
+        return value
+    }
 
-internal class ExactStringRule(
-    private val string: String
-) : Rule<String> {
-    override fun parse(state: ParseState, requireResult: Boolean) {
-        state.startParseToken()
-        if (state.seek + string.length > state.array.size) {
-            state.seek = state.array.size
-            state.errorReason = ParseState.EOF
-            return
+    override fun next(): Int {
+        val i = seek - seekBegin
+        if (isEof()) {
+            return if (i == value.length) {
+                StepCode.COMPLETE
+            } else {
+                StepCode.EOF
+            }
         }
 
-        string.forEach {
-            if (state.readChar() != it) {
-                state.errorReason = MATCH_NOT_FOUND
-            }
+        if (i >= value.length) {
+            return StepCode.COMPLETE
+        }
+
+        return if (readChar() == value[i]) {
+            StepCode.HAS_NEXT
+        } else {
+            StepCode.STRING_DOES_NOT_MATCH
         }
     }
 
-    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): String {
-        return string
+}
+
+internal class ExactStringRule(
+    private val value: CharSequence
+) : StringRule() {
+    override fun createParseIterator(): ParseIterator<CharSequence> {
+        return ExactStringRuleIterator(value)
     }
 }
 
-fun str(string: String): Rule<String> {
+fun str(string: CharSequence): StringRule {
     return ExactStringRule(string)
 }

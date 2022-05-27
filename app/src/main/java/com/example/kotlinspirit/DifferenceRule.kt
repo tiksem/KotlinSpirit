@@ -1,27 +1,70 @@
 package com.example.kotlinspirit
 
-private const val DIFFERENCE_MATCH = "difference match"
+private class DifferenceRuleIterator<T>(
+    private val main: ParseIterator<T>,
+    private val exception: ParseIterator<*>,
+) : ParseIterator<T> {
+    private var previousMainStepCode: Int = -1
+
+    override val seek: Int
+        get() = main.seek
+
+    override fun getResult(): T {
+        return main.getResult()
+    }
+
+    override fun next(): Int {
+        exception.resetSeek(main.seek)
+        val mainResult = main.next()
+        if (!mainResult.hasNext()) {
+            return mainResult
+        }
+
+        while (true) {
+            val code = exception.next()
+            if (code.isError()) {
+                previousMainStepCode = mainResult
+                return mainResult
+            } else if(code.canComplete()) {
+                return if (previousMainStepCode == StepCode.HAS_NEXT_MAY_COMPLETE) {
+                    main.prev()
+                    StepCode.COMPLETE
+                } else {
+                    StepCode.DIFFERENCE_PREDICATE_FAILED
+                }
+            }
+        }
+    }
+
+    override fun setSequence(string: CharSequence, length: Int) {
+        main.setSequence(string, length)
+        exception.setSequence(string, length)
+    }
+
+    override fun resetSeek(seek: Int) {
+        main.resetSeek(seek)
+        exception.resetSeek(seek)
+        previousMainStepCode = -1
+    }
+
+    override fun getToken(): CharSequence {
+        return main.getToken()
+    }
+
+    override fun getBeginSeek(): Int {
+        return main.getBeginSeek()
+    }
+
+    override fun prev() {
+        main.prev()
+    }
+}
 
 class DifferenceRule<T>(
     private val main: Rule<T>,
     private val exception: Rule<*>
-) : Rule<T> {
-    override fun parse(state: ParseState, requireResult: Boolean) {
-        main.parse(state, requireResult)
-        if (state.hasError) {
-            return
-        }
-
-        exception.parse(state)
-        if (state.hasError) {
-            state.errorReason = null
-            state.seek = state.seekTokenBegin
-        } else {
-            state.errorReason = DIFFERENCE_MATCH
-        }
-    }
-
-    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): T {
-        return main.getResult(array, seekBegin, seekEnd)
+) : BaseRule<T>() {
+    override fun createParseIterator(): ParseIterator<T> {
+        return DifferenceRuleIterator(main.iterator, exception.iterator)
     }
 }

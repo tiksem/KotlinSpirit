@@ -1,42 +1,59 @@
 package com.example.kotlinspirit
 
-import kotlin.math.min
+import com.example.kotlinspiritxx.RangeStringRule
 
-private const val DOES_NOT_MATCH = "required string was not found"
-
-abstract class StringRule: Rule<String> {
-    override fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): String {
-        return String(array, seekBegin, seekEnd - seekBegin)
+abstract class StringRule: BaseRule<CharSequence>() {
+    operator fun get(range: IntRange): RangeStringRule {
+        return RangeStringRule(range, this)
     }
 }
 
-abstract class MatchStringRule(
-    private val minimumLength: Int,
-    private val maximumLength: Int,
-) : StringRule() {
-    protected abstract fun isValidChar(char: Char): Boolean
-    abstract operator fun get(range: IntRange): MatchStringRule
-
-    override fun parse(state: ParseState, requireResult: Boolean) {
-        if (state.seek + minimumLength > state.array.size) {
-            state.errorReason = DOES_NOT_MATCH
-            return
+private class MatchStringRuleIterator(
+    private val predicate: (Char) -> Boolean
+) : BaseStringIterator() {
+    override fun next(): Int {
+        if (isEof()) {
+            return StepCode.COMPLETE
         }
 
-        state.startParseToken()
-        var i = 0
-        val max = min(maximumLength, state.array.size - state.seekTokenBegin)
-        while (i < max) {
-            if (!isValidChar(state.array[i + state.seekTokenBegin])) {
-                break
-            }
-
-            i++
-        }
-
-        state.seek = i + state.seekTokenBegin
-        if (i < minimumLength) {
-            state.errorReason = DOES_NOT_MATCH
+        val char = getChar()
+        return if (!predicate(char)) {
+            StepCode.COMPLETE
+        } else {
+            seek++
+            StepCode.HAS_NEXT_MAY_COMPLETE
         }
     }
+}
+
+private class MatchStringRule(
+    private val predicate: (Char) -> Boolean
+) : StringRule() {
+    override fun createParseIterator(): ParseIterator<CharSequence> {
+        return MatchStringRuleIterator(predicate)
+    }
+}
+
+fun str(vararg chars: Char): StringRule {
+    assert(chars.isNotEmpty())
+    return MatchStringRule(CharPredicates.from(*chars))
+}
+
+fun str(vararg ranges: CharRange): StringRule {
+    assert(ranges.isNotEmpty())
+    return MatchStringRule(CharPredicates.from(*ranges))
+}
+
+fun str(
+    ranges: Array<CharRange>,
+    chars: CharArray
+) : StringRule {
+    assert(ranges.isNotEmpty() || chars.isNotEmpty())
+    return MatchStringRule(
+        CharPredicates.from(ranges, chars)
+    )
+}
+
+fun str(predicate: (Char) -> Boolean) : StringRule {
+    return MatchStringRule(predicate)
 }

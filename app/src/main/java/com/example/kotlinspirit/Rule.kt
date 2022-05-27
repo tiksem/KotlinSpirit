@@ -1,43 +1,40 @@
 package com.example.kotlinspirit
 
-interface Rule<T> {
-    fun parse(state: ParseState, requireResult: Boolean = false)
-    fun getResult(array: CharArray, seekBegin: Int, seekEnd: Int): T
+import java.lang.IllegalStateException
 
-    fun getResult(state: ParseState): T {
-        return getResult(state.array, state.seekTokenBegin, state.seek)
-    }
+interface Rule<T> {
+    val iterator: ParseIterator<T>
+
+    fun parse(
+        state: ParseState,
+        string: CharSequence,
+        requireResult: Boolean = false,
+        maxLength: Int? = null
+    ): T?
 
     fun tryParse(string: String): T? {
-        val state = string.toParseState()
-        parse(state, true)
-        return if (state.hasError) {
-            null
-        } else {
-            getResult(state.array, state.seekTokenBegin, state.seek)
-        }
+        val state = ParseState()
+        return parse(state, string, true)
     }
 
     fun match(string: String): Boolean {
-        val state = string.toParseState()
-        parse(state, false)
-        return !state.hasError && state.seek == state.array.size
+        val state = ParseState()
+        parse(state, string, false)
+        return !state.hasError && state.seek == string.length
     }
 
-    fun parseOrThrow(state: ParseState): T {
-        parse(state, true)
+    fun parseOrThrow(string: String): T {
+        val state = ParseState()
+        val result = parse(state, string, true)
         if (state.hasError) {
             throw ParseException(
+                string = string,
                 state = state,
                 tokenName = javaClass.name
             )
         }
 
-        return getResult(state)
-    }
-
-    fun parseOrThrow(string: String): T {
-        return parseOrThrow(string.toParseState())
+        return result ?: throw IllegalStateException("Undefined behaviour")
     }
 
     fun on(
@@ -83,26 +80,17 @@ interface Rule<T> {
         return or(char(value))
     }
 
-    fun repeatAtLeast(times: Int): RepeatRule<T> {
-        return RepeatRule(
-            minimumLength = times,
-            maximumLength = Int.MAX_VALUE,
-            rule = this
-        )
+    fun repeat(times: Int): RepeatRule<T> {
+        return repeat(range = times..times)
     }
 
     fun repeat(): RepeatRule<T> {
-        return RepeatRule(
-            minimumLength = 0,
-            maximumLength = Int.MAX_VALUE,
-            rule = this
-        )
+        return repeat(range = 0..Int.MAX_VALUE)
     }
 
     fun repeat(range: IntRange): RepeatRule<T> {
         return RepeatRule(
-            minimumLength = range.first,
-            maximumLength = range.last,
+            range = range,
             rule = this
         )
     }
@@ -120,12 +108,10 @@ interface Rule<T> {
 
     fun split(
         divider: Rule<*>,
-        min: Int = 0,
-        max: Int = Int.MAX_VALUE
+        count: Int,
     ): SplitRule<T> {
         return SplitRule(
-            minimumLength = min,
-            maximumLength = max,
+            range = count..count,
             tokenRule = this,
             dividerRule = divider
         )
@@ -133,27 +119,47 @@ interface Rule<T> {
 
     fun split(
         divider: Char,
-        min: Int = 0,
-        max: Int = Int.MAX_VALUE
+        count: Int,
     ): SplitRule<T> {
-        return SplitRule(
-            minimumLength = min,
-            maximumLength = max,
-            tokenRule = this,
-            dividerRule = char(divider)
+        return split(
+            divider = char(divider),
+            count = count
         )
     }
 
     fun split(
         divider: String,
-        min: Int = 0,
-        max: Int = Int.MAX_VALUE
+        count: Int
+    ): SplitRule<T> {
+        return split(
+            divider = str(divider),
+            count = count
+        )
+    }
+
+    fun split(
+        divider: Rule<*>
     ): SplitRule<T> {
         return SplitRule(
-            minimumLength = min,
-            maximumLength = max,
+            range = 0..Int.MAX_VALUE,
             tokenRule = this,
-            dividerRule = str(divider)
+            dividerRule = divider
+        )
+    }
+
+    fun split(
+        divider: Char
+    ): SplitRule<T> {
+        return split(
+            char(divider)
+        )
+    }
+
+    fun split(
+        divider: String
+    ): SplitRule<T> {
+        return split(
+            str(divider)
         )
     }
 
@@ -167,5 +173,56 @@ interface Rule<T> {
 
     operator fun rem(divider: String): SplitRule<T> {
         return split(divider)
+    }
+}
+
+abstract class BaseRule<T>: Rule<T> {
+    abstract fun createParseIterator(): ParseIterator<T>
+
+    protected open fun checkPrecondition(string: CharSequence, state: ParseState) {
+    }
+    protected open fun checkPostCondition(string: CharSequence, state: ParseState) {
+    }
+
+    override val iterator: ParseIterator<T> by lazy {
+        createParseIterator()
+    }
+
+    override fun parse(
+        state: ParseState,
+        string: CharSequence,
+        requireResult: Boolean,
+        maxLength: Int?
+    ): T? {
+        checkPrecondition(string, state)
+        if (state.hasError) {
+            return null
+        }
+
+        val iter = iterator
+        state.startParseToken()
+        iter.setSequence(
+            string = string,
+            length = maxLength ?: string.length
+        )
+        while (true) {
+            val code = iter.next()
+            if (!code.hasNext()) {
+                state.seek = iter.seek
+                state.parseCode = code
+                if (code == StepCode.COMPLETE) {
+                    return if (requireResult) {
+                        checkPostCondition(string, state)
+                        if (state.hasError) {
+                            null
+                        } else {
+                            iter.getResult()
+                        }
+                    } else {
+                        null
+                    }
+                }
+            }
+        }
     }
 }

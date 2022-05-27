@@ -1,5 +1,8 @@
 package com.example.kotlinspirit
 
+import java.lang.IllegalStateException
+import java.lang.UnsupportedOperationException
+
 class TernaryStringTree(strings: List<String>) {
     init {
         strings.forEach {
@@ -59,62 +62,92 @@ class TernaryStringTree(strings: List<String>) {
         insert(word.toCharArray(), 0)
     }
 
-    fun search(node: Node, word: CharArray, begin: Int): Node? {
-        val ch = word[begin]
-        if (node.char == ch) {
-            if (begin == word.size - 1) {
-                return if (node.isEndOfWord) {
-                    node
-                } else {
-                    null
+    fun getIterator(): ParseIterator<CharSequence> {
+        val root = this.root
+        if (root == null) {
+            return object : BaseParseIterator<CharSequence>() {
+                override fun getResult(): CharSequence {
+                    return ""
                 }
-            } else {
-                return search(node.eq ?: return null, word, begin + 1)
+
+                override fun next(): Int {
+                    return StepCode.COMPLETE
+                }
             }
-        } else if (ch < node.char) {
-            return search(node.left ?: return null, word, begin)
         } else {
-            return search(node.right ?: return null, word, begin)
+            return Iterator(root)
         }
     }
 
-    fun search(word: CharArray, begin: Int): Node? {
-        return search(root ?: return null, word, begin)
-    }
+    private class Iterator(
+        private val originalNode: Node
+    ) : BaseStringIterator() {
+        private var node = originalNode
+        private var intermediateResultSeek = -1
 
-    fun search(state: ParseState): Node? {
-        return search(root ?: return null, state)
-    }
-
-    fun search(node: Node, state: ParseState): Node? {
-        if (state.seek >= state.array.size) {
-            return null
+        private fun checkIntermediateSeek(errorCode: Int): Int {
+            return if (intermediateResultSeek >= 0) {
+                seek = intermediateResultSeek
+                StepCode.COMPLETE
+            } else {
+                errorCode
+            }
         }
 
-        val ch = state.getChar()
-        when {
-            node.char == ch -> {
-                state.seek++
-                val nodeSeek = state.seek
-                val eq = node.eq?.let { search(it, state) }?.takeIf { it.isEndOfWord }
-                return when {
-                    eq != null -> {
-                        eq
+        override fun setSequence(string: CharSequence, length: Int) {
+            super.setSequence(string, length)
+            intermediateResultSeek = -1
+            node = originalNode
+        }
+
+        override fun prev() {
+            throw UnsupportedOperationException("TernaryStringTree iterator doesn't support prev")
+        }
+
+        override fun next(): Int {
+            if (isEof()) {
+                return checkIntermediateSeek(StepCode.EOF)
+            }
+
+            val ch = getChar()
+            when {
+                node.char == ch -> {
+                    seek++
+                    if (node.isEndOfWord) {
+                        if (node.eq != null) {
+                            intermediateResultSeek = seek
+                        } else {
+                            return StepCode.COMPLETE
+                        }
+                    } else {
+                        val eq = node.eq
+                        if (eq != null) {
+                            node = eq
+                        }
                     }
-                    node.isEndOfWord -> {
-                        state.seek = nodeSeek
-                        node
-                    }
-                    else -> {
-                        null
+
+                    return StepCode.HAS_NEXT
+                }
+                ch < node.char -> {
+                    val left = node.left
+                    return if (left == null) {
+                        seek++
+                        checkIntermediateSeek(StepCode.ONE_OF_STRING_NOT_FOUND)
+                    } else {
+                        node = left
+                        next()
                     }
                 }
-            }
-            ch < node.char -> {
-                return search(node.left ?: return null, state)
-            }
-            else -> {
-                return search(node.right ?: return null, state)
+                else -> {
+                    val right = node.right
+                    return if (right == null) {
+                        seek++
+                        checkIntermediateSeek(StepCode.ONE_OF_STRING_NOT_FOUND)
+                    } else {
+                        node = right
+                        next()
+                    }
+                }
             }
         }
     }
