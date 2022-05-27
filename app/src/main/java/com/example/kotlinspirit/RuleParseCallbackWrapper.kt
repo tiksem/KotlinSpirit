@@ -1,27 +1,32 @@
 package com.example.kotlinspirit
 
-import java.lang.IllegalStateException
+private class RuleParseCallbackWrapperIterator<T>(
+    private val iterator: ParseIterator<T>,
+    private val callback: (T) -> Unit,
+    private val errorCallback: (() -> Unit)? = null
+) : ParseIterator<T> by iterator {
+    override fun next(): Int {
+        val code = iterator.next()
+        if (code == StepCode.COMPLETE) {
+            callback(getResult())
+        } else if (code.isError()) {
+            errorCallback?.invoke()
+        }
+
+        return code
+    }
+}
 
 class RuleParseCallbackWrapper<T>(
     private val rule: Rule<T>,
     private val callback: (T) -> Unit,
     private val errorCallback: (() -> Unit)? = null
-) : Rule<T> {
-    override val iterator: ParseIterator<T>
-        get() = rule.iterator
-
-    override fun parse(
-        state: ParseState,
-        string: CharSequence,
-        requireResult: Boolean,
-        maxLength: Int?
-    ): T? {
-        return rule.parse(state, string, true, maxLength).also {
-            if (state.hasError) {
-                errorCallback?.invoke()
-            } else {
-                callback(it ?: throw IllegalStateException("Result unavailable"))
-            }
-        }
+) : BaseRule<T>() {
+    override fun createParseIterator(): ParseIterator<T> {
+        return RuleParseCallbackWrapperIterator(
+            iterator = rule.iterator,
+            callback = callback,
+            errorCallback = errorCallback
+        )
     }
 }

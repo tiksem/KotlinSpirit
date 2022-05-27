@@ -210,8 +210,8 @@ abstract class BaseRule<T>: Rule<T> {
             if (!code.hasNext()) {
                 state.seek = iter.seek
                 state.parseCode = code
-                if (code == StepCode.COMPLETE) {
-                    return if (requireResult) {
+                return if (code == StepCode.COMPLETE) {
+                    if (requireResult) {
                         checkPostCondition(string, state)
                         if (state.hasError) {
                             null
@@ -221,6 +221,8 @@ abstract class BaseRule<T>: Rule<T> {
                     } else {
                         null
                     }
+                } else {
+                    null
                 }
             }
         }
