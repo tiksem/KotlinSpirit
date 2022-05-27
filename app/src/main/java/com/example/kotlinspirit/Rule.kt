@@ -3,6 +3,24 @@ package com.example.kotlinspirit
 import java.lang.IllegalStateException
 
 interface Rule<T> {
+    fun <To> transform(func: (T) -> To): Rule<To> {
+        return object : Rule<To> {
+            override val iterator: ParseIterator<To>
+                get() = this@Rule.iterator.transform(func)
+
+            override fun parse(
+                state: ParseState,
+                string: CharSequence,
+                requireResult: Boolean,
+                maxLength: Int?
+            ): To? {
+                return this@Rule.parse(state, string, requireResult, maxLength)?.let {
+                    func(it)
+                }
+            }
+        }
+    }
+
     val iterator: ParseIterator<T>
 
     fun parse(
@@ -82,6 +100,10 @@ interface Rule<T> {
 
     fun repeat(times: Int): RepeatRule<T> {
         return repeat(range = times..times)
+    }
+
+    fun repeatAtLeast(times: Int): RepeatRule<T> {
+        return repeat(range = times..Int.MAX_VALUE)
     }
 
     fun repeat(): RepeatRule<T> {

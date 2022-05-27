@@ -1,5 +1,6 @@
 package com.example.kotlinspirit
 
+import org.junit.Assert
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -29,5 +30,30 @@ class ExampleUnitTest {
         r.parseOrThrow("Hello world!")
         assertArrayEquals(array, arrayOf("Hello", "world"))
         assertEquals(mark, '!')
+    }
+
+    @Test
+    fun parsePair() {
+        var first: CharSequence = ""
+        var second: CharSequence = ""
+
+        val quote = char('"', '\'')
+        fun quotedString(callback: (CharSequence) -> Unit): Rule<CharSequence> {
+            return quote + str {
+                it != '"' && it != '\''
+            }.on(success = callback) + quote
+        }
+
+        val r = (quotedString {
+            first = it
+        } + ": " + quotedString {
+            second = it
+        }).transform {
+            Pair(first, second)
+        }
+
+        val e = r.parseOrThrow("\"Ivan\": \"privet%1234#\"")
+        assertEquals(e.first, "Ivan")
+        assertEquals(e.second, "privet%1234#")
     }
 }
