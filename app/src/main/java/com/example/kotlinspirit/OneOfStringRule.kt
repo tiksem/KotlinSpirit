@@ -11,11 +11,3 @@ class OneOfStringRule(
         return tree.getIterator()
     }
 }
-
-fun oneOf(vararg strings: String): OneOfStringRule {
-    return OneOfStringRule(strings.toList())
-}
-
-fun oneOf(strings: List<String>): OneOfStringRule {
-    return OneOfStringRule(strings)
-}

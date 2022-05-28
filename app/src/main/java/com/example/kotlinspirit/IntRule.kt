@@ -251,21 +251,19 @@ private class UnsignedIntRangeRuleIterator(
     }
 }
 
-val int: Rule<Int> = IntRule()
-
-private class IntRule : BaseRule<Int>() {
+internal class IntRule : BaseRule<Int>() {
     override fun createParseIterator(): ParseIterator<Int> {
         return IntRuleIterator()
     }
 }
 
-private class UnsignedIntRule : BaseRule<Int>() {
+internal class UnsignedIntRule : BaseRule<Int>() {
     override fun createParseIterator(): ParseIterator<Int> {
         return UnsignedIntRuleIterator()
     }
 }
 
-private class IntRangeRule(
+internal class IntRangeRule(
     private val range: IntRange
 ): BaseRule<Int>() {
     override fun createParseIterator(): ParseIterator<Int> {
@@ -273,18 +271,10 @@ private class IntRangeRule(
     }
 }
 
-private class UnsignedIntRangeRule(
+internal class UnsignedIntRangeRule(
     private val range: IntRange
 ): BaseRule<Int>() {
     override fun createParseIterator(): ParseIterator<Int> {
         return UnsignedIntRangeRuleIterator(range)
-    }
-}
-
-fun int(range: IntRange): Rule<Int> {
-    if (range.first < 0 || range.last < 0) {
-        return IntRangeRule(range)
-    } else {
-        return UnsignedIntRangeRule(range)
     }
 }

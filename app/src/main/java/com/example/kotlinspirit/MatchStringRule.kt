@@ -26,34 +26,10 @@ private class MatchStringRuleIterator(
     }
 }
 
-private class MatchStringRule(
+internal class MatchStringRule(
     private val predicate: (Char) -> Boolean
 ) : StringRule() {
     override fun createParseIterator(): ParseIterator<CharSequence> {
         return MatchStringRuleIterator(predicate)
     }
-}
-
-fun str(vararg chars: Char): StringRule {
-    assert(chars.isNotEmpty())
-    return MatchStringRule(CharPredicates.from(*chars))
-}
-
-fun str(vararg ranges: CharRange): StringRule {
-    assert(ranges.isNotEmpty())
-    return MatchStringRule(CharPredicates.from(*ranges))
-}
-
-fun str(
-    ranges: Array<CharRange>,
-    chars: CharArray
-) : StringRule {
-    assert(ranges.isNotEmpty() || chars.isNotEmpty())
-    return MatchStringRule(
-        CharPredicates.from(ranges, chars)
-    )
-}
-
-fun str(predicate: (Char) -> Boolean) : StringRule {
-    return MatchStringRule(predicate)
 }

@@ -37,7 +37,3 @@ internal class ExactStringRule(
         return ExactStringRuleIterator(value)
     }
 }
-
-fun str(string: CharSequence): StringRule {
-    return ExactStringRule(string)
-}

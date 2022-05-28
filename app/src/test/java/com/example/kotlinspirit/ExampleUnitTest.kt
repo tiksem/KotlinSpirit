@@ -1,6 +1,9 @@
 package com.example.kotlinspirit
 
-import org.junit.Assert
+import com.example.kotlinspirit.Rules.char
+import com.example.kotlinspirit.Rules.int
+import com.example.kotlinspirit.Rules.quotedString
+import com.example.kotlinspirit.Rules.str
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -40,16 +43,9 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun parsePair() {
+    fun parseStringStringPair() {
         var first: CharSequence = ""
         var second: CharSequence = ""
-
-        val quote = char('"', '\'')
-        fun quotedString(callback: (CharSequence) -> Unit): Rule<CharSequence> {
-            return quote + str {
-                it != '"' && it != '\''
-            }.on(success = callback) + quote
-        }
 
         val r = (quotedString {
             first = it
@@ -63,5 +59,10 @@ class ExampleUnitTest {
 
         assertEquals(e.first, "Ivan")
         assertEquals(e.second, "privet%1234#")
+    }
+
+    @Test
+    fun testStringIntPair() {
+
     }
 }

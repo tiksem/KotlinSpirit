@@ -1,5 +1,8 @@
 package com.example.kotlinspirit
 
+import com.example.kotlinspirit.Rules.char
+import com.example.kotlinspirit.Rules.int
+import com.example.kotlinspirit.Rules.str
 import java.lang.IllegalStateException
 
 interface Rule<T> {

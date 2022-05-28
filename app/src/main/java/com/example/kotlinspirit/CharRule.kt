@@ -47,29 +47,3 @@ class CharMatchRule(
         return CharMatchIterator(predicate)
     }
 }
-
-val char: Rule<Char> = AnyCharRule()
-
-fun char(vararg chars: Char): CharRule {
-    assert(chars.isNotEmpty())
-    return CharMatchRule(CharPredicates.from(*chars))
-}
-
-fun char(vararg ranges: CharRange): CharRule {
-    assert(ranges.isNotEmpty())
-    return CharMatchRule(CharPredicates.from(*ranges))
-}
-
-fun char(
-    ranges: Array<CharRange>,
-    chars: CharArray
-) : CharRule {
-    assert(ranges.isNotEmpty() || chars.isNotEmpty())
-    return CharMatchRule(
-        CharPredicates.from(ranges, chars)
-    )
-}
-
-fun char(predicate: (Char) -> Boolean) : CharRule {
-    return CharMatchRule(predicate)
-}

@@ -11,7 +11,3 @@ class ExactIntRule(
         }
     }
 }
-
-fun int(value: Int): Rule<Int> {
-    return ExactIntRule(value)
-}
