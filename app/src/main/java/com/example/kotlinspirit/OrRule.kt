@@ -38,11 +38,12 @@ private class OrRuleIterator<T>(
         return result
     }
 
-    override fun setSequence(string: CharSequence, length: Int) {
-        aIterator.setSequence(string, length)
-        bIterator.setSequence(string, length)
-        iterator = aIterator
-    }
+    override var sequence: CharSequence
+        get() = aIterator.sequence
+        set(value) {
+            aIterator.sequence = value
+            bIterator.sequence = value
+        }
 
     override fun resetSeek(seek: Int) {
         aIterator.resetSeek(seek)

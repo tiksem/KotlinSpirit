@@ -6,7 +6,6 @@ private class RepeatRuleIterator<T>(
 ) : ParseIterator<List<T>> {
     private var beginSeek: Int = -1
     private val results = ArrayList<T>()
-    private var sequence: CharSequence = ""
 
     override fun getResult(): List<T> {
         return results
@@ -51,10 +50,11 @@ private class RepeatRuleIterator<T>(
         return beginSeek
     }
 
-    override fun setSequence(string: CharSequence, length: Int) {
-        iterator.setSequence(string, length)
-        this.sequence = string
-    }
+    override var sequence: CharSequence
+        get() = iterator.sequence
+        set(value) {
+            iterator.sequence = value
+        }
 
     override fun resetSeek(seek: Int) {
         beginSeek = seek

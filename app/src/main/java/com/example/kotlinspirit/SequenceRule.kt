@@ -4,7 +4,6 @@ private class SequenceRuleIterator(
     private val a: ParseIterator<*>,
     private val b: ParseIterator<*>
 ) : ParseIterator<CharSequence> {
-    private var sequence: CharSequence = ""
     private var iterator = a
 
     override fun getResult(): CharSequence {
@@ -37,11 +36,12 @@ private class SequenceRuleIterator(
         return a.getBeginSeek()
     }
 
-    override fun setSequence(string: CharSequence, length: Int) {
-        a.setSequence(string, length)
-        b.setSequence(string, length)
-        this.sequence = string
-    }
+    override var sequence: CharSequence
+        get() = a.sequence
+        set(value) {
+            a.sequence = value
+            b.sequence = value
+        }
 
     override fun resetSeek(seek: Int) {
         a.resetSeek(seek)

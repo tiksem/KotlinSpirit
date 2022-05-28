@@ -4,7 +4,7 @@ abstract class CharRule : BaseRule<Char>()
 
 abstract class BaseCharParseIterator : BaseParseIterator<Char>() {
     override fun getResult(): Char {
-        return string[seek - 1]
+        return sequence[seek - 1]
     }
 }
 

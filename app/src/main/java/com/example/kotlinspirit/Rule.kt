@@ -257,10 +257,12 @@ abstract class BaseRule<T>: Rule<T> {
 
         val iter = iterator
         state.startParseToken()
-        iter.setSequence(
-            string = string,
-            length = maxLength ?: string.length
-        )
+        val length = maxLength ?: string.length
+        iter.sequence = if (length == string.length) {
+            string
+        } else {
+            string.subSequence(0, length)
+        }
         iter.resetSeek(state.seek)
         while (true) {
             val code = iter.next()

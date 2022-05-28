@@ -108,10 +108,12 @@ private class SplitRuleIterator<T>(
         return token.getBeginSeek()
     }
 
-    override fun setSequence(string: CharSequence, length: Int) {
-        token.setSequence(string, length)
-        divider.setSequence(string, length)
-    }
+    override var sequence: CharSequence
+        get() = token.sequence
+        set(value) {
+            token.sequence = value
+            divider.sequence = value
+        }
 
     override fun getToken(): CharSequence {
         return token.getToken()

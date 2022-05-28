@@ -8,12 +8,12 @@ interface ParseIterator<T> : ResultProvider<T> {
     fun next(): Int
     fun prev()
     val seek: Int
+    var sequence: CharSequence
     fun getBeginSeek(): Int
-    fun setSequence(
-        string: CharSequence,
-        length: Int
-    )
     fun resetSeek(seek: Int)
+    fun isEof(): Boolean {
+        return seek >= sequence.length
+    }
 
     fun <To> transform(func: (T) -> To): ParseIterator<To> {
         return object : ParseIterator<To> by this as ParseIterator<To> {
@@ -27,18 +27,9 @@ interface ParseIterator<T> : ResultProvider<T> {
 }
 
 abstract class BaseParseIterator<T>: ParseIterator<T> {
-    protected var string: CharSequence = ""
-    protected var length: Int = 0
+    override var sequence: CharSequence = ""
     protected var seekBegin: Int = 0
     override var seek = seekBegin
-
-    override fun setSequence(
-        string: CharSequence,
-        length: Int
-    ) {
-        this.string = string
-        this.length = length
-    }
 
     override fun resetSeek(seek: Int) {
         this.seekBegin = seek
@@ -50,19 +41,15 @@ abstract class BaseParseIterator<T>: ParseIterator<T> {
     }
 
     protected fun readChar(): Char {
-        return string[seek++]
+        return sequence[seek++]
     }
 
     protected fun getChar(): Char {
-        return string[seek]
-    }
-
-    protected fun isEof(): Boolean {
-        return seek >= length
+        return sequence[seek]
     }
 
     override fun getToken(): CharSequence {
-        return string.subSequence(seekBegin, seek)
+        return sequence.subSequence(seekBegin, seek)
     }
 
     override fun prev() {

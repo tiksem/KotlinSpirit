@@ -94,8 +94,8 @@ class TernaryStringTree(strings: List<String>) {
             }
         }
 
-        override fun setSequence(string: CharSequence, length: Int) {
-            super.setSequence(string, length)
+        override fun resetSeek(seek: Int) {
+            super.resetSeek(seek)
             intermediateResultSeek = -1
             node = originalNode
         }

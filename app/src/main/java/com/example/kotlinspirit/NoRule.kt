@@ -4,12 +4,16 @@ private class NoIterator<T>(
     private val iterator: ParseIterator<T>
 ) : ParseIterator<CharSequence> {
     private var beginSeek = iterator.seek
-    private var sequence: CharSequence = ""
-    private var length = 0
     private var errorSeek: Int = beginSeek
 
+    override var sequence: CharSequence
+        get() = iterator.sequence
+        set(value) {
+            iterator.sequence = value
+        }
+
     override fun next(): Int {
-        if (iterator.seek == length) {
+        if (isEof()) {
             return if (errorSeek > beginSeek) {
                 StepCode.COMPLETE
             } else {
@@ -50,12 +54,6 @@ private class NoIterator<T>(
 
     override fun getBeginSeek(): Int {
         return beginSeek
-    }
-
-    override fun setSequence(string: CharSequence, length: Int) {
-        iterator.setSequence(string, length)
-        this.length = length
-        this.sequence = string
     }
 
     override fun resetSeek(seek: Int) {

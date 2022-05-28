@@ -36,11 +36,6 @@ private class DifferenceRuleIterator<T>(
         }
     }
 
-    override fun setSequence(string: CharSequence, length: Int) {
-        main.setSequence(string, length)
-        exception.setSequence(string, length)
-    }
-
     override fun resetSeek(seek: Int) {
         main.resetSeek(seek)
         exception.resetSeek(seek)
@@ -58,6 +53,13 @@ private class DifferenceRuleIterator<T>(
     override fun prev() {
         main.prev()
     }
+
+    override var sequence: CharSequence
+        get() = main.sequence
+        set(value) {
+            main.sequence = value
+            exception.sequence = value
+        }
 }
 
 class DifferenceRule<T>(
