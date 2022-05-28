@@ -63,6 +63,20 @@ class ExampleUnitTest {
 
     @Test
     fun testStringIntPair() {
+        var first: CharSequence = ""
+        var second = Int.MAX_VALUE
 
+        val r = (quotedString {
+            first = it
+        } + ": " + int.on {
+            second = it
+        }).transform {
+            Pair(first, second)
+        }
+
+        val e = r.parseOrThrow("\"Ivan\": 23432543")
+
+        assertEquals(e.first, "Ivan")
+        assertEquals(e.second, 23432543)
     }
 }
