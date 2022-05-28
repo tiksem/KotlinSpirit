@@ -16,6 +16,7 @@ object StepCode {
     const val DIFFERENCE_PREDICATE_FAILED = 12
     const val SPLIT_NOT_ENOUGH_DATA = 13
     const val REPEAT_NOT_ENOUGH_DATA = 14
+    const val INT_OUT_OF_RANGE = 15
 }
 
 fun Int.getErrorDescription(): String {
@@ -32,6 +33,7 @@ fun Int.getErrorDescription(): String {
         StepCode.DIFFERENCE_PREDICATE_FAILED -> "difference predicate failed"
         StepCode.SPLIT_NOT_ENOUGH_DATA -> "split not enough data"
         StepCode.REPEAT_NOT_ENOUGH_DATA -> "repeat not enough data"
+        StepCode.INT_OUT_OF_RANGE -> "int out of range"
         else -> "unknown"
     }
 }

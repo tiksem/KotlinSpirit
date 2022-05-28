@@ -50,9 +50,15 @@ private class IntRuleIterator : BaseIntRuleIterator() {
                     value = 0
                 }
 
+                var value = this.value
                 value *= 10
                 value += char - '0'
-                StepCode.HAS_NEXT_MAY_COMPLETE
+                if (value < this.value) {
+                    StepCode.INT_OUT_OF_RANGE
+                } else {
+                    this.value = value
+                    StepCode.HAS_NEXT_MAY_COMPLETE
+                }
             }
             else -> {
                 return if (value < 0) {
@@ -113,12 +119,20 @@ private class IntRangeRuleIterator(
                     value = 0
                 }
 
+                var value = this.value
                 value *= 10
                 value += char - '0'
-                if (range.contains(value * sign)) {
-                    StepCode.HAS_NEXT
-                } else {
-                    StepCode.INT_NOT_IN_REQUESTED_RANGE
+                when {
+                    value < this.value -> {
+                        StepCode.INT_OUT_OF_RANGE
+                    }
+                    value * sign in range -> {
+                        this.value = value
+                        StepCode.HAS_NEXT
+                    }
+                    else -> {
+                        StepCode.INT_NOT_IN_REQUESTED_RANGE
+                    }
                 }
             }
             else -> {
@@ -169,9 +183,15 @@ private class UnsignedIntRuleIterator
                     value = 0
                 }
 
+                var value = this.value
                 value *= 10
                 value += char - '0'
-                StepCode.HAS_NEXT
+                if (value < this.value) {
+                    StepCode.INT_OUT_OF_RANGE
+                } else {
+                    this.value = value
+                    StepCode.HAS_NEXT
+                }
             }
             else -> {
                 return if (value < 0) {
@@ -227,12 +247,20 @@ private class UnsignedIntRangeRuleIterator(
                     value = 0
                 }
 
+                var value = this.value
                 value *= 10
                 value += char - '0'
-                if (range.contains(value)) {
-                    StepCode.HAS_NEXT
-                } else {
-                    StepCode.INT_NOT_IN_REQUESTED_RANGE
+                when {
+                    value < this.value -> {
+                        StepCode.INT_OUT_OF_RANGE
+                    }
+                    value in range -> {
+                        this.value = value
+                        StepCode.HAS_NEXT
+                    }
+                    else -> {
+                        StepCode.INT_NOT_IN_REQUESTED_RANGE
+                    }
                 }
             }
             else -> {
