@@ -133,6 +133,17 @@ interface Rule<T> {
 
     fun split(
         divider: Rule<*>,
+        range: IntRange,
+    ): SplitRule<T> {
+        return SplitRule(
+            range = range,
+            tokenRule = this,
+            dividerRule = divider
+        )
+    }
+
+    fun split(
+        divider: Rule<*>,
         count: Int,
     ): SplitRule<T> {
         return SplitRule(
@@ -159,6 +170,26 @@ interface Rule<T> {
         return split(
             divider = str(divider),
             count = count
+        )
+    }
+
+    fun split(
+        divider: String,
+        range: IntRange
+    ): SplitRule<T> {
+        return split(
+            divider = str(divider),
+            range = range
+        )
+    }
+
+    fun split(
+        divider: Char,
+        range: IntRange
+    ): SplitRule<T> {
+        return split(
+            divider = char(divider),
+            range = range
         )
     }
 

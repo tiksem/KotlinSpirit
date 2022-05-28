@@ -15,34 +15,6 @@ import org.junit.Assert.*
  */
 class ExampleUnitTest {
     @Test
-    fun splitHelloWorld() {
-        val r = str('a'..'z', 'A'..'Z') % " "
-        val e = r.parseOrThrow("hello world")
-        assertArrayEquals(e.toTypedArray(), arrayOf("hello", "world"))
-    }
-
-    @Test
-    fun splitHelloWorld2() {
-        var mark: Char = Char.MIN_VALUE
-        var array = arrayOf<CharSequence>()
-        val r = (str('a'..'z', 'A'..'Z') % " ").on {
-            array = it.toTypedArray()
-        } + char('!', '?').on {
-            mark = it
-        }
-        r.parseOrThrow("Hello world!")
-        assertArrayEquals(array, arrayOf("Hello", "world"))
-        assertEquals(mark, '!')
-    }
-
-    @Test
-    fun splitExact() {
-        val rule = int.split(',', 3)
-        val res = rule.parseOrThrow("34,-23,45")
-        assertArrayEquals(res.toTypedArray(), arrayOf(34,-23,45))
-    }
-
-    @Test
     fun parseStringStringPair() {
         var first: CharSequence = ""
         var second: CharSequence = ""

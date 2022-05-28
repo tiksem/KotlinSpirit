@@ -1,8 +1,11 @@
 package com.example.kotlinspirit
 
 object Rules {
-    val int: Rule<Int> = IntRule()
-    val uint: Rule<Int> = UnsignedIntRule()
+    val int: Rule<Int>
+        get() = IntRule()
+
+    val uint: Rule<Int>
+        get() = UnsignedIntRule()
 
     fun int(range: IntRange): Rule<Int> {
         return if (range.first < 0 || range.last < 0) {
@@ -16,7 +19,7 @@ object Rules {
         return ExactIntRule(value)
     }
 
-    val char: Rule<Char> = AnyCharRule()
+    val char: Rule<Char> get() = AnyCharRule()
 
     fun char(vararg chars: Char): CharRule {
         assert(chars.isNotEmpty())
@@ -50,7 +53,7 @@ object Rules {
         return OneOfStringRule(strings)
     }
 
-    val str = AnyStringRule()
+    val str get() = AnyStringRule()
 
     fun str(string: CharSequence): StringRule {
         return ExactStringRule(string)

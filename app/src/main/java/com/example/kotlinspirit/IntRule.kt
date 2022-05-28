@@ -30,11 +30,11 @@ private class IntRuleIterator : BaseIntRuleIterator() {
         val char = readChar()
         return when {
             char == '-' -> {
-                if (seek != seekBegin + 1) {
-                    StepCode.INVALID_NUMBER
-                } else {
+                if (seek == seekBegin + 1) {
                     sign = -1
                     StepCode.HAS_NEXT
+                } else {
+                    StepCode.COMPLETE
                 }
             }
             char == '0' && value < 0 -> {
@@ -99,11 +99,11 @@ private class IntRangeRuleIterator(
         val char = readChar()
         return when {
             char == '-' -> {
-                if (seek != seekBegin + 1) {
-                    StepCode.INVALID_NUMBER
-                } else {
+                if (value < 0) {
                     sign = -1
                     StepCode.HAS_NEXT
+                } else {
+                    StepCode.COMPLETE
                 }
             }
             char == '0' && value < 0 -> {

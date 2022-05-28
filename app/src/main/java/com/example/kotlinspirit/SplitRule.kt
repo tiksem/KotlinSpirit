@@ -62,7 +62,7 @@ private class SplitRuleIterator<T>(
             }
             code == StepCode.COMPLETE -> {
                 addResult()
-                if (results.size == range.first) {
+                if (results.size == range.last) {
                     return StepCode.COMPLETE
                 }
                 divider.resetSeek(token.seek)

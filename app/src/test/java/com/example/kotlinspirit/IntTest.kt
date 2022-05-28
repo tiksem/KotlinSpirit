@@ -1,6 +1,7 @@
 package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.int
+import com.example.kotlinspirit.Rules.uint
 import org.junit.Assert
 import org.junit.Test
 
@@ -37,5 +38,17 @@ class IntTest {
         val state = ParseState()
         int.parse(state, "21474836473")
         Assert.assertEquals(StepCode.INT_OUT_OF_RANGE, state.parseCode)
+    }
+
+    @Test
+    fun uint() {
+        Assert.assertEquals(345, uint.parseOrThrow("345"))
+    }
+
+    @Test
+    fun uintFailed() {
+        Assert.assertThrows(ParseException::class.java) {
+            uint.parseOrThrow("-345")
+        }
     }
 }
