@@ -33,6 +33,13 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun splitExact() {
+        val rule = int.split(',', 3)
+        val res = rule.parseOrThrow("34,23,45")
+        assertArrayEquals(res.toTypedArray(), arrayOf(34,23,45))
+    }
+
+    @Test
     fun parsePair() {
         var first: CharSequence = ""
         var second: CharSequence = ""
@@ -53,6 +60,7 @@ class ExampleUnitTest {
         }
 
         val e = r.parseOrThrow("\"Ivan\": \"privet%1234#\"")
+
         assertEquals(e.first, "Ivan")
         assertEquals(e.second, "privet%1234#")
     }

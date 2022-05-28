@@ -1,9 +1,21 @@
 package com.example.kotlinspirit
 
-private class IntRuleIterator
-    : BaseParseIterator<Int>()
-{
-    private var value: Int = -1
+private abstract class BaseIntRuleIterator : BaseParseIterator<Int>() {
+    protected var value: Int = -1
+
+    override fun prev() {
+        super.prev()
+        value -= getChar() - '0'
+        value /= 10
+    }
+
+    override fun resetSeek(seek: Int) {
+        super.resetSeek(seek)
+        value = -1
+    }
+}
+
+private class IntRuleIterator : BaseIntRuleIterator() {
     private var sign = 1
 
     override fun next(): Int {
@@ -53,10 +65,9 @@ private class IntRuleIterator
         }
     }
 
-    override fun prev() {
-        super.prev()
-        value -= getChar() - '0'
-        value /= 10
+    override fun resetSeek(seek: Int) {
+        super.resetSeek(seek)
+        sign = 1
     }
 
     override fun getResult(): Int {
@@ -66,10 +77,8 @@ private class IntRuleIterator
 
 private class IntRangeRuleIterator(
     private val range: IntRange
-)
-    : BaseParseIterator<Int>()
+) : BaseIntRuleIterator()
 {
-    private var value: Int = -1
     private var sign = 1
 
     override fun next(): Int {
@@ -123,10 +132,9 @@ private class IntRangeRuleIterator(
         }
     }
 
-    override fun prev() {
-        super.prev()
-        value -= getChar() - '0'
-        value /= 10
+    override fun resetSeek(seek: Int) {
+        super.resetSeek(seek)
+        sign = 1
     }
 
     override fun getResult(): Int {
@@ -135,10 +143,8 @@ private class IntRangeRuleIterator(
 }
 
 private class UnsignedIntRuleIterator
-    : BaseParseIterator<Int>()
+    : BaseIntRuleIterator()
 {
-    private var value: Int = -1
-
     override fun next(): Int {
         if (isEof()) {
             return if (value < 0) {
@@ -176,12 +182,6 @@ private class UnsignedIntRuleIterator
                 }
             }
         }
-    }
-
-    override fun prev() {
-        super.prev()
-        value -= getChar() - '0'
-        value /= 10
     }
 
     override fun getResult(): Int {
@@ -244,12 +244,6 @@ private class UnsignedIntRangeRuleIterator(
                 }
             }
         }
-    }
-
-    override fun prev() {
-        super.prev()
-        value -= getChar() - '0'
-        value /= 10
     }
 
     override fun getResult(): Int {

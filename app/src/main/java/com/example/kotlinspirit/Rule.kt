@@ -227,6 +227,7 @@ abstract class BaseRule<T>: Rule<T> {
             string = string,
             length = maxLength ?: string.length
         )
+        iter.resetSeek(state.seek)
         while (true) {
             val code = iter.next()
             if (!code.hasNext()) {
