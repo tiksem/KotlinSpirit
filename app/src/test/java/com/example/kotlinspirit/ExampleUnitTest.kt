@@ -35,8 +35,8 @@ class ExampleUnitTest {
     @Test
     fun splitExact() {
         val rule = int.split(',', 3)
-        val res = rule.parseOrThrow("34,23,45")
-        assertArrayEquals(res.toTypedArray(), arrayOf(34,23,45))
+        val res = rule.parseOrThrow("34,-23,45")
+        assertArrayEquals(res.toTypedArray(), arrayOf(34,-23,45))
     }
 
     @Test
