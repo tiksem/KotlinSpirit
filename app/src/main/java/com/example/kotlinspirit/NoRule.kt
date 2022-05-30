@@ -62,6 +62,12 @@ private class NoIterator<T>(
         errorSeek = seek
     }
 
+    override var skipper: ParseIterator<*>?
+        get() = iterator.skipper
+        set(value) {
+            iterator.skipper = value
+        }
+
     override fun getToken(): CharSequence {
         return sequence.subSequence(beginSeek, errorSeek)
     }

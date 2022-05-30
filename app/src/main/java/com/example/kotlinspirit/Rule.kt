@@ -12,13 +12,15 @@ interface Rule<T> {
                 get() = this@Rule.iterator.transform(func)
 
             override fun parse(
-                state: ParseState,
                 string: CharSequence,
-                requireResult: Boolean,
-                maxLength: Int?
-            ): To? {
-                return this@Rule.parse(state, string, requireResult, maxLength)?.let {
-                    func(it)
+                skipper: Rule<*>?
+            ): ParseResult<To> {
+                return this@Rule.parse(string).let {
+                    ParseResult(
+                        seek = it.seek,
+                        code = it.code,
+                        result = it.result?.let(func)
+                    )
                 }
             }
         }
@@ -27,35 +29,29 @@ interface Rule<T> {
     val iterator: ParseIterator<T>
 
     fun parse(
-        state: ParseState,
         string: CharSequence,
-        requireResult: Boolean = false,
-        maxLength: Int? = null
-    ): T?
+        skipper: Rule<*>? = null
+    ): ParseResult<T>
 
     fun tryParse(string: String): T? {
-        val state = ParseState()
-        return parse(state, string, true)
+        return parse(string).result
     }
 
     fun match(string: String): Boolean {
-        val state = ParseState()
-        parse(state, string, false)
-        return !state.hasError && state.seek == string.length
+        return parse(string).seek == string.length
     }
 
-    fun parseOrThrow(string: String): T {
-        val state = ParseState()
-        val result = parse(state, string, true)
-        if (state.hasError) {
+    fun parseOrThrow(string: CharSequence): T {
+        val result = parse(string)
+        if (result.hasError) {
             throw ParseException(
                 string = string,
-                state = state,
-                tokenName = javaClass.name
+                seek = result.seek,
+                errorCode = result.code
             )
         }
 
-        return result ?: throw IllegalStateException("Undefined behaviour")
+        return result.result ?: throw IllegalStateException("Undefined behaviour")
     }
 
     fun on(
@@ -235,53 +231,39 @@ interface Rule<T> {
 abstract class BaseRule<T>: Rule<T> {
     abstract fun createParseIterator(): ParseIterator<T>
 
-    protected open fun checkPrecondition(string: CharSequence, state: ParseState) {
-    }
-    protected open fun checkPostCondition(string: CharSequence, state: ParseState) {
-    }
-
     override val iterator: ParseIterator<T> by lazy {
         createParseIterator()
     }
 
     override fun parse(
-        state: ParseState,
         string: CharSequence,
-        requireResult: Boolean,
-        maxLength: Int?
-    ): T? {
-        checkPrecondition(string, state)
-        if (state.hasError) {
-            return null
-        }
-
+        skipper: Rule<*>?
+    ): ParseResult<T> {
         val iter = iterator
-        state.startParseToken()
-        val length = maxLength ?: string.length
-        iter.sequence = if (length == string.length) {
-            string
+        iter.sequence = string
+
+        if (skipper != null) {
+            skipper.iterator.sequence = iter.sequence
+            val skipperIter = skipper.iterator
+            skipperIter.skip(0)
+            iter.skipper = skipperIter
+            iter.resetSeek(skipperIter.seek)
         } else {
-            string.subSequence(0, length)
+            iter.resetSeek(0)
         }
-        iter.resetSeek(state.seek)
         while (true) {
             val code = iter.next()
             if (!code.hasNext()) {
-                state.seek = iter.seek
-                state.parseCode = code
                 return if (code == StepCode.COMPLETE) {
-                    if (requireResult) {
-                        checkPostCondition(string, state)
-                        if (state.hasError) {
-                            null
-                        } else {
-                            iter.getResult()
-                        }
-                    } else {
-                        null
-                    }
+                    ParseResult.result(
+                        seek = iter.seek,
+                        result = iter.getResult(),
+                    )
                 } else {
-                    null
+                    ParseResult.error(
+                        seek = iter.seek,
+                        errorCode = code
+                    )
                 }
             }
         }

@@ -9,6 +9,10 @@ interface ParseIterator<T> : ResultProvider<T> {
     fun prev()
     val seek: Int
     var sequence: CharSequence
+    var skipper: ParseIterator<*>?
+        get() = null
+        set(value) {
+        }
     fun getBeginSeek(): Int
     fun resetSeek(seek: Int)
     fun isEof(): Boolean {
@@ -24,6 +28,23 @@ interface ParseIterator<T> : ResultProvider<T> {
     }
 
     fun getToken(): CharSequence
+
+    fun getTokenLength(): Int {
+        return seek - getBeginSeek()
+    }
+
+    fun skip(seek: Int) {
+        resetSeek(seek)
+        while (true) {
+            val next = next()
+            if (next == StepCode.COMPLETE) {
+                return
+            } else if (next.isError()) {
+                resetSeek(seek)
+                return
+            }
+        }
+    }
 }
 
 abstract class BaseParseIterator<T>: ParseIterator<T> {

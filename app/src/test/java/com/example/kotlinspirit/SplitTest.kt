@@ -1,6 +1,8 @@
 package com.example.kotlinspirit
 
+import com.example.kotlinspirit.Rules.char
 import com.example.kotlinspirit.Rules.int
+import com.example.kotlinspirit.Rules.str
 import org.junit.Assert
 import org.junit.Test
 
@@ -16,9 +18,9 @@ class SplitTest {
     fun splitHelloWorld2() {
         var mark: Char = Char.MIN_VALUE
         var array = arrayOf<CharSequence>()
-        val r = (Rules.str('a'..'z', 'A'..'Z') % " ").on {
+        val r = (str('a'..'z', 'A'..'Z') % " ").on {
             array = it.toTypedArray()
-        } + Rules.char('!', '?').on {
+        } + char('!', '?').on {
             mark = it
         }
         r.parseOrThrow("Hello world!")

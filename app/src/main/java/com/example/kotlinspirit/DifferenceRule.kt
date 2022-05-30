@@ -60,6 +60,13 @@ private class DifferenceRuleIterator<T>(
             main.sequence = value
             exception.sequence = value
         }
+
+    override var skipper: ParseIterator<*>?
+        get() = main.skipper
+        set(value) {
+            main.skipper = value
+            exception.skipper = skipper
+        }
 }
 
 class DifferenceRule<T>(

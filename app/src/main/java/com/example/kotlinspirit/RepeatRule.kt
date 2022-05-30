@@ -22,7 +22,15 @@ private class RepeatRuleIterator<T>(
             }
         } else if(code == StepCode.COMPLETE) {
             results.add(iterator.getResult())
-            iterator.resetSeek(iterator.seek)
+
+            val skipper = this.skipper
+            if (skipper != null) {
+                skipper.skip(iterator.seek)
+                iterator.resetSeek(skipper.seek)
+            } else {
+                iterator.resetSeek(iterator.seek)
+            }
+
             return when {
                 results.size < range.first -> {
                     StepCode.HAS_NEXT
@@ -54,6 +62,12 @@ private class RepeatRuleIterator<T>(
         get() = iterator.sequence
         set(value) {
             iterator.sequence = value
+        }
+
+    override var skipper: ParseIterator<*>?
+        get() = iterator.skipper
+        set(value) {
+            iterator.skipper = value
         }
 
     override fun resetSeek(seek: Int) {

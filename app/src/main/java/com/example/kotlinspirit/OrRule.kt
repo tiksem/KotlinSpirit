@@ -45,6 +45,13 @@ private class OrRuleIterator<T>(
             bIterator.sequence = value
         }
 
+    override var skipper: ParseIterator<*>?
+        get() = aIterator.skipper
+        set(value) {
+            aIterator.skipper = value
+            bIterator.skipper = value
+        }
+
     override fun resetSeek(seek: Int) {
         aIterator.resetSeek(seek)
         bIterator.resetSeek(seek)

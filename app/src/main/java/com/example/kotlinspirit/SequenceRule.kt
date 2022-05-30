@@ -16,12 +16,22 @@ private class SequenceRuleIterator(
             if (iterator == a) {
                 iterator = b
                 b.resetSeek(a.seek)
+                skipIfNeed()
                 b.next()
             } else {
+                skipIfNeed()
                 StepCode.COMPLETE
             }
         } else {
             code
+        }
+    }
+
+    private fun skipIfNeed() {
+        val skipper = this.skipper
+        if (skipper != null) {
+            skipper.skip(iterator.seek)
+            iterator.resetSeek(skipper.seek)
         }
     }
 
@@ -51,6 +61,13 @@ private class SequenceRuleIterator(
     override fun getToken(): CharSequence {
         return sequence.subSequence(a.getBeginSeek(), b.seek)
     }
+
+    override var skipper: ParseIterator<*>?
+        get() = a.skipper
+        set(value) {
+            a.skipper = value
+            b.skipper = value
+        }
 }
 
 class SequenceRule(

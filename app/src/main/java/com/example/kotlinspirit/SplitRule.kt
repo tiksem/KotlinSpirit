@@ -115,6 +115,13 @@ private class SplitRuleIterator<T>(
             divider.sequence = value
         }
 
+    override var skipper: ParseIterator<*>?
+        get() = token.skipper
+        set(value) {
+            token.skipper = value
+            divider.skipper = value
+        }
+
     override fun getToken(): CharSequence {
         return token.getToken()
     }

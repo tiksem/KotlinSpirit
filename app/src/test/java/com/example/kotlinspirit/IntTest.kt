@@ -35,9 +35,8 @@ class IntTest {
 
     @Test
     fun outOfRange() {
-        val state = ParseState()
-        int.parse(state, "21474836473")
-        Assert.assertEquals(StepCode.INT_OUT_OF_RANGE, state.parseCode)
+        val errorCode = int.parse("21474836473").code
+        Assert.assertEquals(StepCode.INT_OUT_OF_RANGE, errorCode)
     }
 
     @Test
