@@ -3,16 +3,16 @@ package com.example.kotlinspirit
 abstract class CharRule : BaseRule<Char>()
 
 abstract class BaseCharParseIterator : BaseParseIterator<Char>() {
-    override fun getResult(): Char {
-        return sequence[seek - 1]
+    override fun getResult(context: ParseContext): Char {
+        return context.string[seek - 1]
     }
 }
 
 internal open class AnyCharRule : CharRule() {
     override fun createParseIterator(): ParseIterator<Char> {
         return object : BaseCharParseIterator() {
-            override fun next(): Int {
-                if (isEof()) {
+            override fun next(context: ParseContext): Int {
+                if (isEof(context)) {
                     return StepCode.EOF
                 }
 
@@ -26,12 +26,12 @@ internal open class AnyCharRule : CharRule() {
 class CharMatchIterator(
     private val predicate: (Char) -> Boolean
 ) : BaseCharParseIterator() {
-    override fun next(): Int {
-        if (isEof()) {
+    override fun next(context: ParseContext): Int {
+        if (isEof(context)) {
             return StepCode.EOF
         }
 
-        val char = readChar()
+        val char = context.readChar()
         return if (predicate(char)) {
             StepCode.COMPLETE
         } else {

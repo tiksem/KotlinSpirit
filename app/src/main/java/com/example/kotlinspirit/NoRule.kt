@@ -6,14 +6,8 @@ private class NoIterator<T>(
     private var beginSeek = iterator.seek
     private var errorSeek: Int = beginSeek
 
-    override var sequence: CharSequence
-        get() = iterator.sequence
-        set(value) {
-            iterator.sequence = value
-        }
-
-    override fun next(): Int {
-        if (isEof()) {
+    override fun next(context: ParseContext): Int {
+        if (isEof(context)) {
             return if (errorSeek > beginSeek) {
                 StepCode.COMPLETE
             } else {
@@ -21,7 +15,7 @@ private class NoIterator<T>(
             }
         }
 
-        val next = iterator.next()
+        val next = iterator.next(context)
         return when {
             next == StepCode.HAS_NEXT -> StepCode.HAS_NEXT
             next.canComplete() -> {
@@ -40,11 +34,11 @@ private class NoIterator<T>(
         }
     }
 
-    override fun getResult(): CharSequence {
-        return getToken()
+    override fun getResult(context: ParseContext): CharSequence {
+        return getToken(context)
     }
 
-    override fun prev() {
+    override fun prev(context: ParseContext) {
         errorSeek--
         iterator.resetSeek(errorSeek)
     }
@@ -60,16 +54,6 @@ private class NoIterator<T>(
         iterator.resetSeek(seek)
         beginSeek = seek
         errorSeek = seek
-    }
-
-    override var skipper: ParseIterator<*>?
-        get() = iterator.skipper
-        set(value) {
-            iterator.skipper = value
-        }
-
-    override fun getToken(): CharSequence {
-        return sequence.subSequence(beginSeek, errorSeek)
     }
 }
 

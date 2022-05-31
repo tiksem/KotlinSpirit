@@ -41,6 +41,11 @@ object Rules {
         )
     }
 
+    val spaceChar: CharRule
+        get() = char {
+            it.isWhitespace()
+        }
+
     fun char(predicate: (Char) -> Boolean) : CharRule {
         return CharMatchRule(predicate)
     }
@@ -83,20 +88,32 @@ object Rules {
         return MatchStringRule(predicate)
     }
 
-    private val quote by lazy {
-        char('"', '\'')
-    }
+    val spaceStr: StringRule
+        get() = str {
+            it.isWhitespace()
+        }
+
+    val latinStr: StringRule
+        get() = str('a'..'z', 'A'..'Z')
 
     fun quotedString(callback: (CharSequence) -> Unit): Rule<CharSequence> {
-        return quote + str {
+        var quote = '\"'
+        return char('"', '\'').on {
+            quote = it
+        } + str {
             it != '"' && it != '\''
-        }.on(success = callback) + quote
+        }.on {
+            callback(it)
+        } + char { it == quote }
     }
 
     fun quotedString(): Rule<CharSequence> {
-        return quote + str {
+        var quote = '\"'
+        return char('"', '\'').on {
+            quote = it
+        } + str {
             it != '"' && it != '\''
-        } + quote
+        } + char { it == quote }
     }
 
     fun quotedString(quote: Rule<*>, callback: (CharSequence) -> Unit): Rule<CharSequence> {

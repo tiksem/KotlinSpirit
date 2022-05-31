@@ -5,10 +5,10 @@ private class RuleParseCallbackWrapperIterator<T>(
     private val callback: (T) -> Unit,
     private val errorCallback: (() -> Unit)? = null
 ) : ParseIterator<T> by iterator {
-    override fun next(): Int {
-        val code = iterator.next()
+    override fun next(context: ParseContext): Int {
+        val code = iterator.next(context)
         if (code == StepCode.COMPLETE) {
-            callback(getResult())
+            callback(getResult(context))
         } else if (code.isError()) {
             errorCallback?.invoke()
         }

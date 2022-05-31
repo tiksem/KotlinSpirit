@@ -11,12 +11,12 @@ abstract class StringRule: BaseRule<CharSequence>() {
 private class MatchStringRuleIterator(
     private val predicate: (Char) -> Boolean
 ) : BaseStringIterator() {
-    override fun next(): Int {
-        if (isEof()) {
+    override fun next(context: ParseContext): Int {
+        if (isEof(context)) {
             return StepCode.COMPLETE
         }
 
-        val char = getChar()
+        val char = context.getChar()
         return if (!predicate(char)) {
             StepCode.COMPLETE
         } else {

@@ -3,9 +3,9 @@ package com.example.kotlinspirit
 private abstract class BaseIntRuleIterator : BaseParseIterator<Int>() {
     protected var value: Int = -1
 
-    override fun prev() {
-        super.prev()
-        value -= getChar() - '0'
+    override fun prev(context: ParseContext) {
+        super.prev(context)
+        value -= context.getChar() - '0'
         value /= 10
     }
 
@@ -18,8 +18,8 @@ private abstract class BaseIntRuleIterator : BaseParseIterator<Int>() {
 private class IntRuleIterator : BaseIntRuleIterator() {
     private var sign = 1
 
-    override fun next(): Int {
-        if (isEof()) {
+    override fun next(context: ParseContext): Int {
+        if (isEof(context)) {
             return if (value < 0) {
                 StepCode.EOF
             } else {
@@ -27,7 +27,7 @@ private class IntRuleIterator : BaseIntRuleIterator() {
             }
         }
 
-        val char = readChar()
+        val char = context.readChar()
         return when {
             char == '-' -> {
                 if (seek == seekBegin + 1) {
@@ -38,7 +38,7 @@ private class IntRuleIterator : BaseIntRuleIterator() {
                 }
             }
             char == '0' && value < 0 -> {
-                if (isEof() || !getChar().isDigit()) {
+                if (isEof(context) || !context.getChar().isDigit()) {
                     value = 0
                     StepCode.COMPLETE
                 } else {
@@ -76,7 +76,7 @@ private class IntRuleIterator : BaseIntRuleIterator() {
         sign = 1
     }
 
-    override fun getResult(): Int {
+    override fun getResult(context: ParseContext): Int {
         return value * sign
     }
 }
@@ -87,8 +87,8 @@ private class IntRangeRuleIterator(
 {
     private var sign = 1
 
-    override fun next(): Int {
-        if (isEof()) {
+    override fun next(context: ParseContext): Int {
+        if (isEof(context)) {
             return if (value < 0) {
                 StepCode.EOF
             } else {
@@ -96,7 +96,7 @@ private class IntRangeRuleIterator(
             }
         }
 
-        val char = readChar()
+        val char = context.readChar()
         return when {
             char == '-' -> {
                 if (value < 0) {
@@ -107,7 +107,7 @@ private class IntRangeRuleIterator(
                 }
             }
             char == '0' && value < 0 -> {
-                if (isEof() || !getChar().isDigit()) {
+                if (isEof(context) || !context.getChar().isDigit()) {
                     value = 0
                     StepCode.COMPLETE
                 } else {
@@ -151,7 +151,7 @@ private class IntRangeRuleIterator(
         sign = 1
     }
 
-    override fun getResult(): Int {
+    override fun getResult(context: ParseContext): Int {
         return value * sign
     }
 }
@@ -159,8 +159,8 @@ private class IntRangeRuleIterator(
 private class UnsignedIntRuleIterator
     : BaseIntRuleIterator()
 {
-    override fun next(): Int {
-        if (isEof()) {
+    override fun next(context: ParseContext): Int {
+        if (isEof(context)) {
             return if (value < 0) {
                 StepCode.EOF
             } else {
@@ -168,10 +168,10 @@ private class UnsignedIntRuleIterator
             }
         }
 
-        val char = readChar()
+        val char = context.readChar()
         return when {
             char == '0' && value < 0 -> {
-                if (isEof() || !getChar().isDigit()) {
+                if (isEof(context) || !context.getChar().isDigit()) {
                     value = 0
                     StepCode.COMPLETE
                 } else {
@@ -204,7 +204,7 @@ private class UnsignedIntRuleIterator
         }
     }
 
-    override fun getResult(): Int {
+    override fun getResult(context: ParseContext): Int {
         return value
     }
 }
@@ -216,8 +216,8 @@ private class UnsignedIntRangeRuleIterator(
 {
     private var value: Int = -1
 
-    override fun next(): Int {
-        if (isEof()) {
+    override fun next(context: ParseContext): Int {
+        if (isEof(context)) {
             return if (value < 0) {
                 StepCode.EOF
             } else {
@@ -225,7 +225,7 @@ private class UnsignedIntRangeRuleIterator(
             }
         }
 
-        val char = readChar()
+        val char = context.readChar()
         return when {
             char == '-' -> {
                 if (seek != seekBegin) {
@@ -235,7 +235,7 @@ private class UnsignedIntRangeRuleIterator(
                 }
             }
             char == '0' && value < 0 -> {
-                if (isEof() || !getChar().isDigit()) {
+                if (isEof(context) || !context.getChar().isDigit()) {
                     value = 0
                     StepCode.COMPLETE
                 } else {
@@ -274,7 +274,7 @@ private class UnsignedIntRangeRuleIterator(
         }
     }
 
-    override fun getResult(): Int {
+    override fun getResult(context: ParseContext): Int {
         return value
     }
 }

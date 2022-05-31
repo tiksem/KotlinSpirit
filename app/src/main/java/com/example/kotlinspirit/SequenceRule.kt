@@ -6,20 +6,17 @@ private class SequenceRuleIterator(
 ) : ParseIterator<CharSequence> {
     private var iterator = a
 
-    override fun getResult(): CharSequence {
-        return getToken()
-    }
-
-    override fun next(): Int {
-        val code = iterator.next()
+    override fun next(context: ParseContext): Int {
+        val code = iterator.next(context)
         return if (code == StepCode.COMPLETE) {
             if (iterator == a) {
+                val seek = skip(context)
                 iterator = b
-                b.resetSeek(a.seek)
-                skipIfNeed()
-                b.next()
+                b.resetSeek(seek)
+                b.next(context)
             } else {
-                skipIfNeed()
+                val seek = skip(context)
+                iterator.resetSeek(seek)
                 StepCode.COMPLETE
             }
         } else {
@@ -27,16 +24,12 @@ private class SequenceRuleIterator(
         }
     }
 
-    private fun skipIfNeed() {
-        val skipper = this.skipper
-        if (skipper != null) {
-            skipper.skip(iterator.seek)
-            iterator.resetSeek(skipper.seek)
-        }
+    override fun getResult(context: ParseContext): CharSequence {
+        return getToken(context)
     }
 
-    override fun prev() {
-        TODO("Not yet implemented")
+    override fun prev(context: ParseContext) {
+        iterator.prev(context)
     }
 
     override val seek: Int
@@ -46,28 +39,10 @@ private class SequenceRuleIterator(
         return a.getBeginSeek()
     }
 
-    override var sequence: CharSequence
-        get() = a.sequence
-        set(value) {
-            a.sequence = value
-            b.sequence = value
-        }
-
     override fun resetSeek(seek: Int) {
         a.resetSeek(seek)
         iterator = a
     }
-
-    override fun getToken(): CharSequence {
-        return sequence.subSequence(a.getBeginSeek(), b.seek)
-    }
-
-    override var skipper: ParseIterator<*>?
-        get() = a.skipper
-        set(value) {
-            a.skipper = value
-            b.skipper = value
-        }
 }
 
 class SequenceRule(

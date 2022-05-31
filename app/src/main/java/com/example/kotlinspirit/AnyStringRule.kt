@@ -1,8 +1,8 @@
 package com.example.kotlinspirit
 
 private class AnyStringRuleIterator : BaseStringIterator() {
-    override fun next(): Int {
-        return if (isEof()) {
+    override fun next(context: ParseContext): Int {
+        return if (isEof(context)) {
             StepCode.COMPLETE
         } else {
             StepCode.HAS_NEXT_MAY_COMPLETE

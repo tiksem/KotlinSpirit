@@ -1,6 +1,5 @@
 package com.example.kotlinspirit
 
-import java.lang.IllegalStateException
 import java.lang.UnsupportedOperationException
 
 class TernaryStringTree(strings: List<String>) {
@@ -66,11 +65,11 @@ class TernaryStringTree(strings: List<String>) {
         val root = this.root
         if (root == null) {
             return object : BaseParseIterator<CharSequence>() {
-                override fun getResult(): CharSequence {
+                override fun getResult(context: ParseContext): CharSequence {
                     return ""
                 }
 
-                override fun next(): Int {
+                override fun next(context: ParseContext): Int {
                     return StepCode.COMPLETE
                 }
             }
@@ -100,16 +99,16 @@ class TernaryStringTree(strings: List<String>) {
             node = originalNode
         }
 
-        override fun prev() {
+        override fun prev(context: ParseContext) {
             throw UnsupportedOperationException("TernaryStringTree iterator doesn't support prev")
         }
 
-        override fun next(): Int {
-            if (isEof()) {
+        override fun next(context: ParseContext): Int {
+            if (isEof(context)) {
                 return checkIntermediateSeek(StepCode.EOF)
             }
 
-            val ch = getChar()
+            val ch = context.getChar()
             when {
                 node.char == ch -> {
                     seek++
@@ -135,7 +134,7 @@ class TernaryStringTree(strings: List<String>) {
                         checkIntermediateSeek(StepCode.ONE_OF_STRING_NOT_FOUND)
                     } else {
                         node = left
-                        next()
+                        next(context)
                     }
                 }
                 else -> {
@@ -145,7 +144,7 @@ class TernaryStringTree(strings: List<String>) {
                         checkIntermediateSeek(StepCode.ONE_OF_STRING_NOT_FOUND)
                     } else {
                         node = right
-                        next()
+                        next(context)
                     }
                 }
             }

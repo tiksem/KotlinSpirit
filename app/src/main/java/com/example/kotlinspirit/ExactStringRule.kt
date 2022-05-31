@@ -3,13 +3,13 @@ package com.example.kotlinspirit
 private class ExactStringRuleIterator(
     private val value: CharSequence
 ) : BaseParseIterator<CharSequence>() {
-    override fun getResult(): CharSequence {
+    override fun getResult(context: ParseContext): CharSequence {
         return value
     }
 
-    override fun next(): Int {
+    override fun next(context: ParseContext): Int {
         val i = seek - seekBegin
-        if (isEof()) {
+        if (isEof(context)) {
             return if (i == value.length) {
                 StepCode.COMPLETE
             } else {
@@ -21,7 +21,7 @@ private class ExactStringRuleIterator(
             return StepCode.COMPLETE
         }
 
-        return if (readChar() == value[i]) {
+        return if (context.readChar() == value[i]) {
             StepCode.HAS_NEXT
         } else {
             StepCode.STRING_DOES_NOT_MATCH

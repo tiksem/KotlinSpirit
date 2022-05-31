@@ -10,12 +10,12 @@ private class SplitRuleIterator<T>(
     private val results = ArrayList<T>()
     private var lastTokenSeek = -1
 
-    override fun getResult(): List<T> {
+    override fun getResult(context: ParseContext): List<T> {
         return results
     }
 
-    private fun addResult() {
-        results.add(token.getResult())
+    private fun addResult(context: ParseContext) {
+        results.add(token.getResult(context))
         lastTokenSeek = token.seek
     }
 
@@ -27,17 +27,17 @@ private class SplitRuleIterator<T>(
         }
     }
 
-    override fun next(): Int {
+    override fun next(context: ParseContext): Int {
         val tokenSeekBefore = token.seek
-        val code = token.next()
+        val code = token.next(context)
         when {
             code == StepCode.HAS_NEXT -> return code
             code == StepCode.HAS_NEXT_MAY_COMPLETE -> {
                 divider.resetSeek(tokenSeekBefore)
                 while (true) {
-                    val dividerCode = divider.next()
+                    val dividerCode = divider.next(context)
                     if (dividerCode == StepCode.COMPLETE) {
-                        addResult()
+                        addResult(context)
                         return when {
                             results.size < range.first -> {
                                 token.resetSeek(divider.seek)
@@ -61,13 +61,13 @@ private class SplitRuleIterator<T>(
                 return getCompleteCode()
             }
             code == StepCode.COMPLETE -> {
-                addResult()
+                addResult(context)
                 if (results.size == range.last) {
                     return StepCode.COMPLETE
                 }
                 divider.resetSeek(token.seek)
                 while (true) {
-                    val dividerCode = divider.next()
+                    val dividerCode = divider.next(context)
                     if (dividerCode == StepCode.COMPLETE) {
                         token.resetSeek(divider.seek)
                         return when {
@@ -87,8 +87,8 @@ private class SplitRuleIterator<T>(
         }
     }
 
-    override fun prev() {
-        token.prev()
+    override fun prev(context: ParseContext) {
+        token.prev(context)
         if (lastTokenSeek == token.seek || divider.seek == token.seek) {
             results.removeLastOrNull()
         }
@@ -108,22 +108,8 @@ private class SplitRuleIterator<T>(
         return token.getBeginSeek()
     }
 
-    override var sequence: CharSequence
-        get() = token.sequence
-        set(value) {
-            token.sequence = value
-            divider.sequence = value
-        }
-
-    override var skipper: ParseIterator<*>?
-        get() = token.skipper
-        set(value) {
-            token.skipper = value
-            divider.skipper = value
-        }
-
-    override fun getToken(): CharSequence {
-        return token.getToken()
+    override fun getToken(context: ParseContext): CharSequence {
+        return token.getToken(context)
     }
 }
 

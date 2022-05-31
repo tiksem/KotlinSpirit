@@ -11,11 +11,8 @@ interface Rule<T> {
             override val iterator: ParseIterator<To>
                 get() = this@Rule.iterator.transform(func)
 
-            override fun parse(
-                string: CharSequence,
-                skipper: Rule<*>?
-            ): ParseResult<To> {
-                return this@Rule.parse(string).let {
+            override fun parse(context: ParseContext): ParseResult<To> {
+                return this@Rule.parse(context).let {
                     ParseResult(
                         seek = it.seek,
                         code = it.code,
@@ -29,9 +26,15 @@ interface Rule<T> {
     val iterator: ParseIterator<T>
 
     fun parse(
+        context: ParseContext
+    ): ParseResult<T>
+
+    fun parse(
         string: CharSequence,
         skipper: Rule<*>? = null
-    ): ParseResult<T>
+    ): ParseResult<T> {
+        return parse(ParseContext(string, skipper))
+    }
 
     fun tryParse(string: String): T? {
         return parse(string).result
@@ -41,8 +44,8 @@ interface Rule<T> {
         return parse(string).seek == string.length
     }
 
-    fun parseOrThrow(string: CharSequence): T {
-        val result = parse(string)
+    fun parseOrThrow(string: CharSequence, skipper: Rule<*>? = null): T {
+        val result = parse(string, skipper)
         if (result.hasError) {
             throw ParseException(
                 string = string,
@@ -236,28 +239,20 @@ abstract class BaseRule<T>: Rule<T> {
     }
 
     override fun parse(
-        string: CharSequence,
-        skipper: Rule<*>?
+        context: ParseContext
     ): ParseResult<T> {
         val iter = iterator
-        iter.sequence = string
+        iter.resetSeek(0)
+        val seek = iter.skip(context)
+        iter.resetSeek(seek)
 
-        if (skipper != null) {
-            skipper.iterator.sequence = iter.sequence
-            val skipperIter = skipper.iterator
-            skipperIter.skip(0)
-            iter.skipper = skipperIter
-            iter.resetSeek(skipperIter.seek)
-        } else {
-            iter.resetSeek(0)
-        }
         while (true) {
-            val code = iter.next()
+            val code = iter.next(context)
             if (!code.hasNext()) {
                 return if (code == StepCode.COMPLETE) {
                     ParseResult.result(
                         seek = iter.seek,
-                        result = iter.getResult(),
+                        result = iter.getResult(context),
                     )
                 } else {
                     ParseResult.error(

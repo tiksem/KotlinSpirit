@@ -7,48 +7,46 @@ private class RepeatRuleIterator<T>(
     private var beginSeek: Int = -1
     private val results = ArrayList<T>()
 
-    override fun getResult(): List<T> {
+    override fun getResult(context: ParseContext): List<T> {
         return results
     }
 
-    override fun next(): Int {
-        val code = iterator.next()
-        if (code.isError()) {
-            iterator.resetSeek(iterator.getBeginSeek())
-            if (results.size < range.first) {
-                return StepCode.REPEAT_NOT_ENOUGH_DATA
-            } else {
-                return StepCode.COMPLETE
-            }
-        } else if(code == StepCode.COMPLETE) {
-            results.add(iterator.getResult())
-
-            val skipper = this.skipper
-            if (skipper != null) {
-                skipper.skip(iterator.seek)
-                iterator.resetSeek(skipper.seek)
-            } else {
-                iterator.resetSeek(iterator.seek)
-            }
-
-            return when {
-                results.size < range.first -> {
-                    StepCode.HAS_NEXT
-                }
-                results.size == range.last -> {
+    override fun next(context: ParseContext): Int {
+        val code = iterator.next(context)
+        when {
+            code.isError() -> {
+                iterator.resetSeek(iterator.getBeginSeek())
+                return if (results.size < range.first) {
+                    StepCode.REPEAT_NOT_ENOUGH_DATA
+                } else {
                     StepCode.COMPLETE
                 }
-                else -> {
-                    StepCode.HAS_NEXT_MAY_COMPLETE
+            }
+            code == StepCode.COMPLETE -> {
+                results.add(iterator.getResult(context))
+                val seek = skip(context)
+                iterator.resetSeek(seek)
+
+                return when {
+                    results.size < range.first -> {
+                        StepCode.HAS_NEXT
+                    }
+                    results.size == range.last -> {
+                        StepCode.COMPLETE
+                    }
+                    else -> {
+                        StepCode.HAS_NEXT_MAY_COMPLETE
+                    }
                 }
             }
-        } else {
-            return code
+            else -> {
+                return code
+            }
         }
     }
 
-    override fun prev() {
-        iterator.prev()
+    override fun prev(context: ParseContext) {
+        iterator.prev(context)
     }
 
     override val seek: Int
@@ -58,26 +56,10 @@ private class RepeatRuleIterator<T>(
         return beginSeek
     }
 
-    override var sequence: CharSequence
-        get() = iterator.sequence
-        set(value) {
-            iterator.sequence = value
-        }
-
-    override var skipper: ParseIterator<*>?
-        get() = iterator.skipper
-        set(value) {
-            iterator.skipper = value
-        }
-
     override fun resetSeek(seek: Int) {
         beginSeek = seek
         iterator.resetSeek(seek)
         results.clear()
-    }
-
-    override fun getToken(): CharSequence {
-        return sequence.subSequence(beginSeek, seek)
     }
 }
 

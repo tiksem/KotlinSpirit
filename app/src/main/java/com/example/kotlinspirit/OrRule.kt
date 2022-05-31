@@ -1,32 +1,41 @@
 package com.example.kotlinspirit
 
 private class OrRuleIterator<T>(
-    private val aIterator: ParseIterator<T>,
-    private val bIterator: ParseIterator<T>,
+    private val a: Rule<T>,
+    private val b: Rule<T>,
 ) : ParseIterator<T> {
-    private var iterator = aIterator
+    private var iterator: ParseIterator<T> = emptyIterator()
     private var previousStepCode: Int = -1
+    private var aFailed = false
 
-    override val seek
-        get() = iterator.seek
+    override val seek get() = iterator.seek
 
-    override fun getResult(): T {
-        return iterator.getResult()
+    override fun getResult(context: ParseContext): T {
+        return iterator.getResult(context)
     }
 
-    override fun next(): Int {
-        val code = iterator.next()
+    override fun next(context: ParseContext): Int {
+        val code = iterator.next(context)
         val result = if (code.isError()) {
             when {
+                code == StepCode.EMPTY_ITERATOR_ERROR -> {
+                    val seek = this.seek
+                    iterator = a.iterator
+                    iterator.resetSeek(seek)
+                    StepCode.HAS_NEXT
+                }
                 previousStepCode == StepCode.HAS_NEXT_MAY_COMPLETE -> {
-                    prev()
+                    prev(context)
                     StepCode.COMPLETE
                 }
-                iterator == bIterator -> {
+                aFailed -> {
                     code
                 }
                 else -> {
-                    iterator = bIterator
+                    aFailed = true
+                    val seek = getBeginSeek()
+                    iterator = b.iterator
+                    iterator.resetSeek(seek)
                     previousStepCode = -1
                     return StepCode.HAS_NEXT
                 }
@@ -38,36 +47,23 @@ private class OrRuleIterator<T>(
         return result
     }
 
-    override var sequence: CharSequence
-        get() = aIterator.sequence
-        set(value) {
-            aIterator.sequence = value
-            bIterator.sequence = value
-        }
-
-    override var skipper: ParseIterator<*>?
-        get() = aIterator.skipper
-        set(value) {
-            aIterator.skipper = value
-            bIterator.skipper = value
-        }
-
     override fun resetSeek(seek: Int) {
-        aIterator.resetSeek(seek)
-        bIterator.resetSeek(seek)
+        aFailed = false
+        iterator = emptyIterator()
+        iterator.resetSeek(seek)
         previousStepCode = -1
     }
 
-    override fun prev() {
-        iterator.prev()
+    override fun prev(context: ParseContext) {
+        iterator.prev(context)
     }
 
     override fun getBeginSeek(): Int {
         return iterator.getBeginSeek()
     }
 
-    override fun getToken(): CharSequence {
-        return iterator.getToken()
+    override fun getToken(context: ParseContext): CharSequence {
+        return iterator.getToken(context)
     }
 }
 
@@ -76,6 +72,6 @@ class OrRule<T>(
     private val b: Rule<T>
 ) : BaseRule<T>() {
     override fun createParseIterator(): ParseIterator<T> {
-        return OrRuleIterator(a.iterator, b.iterator)
+        return OrRuleIterator(a, b)
     }
 }

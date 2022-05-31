@@ -1,54 +1,51 @@
 package com.example.kotlinspirit
 
 interface ResultProvider<T> {
-    fun getResult(): T
+    fun getResult(context: ParseContext): T
 }
 
 interface ParseIterator<T> : ResultProvider<T> {
-    fun next(): Int
-    fun prev()
+    fun next(context: ParseContext): Int
+    fun prev(context: ParseContext)
     val seek: Int
-    var sequence: CharSequence
-    var skipper: ParseIterator<*>?
-        get() = null
-        set(value) {
-        }
     fun getBeginSeek(): Int
     fun resetSeek(seek: Int)
-    fun isEof(): Boolean {
-        return seek >= sequence.length
+
+    fun isEof(context: ParseContext): Boolean {
+        return seek >= context.string.length
     }
 
     fun <To> transform(func: (T) -> To): ParseIterator<To> {
         return object : ParseIterator<To> by this as ParseIterator<To> {
-            override fun getResult(): To {
-                return func(this@ParseIterator.getResult())
+            override fun getResult(context: ParseContext): To {
+                return func(this@ParseIterator.getResult(context))
             }
         }
     }
 
-    fun getToken(): CharSequence
+    fun getToken(context: ParseContext): CharSequence {
+        return context.string.subSequence(getBeginSeek(), seek)
+    }
 
     fun getTokenLength(): Int {
         return seek - getBeginSeek()
     }
 
-    fun skip(seek: Int) {
-        resetSeek(seek)
+    fun skip(context: ParseContext): Int {
+        val skipper = context.skipper?.iterator ?: return seek
+        skipper.resetSeek(seek)
         while (true) {
-            val next = next()
+            val next = skipper.next(context)
             if (next == StepCode.COMPLETE) {
-                return
+                return skipper.seek
             } else if (next.isError()) {
-                resetSeek(seek)
-                return
+                return seek
             }
         }
     }
 }
 
 abstract class BaseParseIterator<T>: ParseIterator<T> {
-    override var sequence: CharSequence = ""
     protected var seekBegin: Int = 0
     override var seek = seekBegin
 
@@ -61,25 +58,21 @@ abstract class BaseParseIterator<T>: ParseIterator<T> {
         return seekBegin
     }
 
-    protected fun readChar(): Char {
-        return sequence[seek++]
+    protected fun ParseContext.readChar(): Char {
+        return string[seek++]
     }
 
-    protected fun getChar(): Char {
-        return sequence[seek]
+    protected fun ParseContext.getChar(): Char {
+        return string[seek]
     }
 
-    override fun getToken(): CharSequence {
-        return sequence.subSequence(seekBegin, seek)
-    }
-
-    override fun prev() {
+    override fun prev(context: ParseContext) {
         seek--
     }
 }
 
 abstract class BaseStringIterator : BaseParseIterator<CharSequence>() {
-    override fun getResult(): CharSequence {
-        return getToken()
+    override fun getResult(context: ParseContext): CharSequence {
+        return getToken(context)
     }
 }
