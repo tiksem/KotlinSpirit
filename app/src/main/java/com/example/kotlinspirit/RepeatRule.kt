@@ -12,6 +12,7 @@ private class RepeatRuleIterator<T>(
     }
 
     override fun next(context: ParseContext): Int {
+        logNext()
         val code = iterator.next(context)
         when {
             code.isError() -> {

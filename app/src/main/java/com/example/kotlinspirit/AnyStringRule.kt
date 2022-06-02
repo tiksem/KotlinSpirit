@@ -1,5 +1,7 @@
 package com.example.kotlinspirit
 
+import android.util.Log
+
 private class AnyStringRuleIterator : BaseStringIterator() {
     override fun next(context: ParseContext): Int {
         return if (isEof(context)) {

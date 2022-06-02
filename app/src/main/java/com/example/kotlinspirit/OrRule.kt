@@ -15,15 +15,16 @@ private class OrRuleIterator<T>(
     }
 
     override fun next(context: ParseContext): Int {
+        logNext()
+        if (iterator == EmptyIterator) {
+            val seek = this.seek
+            iterator = a.iterator
+            iterator.resetSeek(seek)
+        }
+
         val code = iterator.next(context)
         val result = if (code.isError()) {
             when {
-                code == StepCode.EMPTY_ITERATOR_ERROR -> {
-                    val seek = this.seek
-                    iterator = a.iterator
-                    iterator.resetSeek(seek)
-                    StepCode.HAS_NEXT
-                }
                 previousStepCode == StepCode.HAS_NEXT_MAY_COMPLETE -> {
                     prev(context)
                     StepCode.COMPLETE

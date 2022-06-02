@@ -1,5 +1,7 @@
 package com.example.kotlinspirit
 
+import android.util.Log
+
 interface ResultProvider<T> {
     fun getResult(context: ParseContext): T
 }
@@ -42,6 +44,10 @@ interface ParseIterator<T> : ResultProvider<T> {
                 return seek
             }
         }
+    }
+
+    fun logNext() {
+        System.out.println("${javaClass.name}.next seek=$seek")
     }
 }
 

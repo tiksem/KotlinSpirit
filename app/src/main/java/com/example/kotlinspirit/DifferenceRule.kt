@@ -14,6 +14,7 @@ private class DifferenceRuleIterator<T>(
     }
 
     override fun next(context: ParseContext): Int {
+        logNext()
         exception.resetSeek(main.seek)
         val mainResult = main.next(context)
         if (!mainResult.hasNext()) {

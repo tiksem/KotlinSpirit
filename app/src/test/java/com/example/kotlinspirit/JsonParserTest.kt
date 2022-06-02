@@ -49,7 +49,7 @@ class JsonParserTest {
     }
 
     val value: Rule<Any> by lazy {
-        jsonRuleBox or string() or int
+        string() or int
     }
 
     val jsonPair: Rule<Pair<CharSequence, Any>> by lazy {
@@ -70,8 +70,9 @@ class JsonParserTest {
         objRuleBox.rule = obj
         valueRuleBox.rule = value
         pairRuleBox.rule = jsonPair
+        arrayRuleBox.rule = array
 
-        val r = json.parseOrThrow("[2344, \"some shit\"]", Rules.spaceStr) as List<Any>
+        val r = array.parseOrThrow("[2344, \"some shit\"]", Rules.spaceStr) as List<Any>
         Assert.assertTrue(listOf<Any>(2344, "some shit") == r)
     }
 }

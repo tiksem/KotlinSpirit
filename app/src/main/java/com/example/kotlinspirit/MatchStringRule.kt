@@ -12,6 +12,7 @@ private class MatchStringRuleIterator(
     private val predicate: (Char) -> Boolean
 ) : BaseStringIterator() {
     override fun next(context: ParseContext): Int {
+        logNext()
         if (isEof(context)) {
             return StepCode.COMPLETE
         }

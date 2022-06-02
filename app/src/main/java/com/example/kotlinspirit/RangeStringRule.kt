@@ -7,6 +7,7 @@ private class RangeStringRuleIterator(
     private val iterator: ParseIterator<CharSequence>
 ) : ParseIterator<CharSequence> by iterator {
     override fun next(context: ParseContext): Int {
+        logNext()
         val next = iterator.next(context)
         return if (next == StepCode.HAS_NEXT_MAY_COMPLETE) {
             if (iterator.getTokenLength() >= range.first) {

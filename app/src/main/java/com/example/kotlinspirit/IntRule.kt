@@ -19,6 +19,7 @@ private class IntRuleIterator : BaseIntRuleIterator() {
     private var sign = 1
 
     override fun next(context: ParseContext): Int {
+        logNext()
         if (isEof(context)) {
             return if (value < 0) {
                 StepCode.EOF

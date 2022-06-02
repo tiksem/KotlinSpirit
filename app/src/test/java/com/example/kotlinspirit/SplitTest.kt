@@ -2,6 +2,8 @@ package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.char
 import com.example.kotlinspirit.Rules.int
+import com.example.kotlinspirit.Rules.latinStr
+import com.example.kotlinspirit.Rules.spaceStr
 import com.example.kotlinspirit.Rules.str
 import org.junit.Assert
 import org.junit.Test
@@ -68,5 +70,15 @@ class SplitTest {
         val rule = int % !int
         val res = rule.parseOrThrow("1,,,,,-12443|0435663546-+-")
         Assert.assertArrayEquals(res.toTypedArray(), arrayOf(1, -12443, 435663546))
+    }
+
+    @Test
+    fun splitSequence() {
+        val rule = (int + '|' + latinStr) % ','
+        var res = rule.parseOrThrow("123|abcd,1234|abcde,-567|asdf")
+        Assert.assertArrayEquals(res.toTypedArray(), arrayOf("123|abcd", "1234|abcde", "-567|asdf"))
+
+        res = rule.parseOrThrow(" 123   | abcd,    1234\n\n\n| abcde,   -567 |   asdf   ", skipper = spaceStr)
+        Assert.assertArrayEquals(res.toTypedArray(), arrayOf("123|abcd", "1234|abcde", "-567|asdf"))
     }
 }

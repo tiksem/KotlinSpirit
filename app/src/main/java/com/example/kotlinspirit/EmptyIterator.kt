@@ -8,6 +8,7 @@ object EmptyIterator : BaseParseIterator<Any>() {
     }
 
     override fun next(context: ParseContext): Int {
+        logNext()
         return StepCode.EMPTY_ITERATOR_ERROR
     }
 }

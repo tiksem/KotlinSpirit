@@ -2,24 +2,42 @@ package com.example.kotlinspirit
 
 import java.lang.IllegalStateException
 
-private object RuleBoxDefaultIterator : BaseParseIterator<Any>() {
-    override fun getResult(context: ParseContext): Any {
-        throw IllegalStateException("RuleBox should not be empty")
+private class RuleBoxIterator<T>(
+    private val rule: Rule<T>
+): ParseIterator<T> {
+    private var iterator: ParseIterator<T> = emptyIterator()
+
+    override fun getResult(context: ParseContext): T {
+        return iterator.getResult(context)
     }
 
     override fun next(context: ParseContext): Int {
-        throw IllegalStateException("RuleBox should not be empty")
+        return iterator.next(context)
+    }
+
+    override fun prev(context: ParseContext) {
+        iterator.prev(context)
+    }
+
+    override val seek: Int
+        get() = iterator.seek
+
+    override fun getBeginSeek(): Int {
+        return iterator.getBeginSeek()
+    }
+
+    override fun resetSeek(seek: Int) {
+        iterator = rule.iterator
+        iterator.resetSeek(seek)
     }
 }
 
-class RuleBox<T>: Rule<T> {
+class RuleBox<T>: BaseRule<T>() {
     var rule: Rule<T>? = null
 
-    override val iterator: ParseIterator<T>
-        get() = rule?.iterator ?: RuleBoxDefaultIterator as ParseIterator<T>
-
-    override fun parse(context: ParseContext): ParseResult<T> {
-        return rule?.parse(context)
-            ?: throw IllegalStateException("RuleBox should not be empty")
+    override fun createParseIterator(): ParseIterator<T> {
+        return RuleBoxIterator(
+            rule ?: throw IllegalStateException("RuleBoxIterator rule hasn't been initialized")
+        )
     }
 }

@@ -12,6 +12,7 @@ internal open class AnyCharRule : CharRule() {
     override fun createParseIterator(): ParseIterator<Char> {
         return object : BaseCharParseIterator() {
             override fun next(context: ParseContext): Int {
+                logNext()
                 if (isEof(context)) {
                     return StepCode.EOF
                 }
@@ -27,6 +28,7 @@ class CharMatchIterator(
     private val predicate: (Char) -> Boolean
 ) : BaseCharParseIterator() {
     override fun next(context: ParseContext): Int {
+        logNext()
         if (isEof(context)) {
             return StepCode.EOF
         }

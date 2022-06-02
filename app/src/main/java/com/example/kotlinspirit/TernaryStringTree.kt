@@ -104,6 +104,7 @@ class TernaryStringTree(strings: List<String>) {
         }
 
         override fun next(context: ParseContext): Int {
+            logNext()
             if (isEof(context)) {
                 return checkIntermediateSeek(StepCode.EOF)
             }

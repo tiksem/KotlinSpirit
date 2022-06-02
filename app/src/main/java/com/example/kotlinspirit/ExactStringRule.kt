@@ -8,6 +8,7 @@ private class ExactStringRuleIterator(
     }
 
     override fun next(context: ParseContext): Int {
+        logNext()
         val i = seek - seekBegin
         if (isEof(context)) {
             return if (i == value.length) {
