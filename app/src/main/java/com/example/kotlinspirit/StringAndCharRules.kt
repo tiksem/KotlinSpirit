@@ -50,7 +50,9 @@ class MatchCharRule(
     private fun repeat(range: IntRange): StringRule {
         return MatchStringRule(
             commands = intArrayOf(
-                Command.MATCH_CHAR_STR, commands[1], range.first, range.last
+                Command.MATCH_CHAR_STR,
+                commands.getPredicate(),
+                range.first, range.last
             ),
             data
         )
@@ -89,6 +91,14 @@ class MatchCharRule(
         return MatchCharRuleCustomPredicate(
             commands = intArrayOf(Command.MATCH_CHAR, index),
             predicateIndex = index
+        )
+    }
+
+    operator fun minus(rule: MatchCharRule): MatchCharRule {
+        val data = data.remove(rule.data)
+        return MatchCharRule(
+            intArrayOf(Command.MATCH_CHAR, data.predicateIndex),
+            data = data
         )
     }
 }
@@ -141,9 +151,17 @@ open class StringRule(
     }
 }
 
+(a-z[2, 2] or d-z[3, 5]) - e-f[1, 6]
+a-d|g-z[2, 2] or d|g-z[3, 5]
+
 class MatchStringRule(
     commands: IntArray,
     private val data: CharMatchData
 ) : StringRule(commands) {
+    operator fun minus(rule: MatchStringRule): MatchStringRule {
+        val thisMin = commands.getStrCharMin()
+        val thisMax = commands.getStrCharMax()
+        val diffMin = commands.getStrCharMin()
 
+    }
 }

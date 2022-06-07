@@ -1,5 +1,6 @@
 package com.example.kotlinspirit
 
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -14,6 +15,24 @@ class CharMatchData(
         return CharMatchData(
             ranges = ranges + other.ranges,
             chars = chars + other.chars
+        )
+    }
+
+    fun remove(other: CharMatchData): CharMatchData {
+        val resultSet = TreeSet<Char>()
+        resultSet.addAll(this.chars.toList())
+        ranges.forEach {
+            resultSet.addAll(it.toSet())
+        }
+
+        resultSet.removeAll(other.chars.toList())
+        other.ranges.forEach {
+            resultSet.removeAll(it.toSet())
+        }
+
+        return CharMatchData(
+            ranges = emptyArray(),
+            chars = resultSet.toCharArray()
         )
     }
 
@@ -90,8 +109,9 @@ class CharMatchData(
         get() {
             return predicateHash[this] ?: createPredicate().let {
                 predicates.add(it)
-                val index = predicates.indexOf(it)
+                val index = predicates.size - 1
                 predicateHash[this] = index
+                charMatchDataByIndex[index] = this
                 index
             }
         }
@@ -119,6 +139,7 @@ class CharMatchData(
 
     companion object {
         private val predicateHash = ConcurrentHashMap<CharMatchData, Int>()
+        private val charMatchDataByIndex = ConcurrentHashMap<Int, CharMatchData>()
         val predicates = CopyOnWriteArrayList<(Char) -> Boolean>()
 
         fun any(): CharMatchData {

@@ -1,7 +1,5 @@
 package com.example.kotlinspirit
 
-import kotlin.concurrent.withLock
-
 class Parser internal constructor(
     private var results: List<Box<Any>>,
     isGrammarParser: Boolean = false
@@ -80,6 +78,9 @@ class Parser internal constructor(
             Command.MATCH_CHAR -> {
                 return handleChar()
             }
+            Command.MATCH_EXACT_CHAR -> {
+                return handleExactChar()
+            }
             Command.ANY_CHAR -> {
                 handleAnyChar()
             }
@@ -109,6 +110,9 @@ class Parser internal constructor(
             }
             Command.GRAMMAR -> {
                 handleGrammarCommand(requireResult)
+            }
+            Command.ONE_OF -> {
+                handleOneOfCommand()
             }
             else -> null
         }
@@ -309,6 +313,18 @@ class Parser internal constructor(
         }
     }
 
+    private fun handleExactChar(): Char? {
+        val length = string.length
+        if (seek >= length) {
+            return null
+        }
+
+        val char = commands[++commandIndex].toChar()
+        if (seek) {
+
+        }
+    }
+
     private fun handleInt(): Int? {
         val length = string.length
         if (seek >= length) {
@@ -399,5 +415,16 @@ class Parser internal constructor(
         return result
     }
 
-
+    private fun handleOneOfCommand(): Any? {
+        val beginSeek = seek
+        val treeIndex = commands[++commandIndex]
+        val tree = TernaryStringTree.trees[treeIndex]
+        val seek = tree.find(string, seek)
+        return if (seek == null) {
+            this.seek = beginSeek
+            null
+        } else {
+            string.subSequence(beginSeek, seek)
+        }
+    }
 }
