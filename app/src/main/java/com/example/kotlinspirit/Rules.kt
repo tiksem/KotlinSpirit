@@ -62,4 +62,7 @@ object Rules {
             )
         )
     }
+
+    val latinStr
+        get() = str('A'..'B', 'a'..'z')
 }

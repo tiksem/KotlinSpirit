@@ -52,8 +52,8 @@ interface Rule<T : Any> {
         return NoRule(this)
     }
 
-    infix fun or(anotherRule: Rule<Any>): AnyOrRule {
-        return AnyOrRule(this as Rule<Any>, anotherRule)
+    infix fun or(anotherRule: Rule<*>): AnyOrRule {
+        return AnyOrRule(this as Rule<Any>, anotherRule as Rule<Any>)
     }
 
     infix fun or(anotherRule: Rule<T>): OrRule<T> {
