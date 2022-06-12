@@ -11,3 +11,7 @@ fun IntArray.setRegion(startIndex: Int, array: IntArray) {
 fun CharArray.binarySearchContains(char: Char): Boolean {
     return Arrays.binarySearch(this, char) >= 0
 }
+
+fun <T> Array<T>.contains(predicate: (T) -> Boolean): Boolean {
+    return find(predicate) != null
+}

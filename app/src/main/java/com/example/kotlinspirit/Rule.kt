@@ -1,72 +1,98 @@
 package com.example.kotlinspirit
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
+class ParseResult<T> {
+    var data: T? = null
+    var errorCodeOrSeek: Int = StepCode.MAY_COMPLETE
+}
 
-open class Rule<T : Any>(
-    val commands: IntArray
-) {
-    infix fun or(other: Rule<*>): AnyRule {
-        return AnyRule(
-            Commands.concat(command = Command.OR, a = this.commands, b = other.commands)
-        )
-    }
-
-    override fun toString(): String {
-        val result = StringBuilder()
-        var i = 0
+interface Rule<T : Any> {
+    fun parse(seek: Int, string: CharSequence): Int {
+        resetStep()
         while (true) {
-            when (commands[i]) {
-                Command.OR -> {
-                    result.append("OR ")
-                    result.append(commands[++i])
-                }
-                Command.SEQUENCE -> {
-                    result.append("SEQUENCE ")
-                    result.append(commands[++i])
-                }
-                Command.ANY_INT -> {
-                    result.append("ANY_INT")
-                }
-            }
-            i++
-            if (i < commands.size) {
-                result.append(" ")
-            } else {
-                break
+            val stepResult = parseStep(seek, string)
+            val stepCode = stepResult.getStepCode()
+            if (stepCode.isErrorOrComplete()) {
+                return stepResult.toSeekOrError()
             }
         }
-
-        return result.toString()
     }
 
-    companion object {
-        private val resultsLock = ReentrantLock()
-        private val results = Long2ObjectOpenHashMap<ArrayList<Box<Any>>>()
-
-        internal fun <T : Any> addResult(box: Box<T>): IntArray {
-            val id: Int
-            resultsLock.withLock {
-                id = results.size
-                if (results.isEmpty()) {
-                    results[Thread.currentThread().id] = arrayListOf(box as Box<Any>)
-                } else {
-                    results.values.forEach {
-                        it.add(box as Box<Any>)
-                    }
-                }
-            }
-            return intArrayOf(Command.RESULT, id)
+    fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        val parseResult = parse(seek, string)
+        result.errorCodeOrSeek = parseResult
+        if (parseResult >= 0) {
+            result.data = getStepParserResult(string)
         }
+    }
 
-        internal fun getResults() = resultsLock.withLock {
-            val threadId = Thread.currentThread().id
-            results.getOrPut(threadId) {
-                results.values.first().map {
-                    it.copy()
-                }.asArrayList()
+    fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        resetStep()
+        while (true) {
+            val code = parseStep(seek, string).getStepCode()
+            if (code.isError()) {
+                return false
+            } else if (code.canComplete()) {
+                return true
             }
+        }
+    }
+
+    fun resetStep()
+    fun getStepParserResult(string: CharSequence): T
+    fun parseStep(seek: Int, string: CharSequence): Long
+
+    fun resetNoStep() {
+        resetStep()
+    }
+
+    fun noParse(seek: Int, string: CharSequence): Int
+    fun noParseStep(seek: Int, string: CharSequence): Long
+
+    operator fun not(): Rule<*> {
+        return NoRule(this)
+    }
+
+    infix fun or(anotherRule: Rule<Any>): AnyOrRule {
+        return AnyOrRule(this as Rule<Any>, anotherRule)
+    }
+
+    infix fun or(anotherRule: Rule<T>): OrRule<T> {
+        return OrRule(this, anotherRule)
+    }
+
+    operator fun plus(rule: Rule<*>): SequenceRule {
+        return SequenceRule(this, rule)
+    }
+
+    operator fun minus(rule: Rule<*>): DiffRule<T> {
+        return DiffRule(main = this, diff = rule)
+    }
+
+    fun repeat(): Rule<List<T>> {
+        return ZeroOrMoreRule(this)
+    }
+
+    operator fun invoke(callback: (T) -> Unit): RuleWithResult<T> {
+        return RuleWithResult(this, callback)
+    }
+
+    operator fun rem(divider: Rule<*>): SplitRule<T> {
+        return SplitRule(rule = this, divider = divider)
+    }
+
+    fun notifyParseStepComplete(string: CharSequence) {}
+
+    fun clone(): Rule<T>
+
+    fun parseWithResultOrThrow(string: CharSequence): T {
+        val result = ParseResult<T>()
+        parseWithResult(0, string, result)
+        if (result.errorCodeOrSeek < 0) {
+            throw ParseException(
+                -result.errorCodeOrSeek
+            )
+        } else {
+            return result.data!!
         }
     }
 }
