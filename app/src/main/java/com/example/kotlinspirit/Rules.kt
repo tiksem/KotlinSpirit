@@ -63,6 +63,10 @@ object Rules {
         )
     }
 
+    fun str(string: String): ExactStringRule {
+        return ExactStringRule(string)
+    }
+
     val latinStr
         get() = str('A'..'B', 'a'..'z')
 }

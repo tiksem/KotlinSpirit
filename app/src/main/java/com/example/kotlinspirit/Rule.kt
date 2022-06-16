@@ -57,11 +57,13 @@ interface Rule<T : Any> {
     }
 
     infix fun or(anotherRule: Rule<T>): OrRule<T> {
-        return OrRule(this, anotherRule)
+        val c = this
+        return OrRule(c, anotherRule)
     }
 
     operator fun plus(rule: Rule<*>): SequenceRule {
-        return SequenceRule(this, rule)
+        val c = this
+        return SequenceRule(c, rule)
     }
 
     operator fun minus(rule: Rule<*>): DiffRule<T> {
@@ -73,11 +75,19 @@ interface Rule<T : Any> {
     }
 
     operator fun invoke(callback: (T) -> Unit): RuleWithResult<T> {
-        return RuleWithResult(this, callback)
+        return RuleWithResult(this.clone(), callback)
     }
 
     operator fun rem(divider: Rule<*>): SplitRule<T> {
-        return SplitRule(rule = this, divider = divider)
+        return SplitRule(r = this, divider = divider)
+    }
+
+    operator fun rem(divider: Char): SplitRule<T> {
+        return SplitRule(r = this, divider = Rules.char(divider))
+    }
+
+    operator fun rem(divider: String): SplitRule<T> {
+        return SplitRule(r = this, divider = Rules.str(divider))
     }
 
     fun notifyParseStepComplete(string: CharSequence) {}
@@ -93,6 +103,13 @@ interface Rule<T : Any> {
             )
         } else {
             return result.data!!
+        }
+    }
+
+    fun matchOrThrow(string: CharSequence) {
+        val result = parse(0, string)
+        if (result < 0) {
+            throw ParseException(-result)
         }
     }
 }

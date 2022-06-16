@@ -10,6 +10,10 @@ class SequenceRule(
     private var stepEndSeek = -1
     private var activeRule = a
 
+    init {
+        
+    }
+
     override fun parse(seek: Int, string: CharSequence): Int {
         val aResult = a.parse(seek, string)
         if (aResult < 0) {

@@ -11,7 +11,8 @@ object StepCode {
     const val DIFF_FAILED = 7
     const val CHAR_PREDICATE_FAILED = 8
     const val STRING_NOT_ENOUGH_DATA = 9
-    const val NO_FAILED = 10
+    const val STRING_DOES_NOT_MATCH = 10
+    const val NO_FAILED = 11
 }
 
 fun Int.isError(): Boolean {
@@ -60,6 +61,7 @@ fun Int.errorCodeToString(): String {
         StepCode.DIFF_FAILED -> "DIFF_FAILED"
         StepCode.CHAR_PREDICATE_FAILED -> "CHAR_PREDICATE_FAILED"
         StepCode.STRING_NOT_ENOUGH_DATA -> "STRING_NOT_ENOUGH_DATA"
+        StepCode.STRING_DOES_NOT_MATCH -> "STRING_NOT_ENOUGH_DATA"
         StepCode.NO_FAILED -> "NO_FAILED"
         else -> "UNKNOWN"
     }

@@ -1,24 +1,24 @@
 package com.example.kotlinspirit
 
 abstract class Grammar<T : Any> : Rule<T> {
-    private var rule: Rule<*>? = null
+    private var r: Rule<*>? = null
 
     abstract val result: T
     protected abstract fun defineRule(): Rule<*>
     protected abstract fun resetResult()
 
     private fun initRule(): Rule<*> {
-        var rule = this.rule
+        var rule = this.r
         if (rule == null) {
             rule = defineRule()
-            this.rule = rule
+            this.r = rule
         }
 
         return rule
     }
 
     override fun resetStep() {
-        rule?.resetStep()
+        r?.resetStep()
     }
 
     override fun getStepParserResult(string: CharSequence): T {
@@ -38,14 +38,15 @@ abstract class Grammar<T : Any> : Rule<T> {
     }
 
     override fun parse(seek: Int, string: CharSequence): Int {
+        resetResult()
         return initRule().parse(seek, string)
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        resetResult()
         val resultSeek = initRule().parse(seek, string)
         result.errorCodeOrSeek = resultSeek
         if (resultSeek >= 0) {
-            resetResult()
             result.data = this.result
         }
     }

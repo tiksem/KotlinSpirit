@@ -23,12 +23,13 @@ class StringCharPredicateRule(
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
-        var i = 0
+        var i = seek
         while (i < string.length) {
             val c = string[i]
             if (!predicate(c)) {
                 result.data = string.subSequence(seek, i)
                 result.errorCodeOrSeek = i
+                return
             }
 
             i++

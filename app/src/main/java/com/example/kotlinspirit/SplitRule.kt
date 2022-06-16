@@ -1,25 +1,25 @@
 package com.example.kotlinspirit
 
 class SplitRule<T : Any>(
-    private val rule: Rule<T>,
+    private val r: Rule<T>,
     private val divider: Rule<*>,
 ) : Grammar<List<T>>() {
     override var result = ArrayList<T>()
         private set
 
     override fun defineRule(): Rule<*> {
-        return rule {
+        return r {
             result.add(it)
-        } + (divider + rule {
+        } + (divider + r {
             result.add(it)
         }).repeat()
     }
 
     override fun resetResult() {
-        result.clear()
+        result = ArrayList()
     }
 
     override fun clone(): SplitRule<T> {
-        return SplitRule(rule.clone(), divider.clone())
+        return SplitRule(r.clone(), r.clone())
     }
 }

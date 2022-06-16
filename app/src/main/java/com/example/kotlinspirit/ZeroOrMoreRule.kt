@@ -27,7 +27,7 @@ class ZeroOrMoreRule<T : Any>(
         result.data = list
         while (i < string.length) {
             val seekBefore = i
-            rule.parseWithResult(seek, string, itemResult)
+            rule.parseWithResult(i, string, itemResult)
             i = itemResult.errorCodeOrSeek
             if (i < 0) {
                 result.errorCodeOrSeek = seekBefore
