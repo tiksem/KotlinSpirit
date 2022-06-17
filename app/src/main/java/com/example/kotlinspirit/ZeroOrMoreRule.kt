@@ -11,7 +11,7 @@ class ZeroOrMoreRule<T : Any>(
         var i = seek
         while (i < string.length) {
             val seekBefore = i
-            i = rule.parse(seek, string)
+            i = rule.parse(i, string)
             if (i < 0) {
                 return seekBefore
             }

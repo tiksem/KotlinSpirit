@@ -1,6 +1,7 @@
 package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.char
+import com.example.kotlinspirit.Rules.int
 import com.example.kotlinspirit.Rules.str
 import org.junit.Assert
 import org.junit.Test

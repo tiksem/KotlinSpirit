@@ -20,6 +20,6 @@ class SplitRule<T : Any>(
     }
 
     override fun clone(): SplitRule<T> {
-        return SplitRule(r.clone(), r.clone())
+        return SplitRule(r.clone(), divider.clone())
     }
 }
