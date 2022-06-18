@@ -1,7 +1,7 @@
 package com.example.kotlinspirit
 
 object Rules {
-    fun <T : Any> lazy(ruleProvider: () -> Rule<T>): LazyRule<T> {
+    fun <T : Any> lazy(ruleProvider: () -> BaseRule<T>): LazyRule<T> {
         return LazyRule(ruleProvider)
     }
 

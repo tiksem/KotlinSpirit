@@ -6,13 +6,13 @@ import kotlin.math.min
 open class OrRule<T : Any>(
     private val a: Rule<T>,
     private val b: Rule<T>
-) : Rule<T> {
+) : BaseRule<T>() {
     private var activeRule = a
     private var stepBeginSeek = -1
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         val aResult = a.parse(seek, string)
-        return if (aResult < 0) {
+        return if (aResult.getStepCode().isError()) {
             b.parse(seek, string)
         } else {
             aResult
@@ -21,7 +21,7 @@ open class OrRule<T : Any>(
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         a.parseWithResult(seek, string, result)
-        if (result.errorCodeOrSeek < 0) {
+        if (result.stepResult.getStepCode().isError()) {
             b.parseWithResult(seek, string, result)
         }
     }
@@ -80,7 +80,7 @@ open class OrRule<T : Any>(
         throw UnsupportedOperationException()
     }
 
-    override fun clone(): Rule<T> {
+    override fun clone(): OrRule<T> {
         return OrRule(
             a = a.clone(),
             b = b.clone()

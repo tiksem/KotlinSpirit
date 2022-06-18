@@ -5,10 +5,13 @@ class IntRule : BaseRule<Int>() {
     private var successFlag = false
     private var sign = 1
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
-            return -StepCode.EOF
+            return createStepResult(
+                seek = seek,
+                stepCode = StepCode.EOF
+            )
         }
 
         var i = seek
@@ -20,16 +23,19 @@ class IntRule : BaseRule<Int>() {
             when {
                 char == '-' -> {
                     if (successFlag) {
-                        return i
+                        return createComplete(i)
                     } else if (sign == 1) {
                         sign = -1
                     }
                 }
                 !successFlag && char == '0' -> {
                     return if (i >= length || string[i] !in '0'..'9') {
-                        i
+                        createComplete(i)
                     } else {
-                        -StepCode.INT_STARTED_FROM_ZERO
+                        createStepResult(
+                            seek = i,
+                            stepCode = StepCode.INT_STARTED_FROM_ZERO
+                        )
                     }
                 }
                 char in '0'..'9' -> {
@@ -38,25 +44,34 @@ class IntRule : BaseRule<Int>() {
                     result += char - '0'
                     // check int bounds
                     if (result < 0) {
-                        return -StepCode.INT_OUT_OF_BOUNDS
+                        return createStepResult(
+                            seek = i,
+                            stepCode = StepCode.INT_OUT_OF_BOUNDS
+                        )
                     }
                 }
                 successFlag -> {
-                    return i
+                    return createComplete(i - 1)
                 }
                 else -> {
-                    return -StepCode.INVALID_INT
+                    return createStepResult(
+                        seek = i,
+                        stepCode = StepCode.INVALID_INT
+                    )
                 }
             }
         } while (i < length)
 
-        return i
+        return createComplete(i)
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Int>) {
         val length = string.length
         if (seek >= length) {
-            r.errorCodeOrSeek = -StepCode.EOF
+            r.stepResult = createStepResult(
+                seek = seek,
+                stepCode = StepCode.EOF
+            )
             return
         }
 
@@ -71,23 +86,29 @@ class IntRule : BaseRule<Int>() {
                     when {
                         successFlag -> {
                             r.data = result * sign
-                            r.errorCodeOrSeek = i
+                            r.stepResult = createComplete(i)
                             return
                         }
                         sign == 1 -> {
                             sign = -1
                         }
                         else -> {
-                            r.errorCodeOrSeek = -StepCode.INVALID_INT
+                            r.stepResult = createStepResult(
+                                seek = i,
+                                stepCode = StepCode.INVALID_INT
+                            )
                         }
                     }
                 }
                 !successFlag && char == '0' -> {
                     if (i >= length || string[i] !in '0'..'9') {
                         r.data = result * sign
-                        r.errorCodeOrSeek = i
+                        r.stepResult = createComplete(i)
                     } else {
-                        r.errorCodeOrSeek = -StepCode.INT_STARTED_FROM_ZERO
+                        r.stepResult = createStepResult(
+                            seek = i,
+                            stepCode = StepCode.INT_STARTED_FROM_ZERO
+                        )
                     }
                     return
                 }
@@ -97,24 +118,30 @@ class IntRule : BaseRule<Int>() {
                     result += char - '0'
                     // check int bounds
                     if (result < 0) {
-                        r.errorCodeOrSeek = -StepCode.INT_OUT_OF_BOUNDS
+                        r.stepResult = createStepResult(
+                            seek = i,
+                            stepCode = StepCode.INT_OUT_OF_BOUNDS
+                        )
                         return
                     }
                 }
                 successFlag -> {
                     r.data = result * sign
-                    r.errorCodeOrSeek = i - 1
+                    r.stepResult = createComplete(i - 1)
                     return
                 }
                 else -> {
-                    r.errorCodeOrSeek = -StepCode.INVALID_INT
+                    r.stepResult = createStepResult(
+                        seek = i,
+                        stepCode = StepCode.INVALID_INT
+                    )
                     return
                 }
             }
         } while (i < length)
 
         r.data = result * sign
-        r.errorCodeOrSeek = i
+        r.stepResult = createComplete(i)
     }
 
     override fun resetStep() {
@@ -226,7 +253,7 @@ class IntRule : BaseRule<Int>() {
     override fun noParse(seek: Int, string: CharSequence): Int {
         val length = string.length
         if (seek >= length) {
-            return -StepCode.EOF
+            return -seek
         }
 
         var i = seek
@@ -237,7 +264,7 @@ class IntRule : BaseRule<Int>() {
                 char == '-' && !noSuccess -> {
                     if (i < length - 1) {
                         if (string[i + 1] in '0'..'9') {
-                            return -StepCode.NO_FAILED
+                            return -seek
                         } else {
                             noSuccess = true
                             i+=2
@@ -250,7 +277,7 @@ class IntRule : BaseRule<Int>() {
                     return if (noSuccess) {
                         i
                     } else {
-                        -StepCode.NO_FAILED
+                        -i
                     }
                 }
                 else -> {

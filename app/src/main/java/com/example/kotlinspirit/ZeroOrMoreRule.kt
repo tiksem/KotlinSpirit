@@ -7,17 +7,22 @@ class ZeroOrMoreRule<T : Any>(
 ) : BaseRule<List<T>>() {
     private val result = ArrayList<T>()
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         while (i < string.length) {
             val seekBefore = i
-            i = rule.parse(i, string)
-            if (i < 0) {
-                return seekBefore
+            val ruleRes = rule.parse(i, string)
+            if (ruleRes.getStepCode().isError()) {
+                return createComplete(seekBefore)
+            } else {
+                i = ruleRes.getSeek()
+                if (i == seekBefore) {
+                    return createComplete(i)
+                }
             }
         }
 
-        return i
+        return createComplete(i)
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
@@ -28,15 +33,22 @@ class ZeroOrMoreRule<T : Any>(
         while (i < string.length) {
             val seekBefore = i
             rule.parseWithResult(i, string, itemResult)
-            i = itemResult.errorCodeOrSeek
-            if (i < 0) {
-                result.errorCodeOrSeek = seekBefore
+            val stepResult = itemResult.stepResult
+            if (stepResult.getStepCode().isError()) {
+                result.stepResult = createComplete(seekBefore)
+                return
             } else {
+                i = stepResult.getSeek()
+                if (i == seekBefore) {
+                    result.stepResult = createComplete(i)
+                    return
+                }
+
                 list.add(itemResult.data ?: throw IllegalStateException("data should not be empty"))
             }
         }
 
-        result.errorCodeOrSeek = i
+        result.stepResult = createComplete(i)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {

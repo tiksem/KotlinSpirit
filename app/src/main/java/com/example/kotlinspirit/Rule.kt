@@ -1,25 +1,33 @@
 package com.example.kotlinspirit
 
+import com.example.kotlinspirit.Rules.char
+import com.example.kotlinspirit.Rules.str
+
+private val DEFAULT_STEP_RESULT = createStepResult(
+    seek = 0,
+    stepCode = StepCode.COMPLETE
+)
+
 class ParseResult<T> {
     var data: T? = null
-    var errorCodeOrSeek: Int = StepCode.MAY_COMPLETE
+    var stepResult: Long = DEFAULT_STEP_RESULT
 }
 
 interface Rule<T : Any> {
-    fun parse(seek: Int, string: CharSequence): Int {
+    fun parse(seek: Int, string: CharSequence): Long {
         resetStep()
         while (true) {
             val stepResult = parseStep(seek, string)
             val stepCode = stepResult.getStepCode()
             if (stepCode.isErrorOrComplete()) {
-                return stepResult.toSeekOrError()
+                return stepResult
             }
         }
     }
 
     fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         val parseResult = parse(seek, string)
-        result.errorCodeOrSeek = parseResult
+        result.stepResult = parseResult
         if (parseResult >= 0) {
             result.data = getStepParserResult(string)
         }
@@ -83,21 +91,44 @@ interface Rule<T : Any> {
     }
 
     fun repeat(): Rule<*>
+    fun repeat(range: IntRange): Rule<*>
 
-    operator fun invoke(callback: (T) -> Unit): RuleWithResult<T> {
-        return RuleWithResult(this.clone(), callback)
-    }
+    operator fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T>
 
     operator fun rem(divider: Rule<*>): SplitRule<T> {
-        return SplitRule(r = this, divider = divider)
+        return split(divider = divider, range = 1..Int.MAX_VALUE)
+    }
+
+    fun split(divider: Rule<*>, range: IntRange): SplitRule<T> {
+        return SplitRule(r = this, divider = divider, range = range)
+    }
+
+    fun split(divider: Rule<*>, times: Int): SplitRule<T> {
+        return split(divider = divider, range = times..times)
+    }
+
+    fun split(divider: Char, range: IntRange): SplitRule<T> {
+        return split(char(divider), range)
+    }
+
+    fun split(divider: String, range: IntRange): SplitRule<T> {
+        return split(str(divider), range)
+    }
+
+    fun split(divider: Char, times: Int): SplitRule<T> {
+        return split(char(divider), times)
+    }
+
+    fun split(divider: String, times: Int): SplitRule<T> {
+        return split(str(divider), times)
     }
 
     operator fun rem(divider: Char): SplitRule<T> {
-        return SplitRule(r = this, divider = Rules.char(divider))
+        return rem(char(divider))
     }
 
     operator fun rem(divider: String): SplitRule<T> {
-        return SplitRule(r = this, divider = Rules.str(divider))
+        return rem(str(divider))
     }
 
     fun notifyParseStepComplete(string: CharSequence) {}
@@ -107,10 +138,9 @@ interface Rule<T : Any> {
     fun parseWithResultOrThrow(string: CharSequence): T {
         val result = ParseResult<T>()
         parseWithResult(0, string, result)
-        if (result.errorCodeOrSeek < 0) {
-            throw ParseException(
-                -result.errorCodeOrSeek
-            )
+        val stepResult = result.stepResult
+        if (stepResult.getStepCode().isError()) {
+            throw ParseException(stepResult, string)
         } else {
             return result.data!!
         }
@@ -118,8 +148,12 @@ interface Rule<T : Any> {
 
     fun matchOrThrow(string: CharSequence) {
         val result = parse(0, string)
-        if (result < 0) {
-            throw ParseException(-result)
+        if (result.getStepCode().isError()) {
+            throw ParseException(result, string)
         }
+    }
+
+    fun asStringRule(): StringRuleWrapper {
+        return StringRuleWrapper(this)
     }
 }

@@ -14,13 +14,13 @@ class SequenceRule(
 
     }
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         val aResult = a.parse(seek, string)
-        if (aResult < 0) {
+        if (aResult.getStepCode().isError()) {
             return aResult
         }
 
-        return b.parse(aResult, string)
+        return b.parse(aResult.getSeek(), string)
     }
 
     override fun parseWithResult(
@@ -28,19 +28,19 @@ class SequenceRule(
         string: CharSequence,
         result: ParseResult<CharSequence>
     ) {
-        val seekOrError = parse(seek, string)
-        result.errorCodeOrSeek = seekOrError
-        if (seekOrError >= 0) {
-            result.data = string.subSequence(seek, seekOrError)
+        val parseResult = parse(seek, string)
+        result.stepResult = parseResult
+        if (parseResult.getStepCode().isNotError()) {
+            result.data = string.subSequence(seek, parseResult.getSeek())
         }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         val aResult = a.parse(seek, string)
-        if (aResult < 0) {
-            return false
+        return if (aResult.getStepCode().isError()) {
+            false
         } else {
-            return b.hasMatch(aResult, string)
+            b.hasMatch(aResult.getSeek(), string)
         }
     }
 
@@ -85,8 +85,8 @@ class SequenceRule(
     override fun noParse(seek: Int, string: CharSequence): Int {
         val aNoParseResult = a.noParse(seek, string)
         return if (aNoParseResult < 0) {
-            val aSeek = a.parse(seek, string)
-            b.noParse(aSeek, string)
+            val aParseResult = a.parse(seek, string)
+            b.noParse(aParseResult.getSeek(), string)
         } else {
             aNoParseResult
         }
@@ -96,7 +96,7 @@ class SequenceRule(
         throw UnsupportedOperationException()
     }
 
-    override fun clone(): Rule<CharSequence> {
+    override fun clone(): SequenceRule {
         return SequenceRule(a.clone(), b.clone())
     }
 }

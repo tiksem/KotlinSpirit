@@ -7,30 +7,42 @@ class CharPredicateRule(
 ) : Rule<Char> {
     private var result = 0.toChar()
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         if (seek >= string.length) {
-            return -StepCode.EOF
+            return createStepResult(
+                seek = seek,
+                stepCode = StepCode.EOF
+            )
         }
 
         return if (predicate(string[seek])) {
-            seek + 1
+            createComplete(seek + 1)
         } else {
-            -StepCode.CHAR_PREDICATE_FAILED
+            createStepResult(
+                seek = seek,
+                stepCode = StepCode.CHAR_PREDICATE_FAILED
+            )
         }
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         if (seek >= string.length) {
-            result.errorCodeOrSeek = -StepCode.EOF
+            result.stepResult = createStepResult(
+                seek = seek,
+                stepCode = StepCode.EOF
+            )
             return
         }
 
         val ch = string[seek]
         if (predicate(ch)) {
             result.data = ch
-            result.errorCodeOrSeek = seek + 1
+            result.stepResult = createComplete(seek + 1)
         } else {
-            result.errorCodeOrSeek = -StepCode.CHAR_PREDICATE_FAILED
+            result.stepResult = createStepResult(
+                seek = seek,
+                stepCode = StepCode.CHAR_PREDICATE_FAILED
+            )
         }
     }
 
@@ -87,11 +99,19 @@ class CharPredicateRule(
         return StringCharPredicateRule(predicate)
     }
 
+    override fun repeat(range: IntRange): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(predicate, range)
+    }
+
     override fun noParse(seek: Int, string: CharSequence): Int {
         throw UnsupportedOperationException()
     }
 
     override fun noParseStep(seek: Int, string: CharSequence): Long {
         throw UnsupportedOperationException()
+    }
+
+    override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {
+        return CharPredicateResultRule(rule = this.clone(), callback)
     }
 }

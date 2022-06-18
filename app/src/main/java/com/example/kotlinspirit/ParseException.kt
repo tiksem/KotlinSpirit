@@ -1,7 +1,10 @@
 package com.example.kotlinspirit
 
 class ParseException(
-    val errorCode: Int,
+    result: Long,
+    string: CharSequence
 ) : Exception(
-    "Failed to parse token, error: ${errorCode.errorCodeToString()}"
+    "Failed to parse token: ${string.subSequence(0, result.getSeek())}, error: ${
+        result.getStepCode().errorCodeToString()
+    }"
 )

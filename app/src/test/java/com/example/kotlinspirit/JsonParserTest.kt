@@ -12,7 +12,8 @@ private val jsonString = object : Grammar<CharSequence>() {
         private set
 
     override fun defineRule(): Rule<*> {
-        return char('"') + ((!char('"')).repeat()) {
+        val ch = !char('"') or str("\\\"")
+        return char('"') + (ch.repeat().asStringRule()) {
             result = it
         } + char('"')
     }
@@ -36,12 +37,15 @@ private val jsonObject = object : Grammar<Map<CharSequence, Any>>() {
     }
 
     override fun defineRule(): Rule<*> {
-        val jsonPair = jsonString {
+        val jsonPair = skipper + jsonString {
             key = it
-        } + skipper + ':' + skipper + (value {
+        } + skipper + ':' + skipper + value {
             result[key] = it
-        })
-        return char('{') + skipper + jsonPair % ',' + skipper + '}'
+        } + skipper
+        return char('{') + skipper + jsonPair.split(
+            divider = ',',
+            range = 0..Int.MAX_VALUE
+        ) + '}'
     }
 }
 
@@ -56,7 +60,7 @@ private val jsonArray = object : Grammar<List<Any>>() {
     override fun defineRule(): Rule<*> {
         return char('[') + (skipper + value {
             result.add(it)
-        } + skipper) % ',' + ']'
+        } + skipper).split(',', 0..Int.MAX_VALUE) + ']'
     }
 }
 
@@ -69,6 +73,55 @@ private val json = object : Grammar<Any>() {
             result = it
         } + skipper
     }
+}
+
+private fun Map<out Any, Any>.contentEquals(other: Map<out Any, Any>): Boolean {
+    if (size != other.size) {
+        return false
+    }
+
+    if (!this.keys.toTypedArray().contentEquals(other.keys.toTypedArray())) {
+        return false
+    }
+
+    fun anyEqual(v: Any, v2: Any): Boolean {
+        if (v == v2) {
+            return true
+        }
+
+        when (v) {
+            is Map<*, *> -> {
+                return (v as Map<String, Any>).contentEquals(
+                    v2 as? Map<String, Any> ?: return false
+                )
+            }
+            is List<*> -> {
+                val v2List = v2 as? List<*> ?: return false
+                if (v.size != v2List.size) {
+                    return false
+                }
+
+                v.zip(v2List).forEach {
+                    if (!anyEqual(it.first ?: return false, it.second ?: return false)) {
+                        return false
+                    }
+                }
+            }
+        }
+
+        return true
+    }
+
+    keys.forEach {
+        val v = this[it]!!
+        val v2 = other[it]!!
+
+        if (!anyEqual(v, v2)) {
+            return false
+        }
+    }
+
+    return true
 }
 
 class JsonParserTest {
@@ -93,6 +146,29 @@ class JsonParserTest {
         Assert.assertArrayEquals(
             arrayOf(1223233, "aaaaaa", 123456),
             jsonArray.parseWithResultOrThrow("[  1223233, \"aaaaaa\", 123456]").toTypedArray()
+        )
+    }
+
+    @Test
+    fun emptyArrayTest() {
+        Assert.assertArrayEquals(
+            arrayOf(),
+            jsonArray.parseWithResultOrThrow("[]").toTypedArray()
+        )
+    }
+
+    @Test
+    fun testObject() {
+        val res = jsonObject.parseWithResultOrThrow(
+            "{\"str\": \n\n\n\"value\", \"int\": 1234345, \"arr\": [123, \"123\", \n\n12]   }"
+        )
+
+        res.contentEquals(
+            mapOf(
+                "str" to "value",
+                "int" to 1234345,
+                "arr" to listOf(123, "123", 12)
+            )
         )
     }
 }

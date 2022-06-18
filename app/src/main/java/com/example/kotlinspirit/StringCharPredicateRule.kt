@@ -8,18 +8,18 @@ class StringCharPredicateRule(
     private var stepSeekBegin = -1
     private var result: CharSequence = ""
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         while (i < string.length) {
             val c = string[i]
             if (!predicate(c)) {
-                return i
+                return createComplete(i)
             }
 
             i++
         }
 
-        return i
+        return createComplete(i)
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
@@ -28,7 +28,7 @@ class StringCharPredicateRule(
             val c = string[i]
             if (!predicate(c)) {
                 result.data = string.subSequence(seek, i)
-                result.errorCodeOrSeek = i
+                result.stepResult = createComplete(i)
                 return
             }
 
@@ -36,7 +36,7 @@ class StringCharPredicateRule(
         }
 
         result.data = string.subSequence(seek, i)
-        result.errorCodeOrSeek = i
+        result.stepResult = createComplete(i)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {

@@ -1,33 +1,29 @@
 package com.example.kotlinspirit
 
-class RuleWithResult<T : Any>(
-    private val rule: Rule<T>,
-    private val callback: (T) -> Unit
+abstract class BaseRuleWithResult<T : Any>(
+    protected val rule: Rule<T>,
+    protected val callback: (T) -> Unit
 ) : Rule<T> {
     private val result = ParseResult<T>()
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         rule.parseWithResult(seek, string, result)
-        if (result.errorCodeOrSeek >= 0) {
+        if (result.stepResult.getStepCode().isNotError()) {
             callback(result.data ?: throw IllegalStateException("result is null"))
         }
 
-        return result.errorCodeOrSeek
+        return result.stepResult
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         rule.parseWithResult(seek, string, result)
-        if (result.errorCodeOrSeek >= 0) {
+        if (result.stepResult.getStepCode().isNotError()) {
             callback(result.data ?: throw IllegalStateException("result is null"))
         }
     }
 
     override fun notifyParseStepComplete(string: CharSequence) {
         callback(getStepParserResult(string))
-    }
-
-    override fun clone(): RuleWithResult<T> {
-        return RuleWithResult(rule.clone(), callback)
     }
 
     override fun resetStep() {
@@ -39,7 +35,6 @@ class RuleWithResult<T : Any>(
     }
 
     override fun parseStep(seek: Int, string: CharSequence): Long {
-        string.codePoints()
         return rule.parseStep(seek, string)
     }
 
@@ -50,8 +45,46 @@ class RuleWithResult<T : Any>(
     override fun noParseStep(seek: Int, string: CharSequence): Long {
         return rule.noParseStep(seek, string)
     }
+}
 
-    override fun repeat(): Rule<*> {
-        return rule.repeat()
+class RuleWithResult<T : Any>(
+    rule: BaseRule<T>,
+    callback: (T) -> Unit
+) : BaseRuleWithResult<T>(rule, callback) {
+    override fun repeat(): Rule<List<T>> {
+        return rule.repeat() as Rule<List<T>>
+    }
+
+    override fun repeat(range: IntRange): Rule<*> {
+        return rule.repeat(range) as Rule<List<T>>
+    }
+
+    override fun invoke(callback: (T) -> Unit): RuleWithResult<T> {
+        return RuleWithResult(rule as BaseRule<T>, callback)
+    }
+
+    override fun clone(): RuleWithResult<T> {
+        return RuleWithResult(rule.clone() as BaseRule<T>, callback)
+    }
+}
+
+class CharPredicateResultRule(
+    rule: CharPredicateRule,
+    callback: (Char) -> Unit
+) : BaseRuleWithResult<Char>(rule, callback) {
+    override fun repeat(): StringCharPredicateRule {
+        return (rule as CharPredicateRule).repeat()
+    }
+
+    override fun repeat(range: IntRange): StringCharPredicateRangeRule {
+        return (rule as CharPredicateRule).repeat(range)
+    }
+
+    override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {
+        return CharPredicateResultRule(rule as CharPredicateRule, callback)
+    }
+
+    override fun clone(): CharPredicateResultRule {
+        return CharPredicateResultRule(rule.clone() as CharPredicateRule, callback)
     }
 }

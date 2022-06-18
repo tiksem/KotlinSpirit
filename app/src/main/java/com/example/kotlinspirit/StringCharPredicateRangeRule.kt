@@ -1,19 +1,22 @@
 package com.example.kotlinspirit
 
 import java.lang.UnsupportedOperationException
+import kotlin.math.min
 
-class StringOneOrMoreCharPredicateRule(
-    private val predicate: (Char) -> Boolean
+class StringCharPredicateRangeRule(
+    private val predicate: (Char) -> Boolean,
+    private val range: IntRange
 ) : BaseRule<CharSequence>() {
     private var stepSeekBegin = -1
     private var result: CharSequence = ""
 
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
-        while (i < string.length) {
+        val limit = min(string.length, range.last + seek)
+        while (i < limit) {
             val c = string[i]
             if (!predicate(c)) {
-                return if (i - seek >= 1) {
+                return if (i - seek >= range.first) {
                     createComplete(i)
                 } else {
                     createStepResult(
@@ -26,7 +29,7 @@ class StringOneOrMoreCharPredicateRule(
             i++
         }
 
-        return if (i - seek >= 1) {
+        return if (i - seek >= range.first) {
             createComplete(i)
         } else {
             createStepResult(
@@ -38,10 +41,11 @@ class StringOneOrMoreCharPredicateRule(
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
         var i = seek
-        while (i < string.length) {
+        val limit = min(string.length, range.last + seek)
+        while (i < limit) {
             val c = string[i]
             if (!predicate(c)) {
-                if (i - seek >= 1) {
+                if (i - seek >= range.first) {
                     result.data = string.subSequence(seek, i)
                     result.stepResult = createComplete(i)
                 } else {
@@ -56,7 +60,7 @@ class StringOneOrMoreCharPredicateRule(
             i++
         }
 
-        if (i - seek >= 1) {
+        if (i - seek >= range.first) {
             result.data = string.subSequence(seek, i)
             result.stepResult = createComplete(i)
         } else {
@@ -86,7 +90,7 @@ class StringOneOrMoreCharPredicateRule(
         }
 
         if (seek >= string.length) {
-            return if (seek > stepSeekBegin) {
+            return if (seek - range.first >= stepSeekBegin) {
                 result = string.subSequence(stepSeekBegin, seek)
                 notifyParseStepComplete(string)
                 createStepResult(
@@ -108,7 +112,7 @@ class StringOneOrMoreCharPredicateRule(
                 stepCode = StepCode.MAY_COMPLETE
             )
         } else {
-            if (seek > stepSeekBegin) {
+            if (seek - range.first > stepSeekBegin) {
                 result = string.subSequence(stepSeekBegin, seek)
                 notifyParseStepComplete(string)
                 createStepResult(
@@ -132,15 +136,16 @@ class StringOneOrMoreCharPredicateRule(
         throw UnsupportedOperationException()
     }
 
-    override fun not(): StringOneOrMoreCharPredicateRule {
-        return StringOneOrMoreCharPredicateRule(
+    override fun not(): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(
             predicate = {
                 !predicate(it)
-            }
+            },
+            range = range
         )
     }
 
-    override fun clone(): StringOneOrMoreCharPredicateRule {
-        return StringOneOrMoreCharPredicateRule(predicate)
+    override fun clone(): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(predicate, range)
     }
 }

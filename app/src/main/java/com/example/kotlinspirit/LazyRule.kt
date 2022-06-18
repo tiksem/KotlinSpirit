@@ -5,7 +5,7 @@ abstract class BaseLazyRule<T : Any>(
 ): Rule<T> {
     private var rule: Rule<T>? = null
 
-    protected fun initRule(): Rule<T> {
+    protected open fun initRule(): Rule<T> {
         val rule = this.rule
         if (rule != null) {
             return rule
@@ -16,7 +16,7 @@ abstract class BaseLazyRule<T : Any>(
         }
     }
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         return initRule().parse(seek, string)
     }
 
@@ -63,16 +63,36 @@ class LazyCharPredicateRule(
     override fun clone(): LazyCharPredicateRule {
         return LazyCharPredicateRule(ruleProvider)
     }
+
+    override fun repeat(range: IntRange): Rule<*> {
+        return initRule().repeat(range)
+    }
+
+    override fun invoke(callback: (Char) -> Unit): BaseRuleWithResult<Char> {
+        return initRule().invoke(callback)
+    }
 }
 
 class LazyRule<T : Any>(
-    private val ruleProvider: () -> Rule<T>
+    private val ruleProvider: () -> BaseRule<T>
 ) : BaseLazyRule<T>(ruleProvider) {
+    override fun initRule(): BaseRule<T> {
+        return super.initRule() as BaseRule<T>
+    }
+
     override fun repeat(): Rule<List<T>> {
         return ZeroOrMoreRule(this)
     }
 
     override fun clone(): Rule<T> {
         return LazyRule(ruleProvider)
+    }
+
+    override fun repeat(range: IntRange): Rule<List<T>> {
+        return initRule().repeat(range)
+    }
+
+    override fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T> {
+        return RuleWithResult(initRule(), callback)
     }
 }

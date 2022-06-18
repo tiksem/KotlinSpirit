@@ -37,7 +37,7 @@ abstract class Grammar<T : Any> : BaseRule<T>() {
         return initRule().noParseStep(seek, string)
     }
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         resetResult()
         return initRule().parse(seek, string)
     }
@@ -45,7 +45,7 @@ abstract class Grammar<T : Any> : BaseRule<T>() {
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         resetResult()
         val resultSeek = initRule().parse(seek, string)
-        result.errorCodeOrSeek = resultSeek
+        result.stepResult = resultSeek
         if (resultSeek >= 0) {
             result.data = this.result
         }

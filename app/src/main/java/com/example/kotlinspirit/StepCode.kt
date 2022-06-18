@@ -15,44 +15,43 @@ object StepCode {
     const val NO_FAILED = 11
 }
 
-fun Int.isError(): Boolean {
+inline fun Int.isError(): Boolean {
     return this > StepCode.COMPLETE
 }
 
-fun Int.isErrorOrComplete(): Boolean {
+inline fun Int.isNotError(): Boolean {
+    return this <= StepCode.COMPLETE
+}
+
+inline fun Int.isErrorOrComplete(): Boolean {
     return this > StepCode.MAY_COMPLETE
 }
 
-fun Int.isNextOrMayComplete(): Boolean {
+inline fun Int.isNextOrMayComplete(): Boolean {
     return this < StepCode.COMPLETE
 }
 
-fun Int.canComplete(): Boolean {
+inline fun Int.canComplete(): Boolean {
     return this == StepCode.MAY_COMPLETE || this == StepCode.COMPLETE
 }
 
-fun Long.getSeek(): Int {
+inline fun Long.getSeek(): Int {
     return (this shr 32).toInt()
 }
 
-fun Long.getStepCode(): Int {
+inline fun Long.getStepCode(): Int {
     return toInt()
 }
 
-fun Long.toSeekOrError(): Int {
-    val code = getStepCode()
-    if (code.isError()) {
-        return -code
-    } else {
-        return getSeek()
-    }
+inline fun createStepResult(seek: Int, stepCode: Int): Long {
+    return seek.toLong() shl 32 or (stepCode.toLong() and 0xFFFFFFFFL)
 }
 
-fun createStepResult(seek: Int, stepCode: Int): Long {
-    return seek.toLong() shl 32 or stepCode.toLong() and 0xFFFFFFFFL
+inline fun createComplete(seek: Int): Long {
+    return createStepResult(seek, StepCode.COMPLETE)
 }
 
-fun Int.errorCodeToString(): String {
+inline fun Int.errorCodeToString(): String {
     return when (this) {
         StepCode.EOF -> "EOF"
         StepCode.INVALID_INT -> "INVALID_INT"

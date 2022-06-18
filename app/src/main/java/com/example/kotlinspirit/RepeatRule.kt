@@ -9,27 +9,31 @@ class RepeatRule<T : Any>(
 ) : BaseRule<List<T>>() {
     private val result = ArrayList<T>()
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         var resultsCount = 0
         while (i < string.length && resultsCount < range.last) {
             val seekBefore = i
-            i = rule.parse(seek, string)
-            if (i < 0) {
+            val ruleRes = rule.parse(seek, string)
+            if (ruleRes.getStepCode().isError()) {
                 return if (resultsCount < range.first) {
-                    i
+                    ruleRes
                 } else {
-                    seekBefore
+                    createComplete(seekBefore)
                 }
             } else {
+                i = ruleRes.getSeek()
                 resultsCount++
             }
         }
 
         return if (resultsCount >= range.first) {
-            i
+            createComplete(i)
         } else {
-            return -StepCode.EOF
+            return createStepResult(
+                seek = i,
+                stepCode = StepCode.EOF
+            )
         }
     }
 
@@ -40,13 +44,13 @@ class RepeatRule<T : Any>(
         while (i < string.length  && list.size < range.last) {
             val seekBefore = i
             rule.parseWithResult(seek, string, itemResult)
-            i = itemResult.errorCodeOrSeek
-            if (i < 0) {
+            val stepResult = itemResult.stepResult
+            if (stepResult.getStepCode().isError()) {
                 if (list.size >= range.first) {
                     result.data = list
-                    result.errorCodeOrSeek = seekBefore
+                    result.stepResult = createComplete(seekBefore)
                 } else {
-                    result.errorCodeOrSeek = i
+                    result.stepResult = stepResult
                 }
             } else {
                 list.add(itemResult.data ?: throw IllegalStateException("data should not be empty"))
@@ -55,9 +59,12 @@ class RepeatRule<T : Any>(
 
         if (list.size >= range.first) {
             result.data = list
-            result.errorCodeOrSeek = i
+            result.stepResult = createComplete(i)
         } else {
-            result.errorCodeOrSeek = -StepCode.EOF
+            result.stepResult = createStepResult(
+                seek = i,
+                stepCode = StepCode.EOF
+            )
         }
     }
 

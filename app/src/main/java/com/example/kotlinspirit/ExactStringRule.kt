@@ -5,12 +5,17 @@ class ExactStringRule(
 ) : BaseRule<CharSequence>() {
     private var beginSeek = -1
 
-    override fun parse(seek: Int, string: CharSequence): Int {
+    override fun parse(seek: Int, string: CharSequence): Long {
         val str = string.subSequence(seek, string.length)
         return if (str.startsWith(this.string)) {
-            seek + this.string.length
+            createComplete(
+                seek = seek + this.string.length
+            )
         } else {
-            -StepCode.STRING_DOES_NOT_MATCH
+            createStepResult(
+                seek = seek,
+                stepCode = StepCode.STRING_DOES_NOT_MATCH
+            )
         }
     }
 
@@ -19,10 +24,15 @@ class ExactStringRule(
     ) {
         val str = string.subSequence(seek, string.length)
         if (str.startsWith(this.string)) {
-            result.errorCodeOrSeek = seek + this.string.length
+            result.stepResult = createComplete(
+                seek = seek + this.string.length
+            )
             result.data = string.subSequence(seek, this.string.length + seek)
         } else {
-            result.errorCodeOrSeek = -StepCode.STRING_DOES_NOT_MATCH
+            result.stepResult = createStepResult(
+                seek = seek,
+                stepCode = StepCode.STRING_DOES_NOT_MATCH
+            )
         }
     }
 
@@ -71,7 +81,7 @@ class ExactStringRule(
     override fun noParse(seek: Int, string: CharSequence): Int {
         val findIndex = string.indexOf(this.string, seek)
         return if (findIndex == seek) {
-            -StepCode.NO_FAILED
+            -seek
         } else {
             findIndex
         }
