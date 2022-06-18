@@ -39,6 +39,7 @@ class RuleWithResult<T : Any>(
     }
 
     override fun parseStep(seek: Int, string: CharSequence): Long {
+        string.codePoints()
         return rule.parseStep(seek, string)
     }
 
@@ -48,5 +49,9 @@ class RuleWithResult<T : Any>(
 
     override fun noParseStep(seek: Int, string: CharSequence): Long {
         return rule.noParseStep(seek, string)
+    }
+
+    override fun repeat(): Rule<*> {
+        return rule.repeat()
     }
 }

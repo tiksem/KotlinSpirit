@@ -1,6 +1,6 @@
 package com.example.kotlinspirit
 
-class IntRule : Rule<Int> {
+class IntRule : BaseRule<Int>() {
     private var result = 0
     private var successFlag = false
     private var sign = 1

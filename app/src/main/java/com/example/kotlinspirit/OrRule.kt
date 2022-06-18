@@ -86,6 +86,10 @@ open class OrRule<T : Any>(
             b = b.clone()
         )
     }
+
+    override fun repeat(): Rule<List<T>> {
+        return ZeroOrMoreRule(this)
+    }
 }
 
 class AnyOrRule(a: Rule<Any>, b: Rule<Any>) : OrRule<Any>(a, b) {}

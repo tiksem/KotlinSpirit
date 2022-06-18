@@ -5,13 +5,13 @@ import java.lang.UnsupportedOperationException
 class SequenceRule(
     private val a: Rule<*>,
     private val b: Rule<*>
-) : Rule<CharSequence> {
+) : BaseRule<CharSequence>() {
     private var stepBeginSeek = -1
     private var stepEndSeek = -1
     private var activeRule = a
 
     init {
-        
+
     }
 
     override fun parse(seek: Int, string: CharSequence): Int {

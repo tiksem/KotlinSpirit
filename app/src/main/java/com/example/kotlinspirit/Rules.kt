@@ -1,6 +1,10 @@
 package com.example.kotlinspirit
 
 object Rules {
+    fun <T : Any> lazy(ruleProvider: () -> Rule<T>): LazyRule<T> {
+        return LazyRule(ruleProvider)
+    }
+
     val int get() = IntRule()
 
     fun char(vararg ch: Char): CharPredicateRule {
@@ -65,6 +69,10 @@ object Rules {
 
     fun str(string: String): ExactStringRule {
         return ExactStringRule(string)
+    }
+
+    fun str(predicate: (Char) -> Boolean): StringCharPredicateRule {
+        return StringCharPredicateRule(predicate)
     }
 
     val latinStr

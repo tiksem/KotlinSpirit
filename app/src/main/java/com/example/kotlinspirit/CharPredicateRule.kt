@@ -3,7 +3,7 @@ package com.example.kotlinspirit
 import java.lang.UnsupportedOperationException
 
 class CharPredicateRule(
-    private val predicate: (Char) -> Boolean
+    val predicate: (Char) -> Boolean
 ) : Rule<Char> {
     private var result = 0.toChar()
 
@@ -81,6 +81,10 @@ class CharPredicateRule(
                 !predicate(it)
             }
         )
+    }
+
+    override fun repeat(): StringCharPredicateRule {
+        return StringCharPredicateRule(predicate)
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {

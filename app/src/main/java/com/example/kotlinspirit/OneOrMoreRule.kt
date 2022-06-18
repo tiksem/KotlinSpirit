@@ -4,7 +4,7 @@ import java.lang.IllegalStateException
 
 class OneOrMoreRule<T : Any>(
     private val rule: Rule<T>
-) : Rule<List<T>> {
+) : BaseRule<List<T>>() {
     private val result = ArrayList<T>()
 
     override fun parse(seek: Int, string: CharSequence): Int {

@@ -66,13 +66,23 @@ interface Rule<T : Any> {
         return SequenceRule(c, rule)
     }
 
+    operator fun plus(char: Char): SequenceRule {
+        val c = this
+        return SequenceRule(c, CharPredicateRule {
+            it == char
+        })
+    }
+
+    operator fun plus(string: String): SequenceRule {
+        val c = this
+        return SequenceRule(c, ExactStringRule(string))
+    }
+
     operator fun minus(rule: Rule<*>): DiffRule<T> {
         return DiffRule(main = this, diff = rule)
     }
 
-    fun repeat(): Rule<List<T>> {
-        return ZeroOrMoreRule(this)
-    }
+    fun repeat(): Rule<*>
 
     operator fun invoke(callback: (T) -> Unit): RuleWithResult<T> {
         return RuleWithResult(this.clone(), callback)

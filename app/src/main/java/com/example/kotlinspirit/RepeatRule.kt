@@ -6,7 +6,7 @@ import java.lang.UnsupportedOperationException
 class RepeatRule<T : Any>(
     private val rule: Rule<T>,
     private val range: IntRange
-) : Rule<List<T>> {
+) : BaseRule<List<T>>() {
     private val result = ArrayList<T>()
 
     override fun parse(seek: Int, string: CharSequence): Int {

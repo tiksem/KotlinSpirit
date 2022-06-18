@@ -5,7 +5,7 @@ import java.lang.UnsupportedOperationException
 class DiffRule<T : Any>(
     private val main: Rule<T>,
     private val diff: Rule<*>
-) : Rule<T> {
+) : BaseRule<T>() {
     private var mainMayCompleteSeek: Int = -1
 
     override fun resetStep() {

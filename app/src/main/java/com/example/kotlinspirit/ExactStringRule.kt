@@ -2,7 +2,7 @@ package com.example.kotlinspirit
 
 class ExactStringRule(
     private val string: String
-) : Rule<CharSequence> {
+) : BaseRule<CharSequence>() {
     private var beginSeek = -1
 
     override fun parse(seek: Int, string: CharSequence): Int {

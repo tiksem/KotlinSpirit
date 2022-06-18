@@ -6,11 +6,11 @@ import org.junit.Test
 class StringPredicateRuleTest {
     @Test
     fun test1() {
-        (char('!', '?') + " ").matchOrThrow("! ")
+        (char('!', '?') + ' ').matchOrThrow("! ")
     }
 
     @Test
     fun test2() {
-        (char('!', '?') + " ").matchOrThrow("? ")
+        (char('!', '?') + ' ').matchOrThrow("? ")
     }
 }

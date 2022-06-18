@@ -1,13 +1,13 @@
 package com.example.kotlinspirit
 
-abstract class Grammar<T : Any> : Rule<T> {
+abstract class Grammar<T : Any> : BaseRule<T>() {
     private var r: Rule<*>? = null
 
     abstract val result: T
     protected abstract fun defineRule(): Rule<*>
-    protected abstract fun resetResult()
+    protected open fun resetResult() {}
 
-    private fun initRule(): Rule<*> {
+    protected fun initRule(): Rule<*> {
         var rule = this.r
         if (rule == null) {
             rule = defineRule()
@@ -57,5 +57,9 @@ abstract class Grammar<T : Any> : Rule<T> {
 
     override fun resetNoStep() {
         initRule().resetNoStep()
+    }
+
+    override fun clone(): Grammar<T> {
+        return this.javaClass.newInstance()
     }
 }
