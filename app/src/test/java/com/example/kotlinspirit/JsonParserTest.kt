@@ -79,4 +79,20 @@ class JsonParserTest {
             jsonString.parseWithResultOrThrow("\"some str\"")
         )
     }
+
+    @Test
+    fun valueStringTest() {
+        Assert.assertEquals(
+            "some str",
+            value.parseWithResultOrThrow("\"some str\"")
+        )
+    }
+
+    @Test
+    fun testArray() {
+        Assert.assertArrayEquals(
+            arrayOf(1223233, "aaaaaa", 123456),
+            jsonArray.parseWithResultOrThrow("[  1223233, \"aaaaaa\", 123456]").toTypedArray()
+        )
+    }
 }

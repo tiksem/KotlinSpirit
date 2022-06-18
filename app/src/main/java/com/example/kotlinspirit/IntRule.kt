@@ -103,7 +103,7 @@ class IntRule : BaseRule<Int>() {
                 }
                 successFlag -> {
                     r.data = result * sign
-                    r.errorCodeOrSeek = i
+                    r.errorCodeOrSeek = i - 1
                     return
                 }
                 else -> {

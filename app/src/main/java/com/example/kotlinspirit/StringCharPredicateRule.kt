@@ -9,7 +9,7 @@ class StringCharPredicateRule(
     private var result: CharSequence = ""
 
     override fun parse(seek: Int, string: CharSequence): Int {
-        var i = 0
+        var i = seek
         while (i < string.length) {
             val c = string[i]
             if (!predicate(c)) {
