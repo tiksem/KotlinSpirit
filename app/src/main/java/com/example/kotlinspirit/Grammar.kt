@@ -18,6 +18,7 @@ abstract class Grammar<T : Any> : BaseRule<T>() {
     }
 
     override fun resetStep() {
+        resetResult()
         r?.resetStep()
     }
 

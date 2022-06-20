@@ -6,6 +6,7 @@ object Rules {
     }
 
     val int get() = IntRule()
+    val long get() = LongRule()
 
     fun char(vararg ch: Char): CharPredicateRule {
         return CharPredicateRule(
@@ -77,4 +78,6 @@ object Rules {
 
     val latinStr
         get() = str('A'..'B', 'a'..'z')
+
+    val double get() = DoubleRule()
 }

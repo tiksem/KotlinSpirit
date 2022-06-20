@@ -13,6 +13,7 @@ object StepCode {
     const val STRING_NOT_ENOUGH_DATA = 9
     const val STRING_DOES_NOT_MATCH = 10
     const val NO_FAILED = 11
+    const val INVALID_DOUBLE = 12
 }
 
 inline fun Int.isError(): Boolean {
@@ -51,8 +52,15 @@ inline fun createComplete(seek: Int): Long {
     return createStepResult(seek, StepCode.COMPLETE)
 }
 
-inline fun Int.errorCodeToString(): String {
+fun Long.stepResultToString(): String {
+    return "seek = ${getSeek()}, code = ${getStepCode().stepCodeToString()}"
+}
+
+inline fun Int.stepCodeToString(): String {
     return when (this) {
+        StepCode.COMPLETE -> "COMPLETE"
+        StepCode.HAS_NEXT -> "HAS_NEXT"
+        StepCode.MAY_COMPLETE -> "MAY_COMPLETE"
         StepCode.EOF -> "EOF"
         StepCode.INVALID_INT -> "INVALID_INT"
         StepCode.INT_STARTED_FROM_ZERO -> "INT_STARTED_FROM_ZERO"
@@ -62,6 +70,7 @@ inline fun Int.errorCodeToString(): String {
         StepCode.STRING_NOT_ENOUGH_DATA -> "STRING_NOT_ENOUGH_DATA"
         StepCode.STRING_DOES_NOT_MATCH -> "STRING_NOT_ENOUGH_DATA"
         StepCode.NO_FAILED -> "NO_FAILED"
+        StepCode.INVALID_DOUBLE -> "INVALID_DOUBLE"
         else -> "UNKNOWN"
     }
 }

@@ -153,6 +153,10 @@ interface Rule<T : Any> {
         }
     }
 
+    fun match(string: CharSequence): Boolean {
+        return parse(0, string).getStepCode() == StepCode.COMPLETE
+    }
+
     fun asStringRule(): StringRuleWrapper {
         return StringRuleWrapper(this)
     }

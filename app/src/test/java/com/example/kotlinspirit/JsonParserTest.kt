@@ -6,6 +6,9 @@ import com.example.kotlinspirit.Rules.str
 import com.example.kotlinspirit.Rules.lazy
 import org.junit.Assert
 import org.junit.Test
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
 private val jsonString = object : Grammar<CharSequence>() {
     override var result: CharSequence = ""
@@ -151,6 +154,7 @@ class JsonParserTest {
 
     @Test
     fun emptyArrayTest() {
+        val scanner = Scanner("")
         Assert.assertArrayEquals(
             arrayOf(),
             jsonArray.parseWithResultOrThrow("[]").toTypedArray()

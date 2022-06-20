@@ -5,6 +5,6 @@ class ParseException(
     string: CharSequence
 ) : Exception(
     "Failed to parse token: ${string.subSequence(0, result.getSeek())}, error: ${
-        result.getStepCode().errorCodeToString()
+        result.getStepCode().stepCodeToString()
     }"
 )
