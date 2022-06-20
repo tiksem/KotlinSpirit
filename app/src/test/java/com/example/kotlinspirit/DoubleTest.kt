@@ -148,4 +148,67 @@ class DoubleTest {
             stepCode = StepCode.COMPLETE
         ))
     }
+
+    @Test
+    fun startedWithDot() {
+        val str = ".4343343434"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun startedWithDotE() {
+        val str = ".4343343434e345"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun startedWithDotEnegative() {
+        val str = ".4343343434e-345"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun notMoreDot() {
+        val str = ".4343343.56677"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = 8,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun notMoreDotError() {
+        val str = ".."
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = 0,
+            stepCode = StepCode.INVALID_DOUBLE
+        ))
+    }
+
+    @Test
+    fun noParseTest() {
+        val str = "......."
+        Assert.assertEquals(double.noParse(0, str), str.length)
+    }
+
+    @Test
+    fun noParseTest2() {
+        val str = ".......9.0"
+        Assert.assertEquals(double.noParse(0, str), str.length - 4)
+    }
+
+    @Test
+    fun noParseTest3() {
+        val str = "abcdegfrt9.0"
+        Assert.assertEquals(double.noParse(0, str), str.length - 3)
+    }
 }

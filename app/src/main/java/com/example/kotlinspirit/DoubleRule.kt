@@ -13,8 +13,10 @@ class DoubleRule : BaseRule<Double>() {
         // Skip integer part
         var i = seek
         val c = string[i]
-        if (c == '-') {
+        var noMoreDots = false
+        if (c == '-' || c == '.') {
             i++
+            noMoreDots = c == '.'
             if (string[i].isDigit()) {
                 i++
                 while (i < length && string[i].isDigit()) {
@@ -44,6 +46,17 @@ class DoubleRule : BaseRule<Double>() {
 
         when (string[i]) {
             '.' -> {
+                if (noMoreDots) {
+                    return if (i == seek) {
+                        createStepResult(
+                            seek = seek,
+                            stepCode = StepCode.INVALID_DOUBLE
+                        )
+                    } else {
+                        createComplete(i)
+                    }
+                }
+
                 i++
                 while (i < length && string[i].isDigit()) {
                     i++
@@ -137,7 +150,46 @@ class DoubleRule : BaseRule<Double>() {
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        TODO("Not yet implemented")
+        val length = string.length
+        if (seek >= length) {
+            return -seek
+        }
+
+        var i = seek
+        do {
+            val c = string[i]
+            if (c.isDigit()) {
+                return if (i == seek) {
+                    -seek
+                } else {
+                    i
+                }
+            } else if(c == '-') {
+                if (i + 1 < length) {
+                    if (string[i + 1].isDigit()) {
+                        return i
+                    } else {
+                        i++
+                    }
+                } else {
+                    return i + 1
+                }
+            } else if (c == '.') {
+                if (i + 1 < length) {
+                    if (string[i + 1].isDigit()) {
+                        return i
+                    } else {
+                        i++
+                    }
+                } else {
+                    return i + 1
+                }
+            } else {
+                i++
+            }
+        } while (i < length)
+
+        return i
     }
 
     override fun noParseStep(seek: Int, string: CharSequence): Long {
