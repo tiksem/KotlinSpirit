@@ -14,7 +14,7 @@ class DoubleRule : BaseRule<Double>() {
         var i = seek
         val c = string[i]
         var noMoreDots = false
-        if (c == '-' || c == '.') {
+        if (c == '-' || c == '+' || c == '.') {
             i++
             if (i >= length) {
                 return createStepResult(
@@ -24,7 +24,7 @@ class DoubleRule : BaseRule<Double>() {
             }
 
             noMoreDots = c == '.'
-            if (c == '-' && string[i] == '.') {
+            if (!noMoreDots && string[i] == '.') {
                 if (++i >= length) {
                     return createStepResult(
                         seek = seek,
@@ -83,7 +83,8 @@ class DoubleRule : BaseRule<Double>() {
                     val v = string[i++]
                     if (v == 'e' || v == 'E') {
                         if (i < length) {
-                            if (string[i] == '-') {
+                            val c2 = string[i]
+                            if (c2 == '-' || c2 == '+') {
                                 ++i
                                 return if (i < length && string[i].isDigit()) {
                                     i++

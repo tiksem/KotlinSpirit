@@ -69,6 +69,24 @@ class DoubleTest {
     }
 
     @Test
+    fun testDoubleWithEPlus() {
+        val str = "23423453453456543435453.2322332e+122"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun testDoubleWithEUppercasePlus() {
+        val str = "23423453453456543435453.2322332E+122"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
     fun testDoubleWithENoFraction() {
         val str = "23423453453456543435453.e122"
         Assert.assertEquals(double.parse(0, str), createStepResult(
@@ -98,6 +116,24 @@ class DoubleTest {
     @Test
     fun testDoubleWithEUppercaseNegativeNoFraction() {
         val str = "23423453453456543435453.E-122"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun testDoubleWithEPlusNoFraction() {
+        val str = "23423453453456543435453.e+122"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun testDoubleWithEUppercasePlusNoFraction() {
+        val str = "23423453453456543435453.E+122"
         Assert.assertEquals(double.parse(0, str), createStepResult(
             seek = str.length,
             stepCode = StepCode.COMPLETE
@@ -150,6 +186,15 @@ class DoubleTest {
     }
 
     @Test
+    fun testIntegerPlus() {
+        val str = "+23423453453456543435453"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
     fun startedWithDot() {
         val str = ".4343343434"
         Assert.assertEquals(double.parse(0, str), createStepResult(
@@ -188,6 +233,15 @@ class DoubleTest {
     @Test
     fun startsWithDotAndMinus() {
         val str = "-.4343343"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun startsWithDotAndPlus() {
+        val str = "+.4343343"
         Assert.assertEquals(double.parse(0, str), createStepResult(
             seek = str.length,
             stepCode = StepCode.COMPLETE
