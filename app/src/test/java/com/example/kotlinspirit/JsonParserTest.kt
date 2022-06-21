@@ -1,7 +1,7 @@
 package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.char
-import com.example.kotlinspirit.Rules.int
+import com.example.kotlinspirit.Rules.double
 import com.example.kotlinspirit.Rules.str
 import com.example.kotlinspirit.Rules.lazy
 import org.junit.Assert
@@ -27,7 +27,7 @@ private val skipper = str {
 }
 
 private val value: LazyRule<Any> = lazy {
-    jsonString or int or jsonObject or jsonArray
+    jsonString or double or jsonObject or jsonArray
 }
 
 private val jsonObject = object : Grammar<Map<CharSequence, Any>>() {
@@ -147,7 +147,7 @@ class JsonParserTest {
     @Test
     fun testArray() {
         Assert.assertArrayEquals(
-            arrayOf(1223233, "aaaaaa", 123456),
+            arrayOf(1223233.0, "aaaaaa", 123456.0),
             jsonArray.parseOrThrow("[  1223233, \"aaaaaa\", 123456]").toTypedArray()
         )
     }
