@@ -2,7 +2,7 @@ package com.example.kotlinspirit
 
 class NoRule(
     private val rule: Rule<*>
-) : BaseRule<CharSequence>() {
+) : RuleWithDefaultRepeat<CharSequence>() {
     private var stepSeekBegin = -1
     private var stepEndSeek = -1
 

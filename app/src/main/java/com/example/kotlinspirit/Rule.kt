@@ -13,8 +13,8 @@ class ParseResult<T> {
     var stepResult: Long = DEFAULT_STEP_RESULT
 }
 
-interface Rule<T : Any> {
-    fun parse(seek: Int, string: CharSequence): Long {
+abstract class Rule<T : Any> {
+    open fun parse(seek: Int, string: CharSequence): Long {
         resetStep()
         while (true) {
             val stepResult = parseStep(seek, string)
@@ -25,7 +25,7 @@ interface Rule<T : Any> {
         }
     }
 
-    fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+    open fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         val parseResult = parse(seek, string)
         result.stepResult = parseResult
         if (parseResult >= 0) {
@@ -33,7 +33,7 @@ interface Rule<T : Any> {
         }
     }
 
-    fun hasMatch(seek: Int, string: CharSequence): Boolean {
+    open fun hasMatch(seek: Int, string: CharSequence): Boolean {
         resetStep()
         while (true) {
             val code = parseStep(seek, string).getStepCode()
@@ -45,18 +45,18 @@ interface Rule<T : Any> {
         }
     }
 
-    fun resetStep()
-    fun getStepParserResult(string: CharSequence): T
-    fun parseStep(seek: Int, string: CharSequence): Long
+    internal abstract fun resetStep()
+    internal abstract fun getStepParserResult(string: CharSequence): T
+    internal abstract fun parseStep(seek: Int, string: CharSequence): Long
 
-    fun resetNoStep() {
+    internal open fun resetNoStep() {
         resetStep()
     }
 
-    fun noParse(seek: Int, string: CharSequence): Int
-    fun noParseStep(seek: Int, string: CharSequence): Long
+    internal abstract fun noParse(seek: Int, string: CharSequence): Int
+    internal abstract fun noParseStep(seek: Int, string: CharSequence): Long
 
-    operator fun not(): Rule<*> {
+    open operator fun not(): Rule<*> {
         return NoRule(this)
     }
 
@@ -90,10 +90,10 @@ interface Rule<T : Any> {
         return DiffRule(main = this, diff = rule)
     }
 
-    fun repeat(): Rule<*>
-    fun repeat(range: IntRange): Rule<*>
+    abstract fun repeat(): Rule<*>
+    abstract fun repeat(range: IntRange): Rule<*>
 
-    operator fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T>
+    abstract operator fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T>
 
     operator fun rem(divider: Rule<*>): SplitRule<T> {
         return split(divider = divider, range = 1..Int.MAX_VALUE)
@@ -131,11 +131,11 @@ interface Rule<T : Any> {
         return rem(str(divider))
     }
 
-    fun notifyParseStepComplete(string: CharSequence) {}
+    internal open fun notifyParseStepComplete(string: CharSequence) {}
 
-    fun clone(): Rule<T>
+    abstract fun clone(): Rule<T>
 
-    fun parseWithResultOrThrow(string: CharSequence): T {
+    fun parseOrThrow(string: CharSequence): T {
         val result = ParseResult<T>()
         parseWithResult(0, string, result)
         val stepResult = result.stepResult
@@ -153,8 +153,8 @@ interface Rule<T : Any> {
         }
     }
 
-    fun match(string: CharSequence): Boolean {
-        return parse(0, string).getStepCode() == StepCode.COMPLETE
+    fun hasMatch(string: CharSequence): Boolean {
+        return hasMatch(0, string)
     }
 
     fun asStringRule(): StringRuleWrapper {

@@ -6,7 +6,7 @@ import kotlin.math.min
 open class OrRule<T : Any>(
     private val a: Rule<T>,
     private val b: Rule<T>
-) : BaseRule<T>() {
+) : RuleWithDefaultRepeat<T>() {
     private var activeRule = a
     private var stepBeginSeek = -1
 

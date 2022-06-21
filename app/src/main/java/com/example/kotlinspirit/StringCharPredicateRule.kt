@@ -4,7 +4,7 @@ import java.lang.UnsupportedOperationException
 
 class StringCharPredicateRule(
     private val predicate: (Char) -> Boolean
-) : BaseRule<CharSequence>() {
+) : RuleWithDefaultRepeat<CharSequence>() {
     private var stepSeekBegin = -1
     private var result: CharSequence = ""
 

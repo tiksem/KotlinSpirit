@@ -2,7 +2,7 @@ package com.example.kotlinspirit
 
 abstract class BaseLazyRule<T : Any>(
     private val ruleProvider: () -> Rule<T>
-): Rule<T> {
+): Rule<T>() {
     private var rule: Rule<T>? = null
 
     protected open fun initRule(): Rule<T> {
@@ -74,10 +74,10 @@ class LazyCharPredicateRule(
 }
 
 class LazyRule<T : Any>(
-    private val ruleProvider: () -> BaseRule<T>
+    private val ruleProvider: () -> RuleWithDefaultRepeat<T>
 ) : BaseLazyRule<T>(ruleProvider) {
-    override fun initRule(): BaseRule<T> {
-        return super.initRule() as BaseRule<T>
+    override fun initRule(): RuleWithDefaultRepeat<T> {
+        return super.initRule() as RuleWithDefaultRepeat<T>
     }
 
     override fun repeat(): Rule<List<T>> {
@@ -93,6 +93,6 @@ class LazyRule<T : Any>(
     }
 
     override fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T> {
-        return RuleWithResult(initRule(), callback)
+        return RuleWithDefaultRepeatResult(initRule(), callback)
     }
 }

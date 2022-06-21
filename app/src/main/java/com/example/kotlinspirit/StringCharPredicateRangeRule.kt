@@ -6,7 +6,7 @@ import kotlin.math.min
 class StringCharPredicateRangeRule(
     private val predicate: (Char) -> Boolean,
     private val range: IntRange
-) : BaseRule<CharSequence>() {
+) : RuleWithDefaultRepeat<CharSequence>() {
     private var stepSeekBegin = -1
     private var result: CharSequence = ""
 

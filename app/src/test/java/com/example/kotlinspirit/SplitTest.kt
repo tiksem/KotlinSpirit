@@ -1,7 +1,6 @@
 package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.char
-import com.example.kotlinspirit.Rules.int
 import com.example.kotlinspirit.Rules.str
 import org.junit.Assert
 import org.junit.Test
@@ -10,7 +9,7 @@ class SplitTest {
     @Test
     fun splitHelloWorld() {
         val r = str('a'..'z', 'A'..'Z') % " "
-        val e = r.parseWithResultOrThrow("hello world")
+        val e = r.parseOrThrow("hello world")
         Assert.assertArrayEquals(e.toTypedArray(), arrayOf("hello", "world"))
     }
 

@@ -1,6 +1,6 @@
 package com.example.kotlinspirit
 
-abstract class Grammar<T : Any> : BaseRule<T>() {
+abstract class Grammar<T : Any> : RuleWithDefaultRepeat<T>() {
     private var r: Rule<*>? = null
 
     abstract val result: T

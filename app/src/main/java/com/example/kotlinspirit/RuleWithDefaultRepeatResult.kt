@@ -3,7 +3,7 @@ package com.example.kotlinspirit
 abstract class BaseRuleWithResult<T : Any>(
     protected val rule: Rule<T>,
     protected val callback: (T) -> Unit
-) : Rule<T> {
+) : Rule<T>() {
     private val result = ParseResult<T>()
 
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -47,8 +47,8 @@ abstract class BaseRuleWithResult<T : Any>(
     }
 }
 
-class RuleWithResult<T : Any>(
-    rule: BaseRule<T>,
+class RuleWithDefaultRepeatResult<T : Any>(
+    rule: RuleWithDefaultRepeat<T>,
     callback: (T) -> Unit
 ) : BaseRuleWithResult<T>(rule, callback) {
     override fun repeat(): Rule<List<T>> {
@@ -59,12 +59,12 @@ class RuleWithResult<T : Any>(
         return rule.repeat(range) as Rule<List<T>>
     }
 
-    override fun invoke(callback: (T) -> Unit): RuleWithResult<T> {
-        return RuleWithResult(rule as BaseRule<T>, callback)
+    override fun invoke(callback: (T) -> Unit): RuleWithDefaultRepeatResult<T> {
+        return RuleWithDefaultRepeatResult(rule as RuleWithDefaultRepeat<T>, callback)
     }
 
-    override fun clone(): RuleWithResult<T> {
-        return RuleWithResult(rule.clone() as BaseRule<T>, callback)
+    override fun clone(): RuleWithDefaultRepeatResult<T> {
+        return RuleWithDefaultRepeatResult(rule.clone() as RuleWithDefaultRepeat<T>, callback)
     }
 }
 

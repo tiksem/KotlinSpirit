@@ -8,7 +8,7 @@ private inline fun getPowerOf10(exp: Int): Double {
     }
 }
 
-class DoubleRule : BaseRule<Double>() {
+class DoubleRule : RuleWithDefaultRepeat<Double>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {

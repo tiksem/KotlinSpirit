@@ -4,7 +4,7 @@ import java.lang.UnsupportedOperationException
 
 class CharPredicateRule(
     val predicate: (Char) -> Boolean
-) : Rule<Char> {
+) : Rule<Char>() {
     private var result = 0.toChar()
 
     override fun parse(seek: Int, string: CharSequence): Long {

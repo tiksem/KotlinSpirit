@@ -1,6 +1,6 @@
 package com.example.kotlinspirit
 
-class LongRule : BaseRule<Long>() {
+class LongRule : RuleWithDefaultRepeat<Long>() {
     private var result = 0L
     private var successFlag = false
     private var sign = 1

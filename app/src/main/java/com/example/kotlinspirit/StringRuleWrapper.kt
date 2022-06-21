@@ -2,12 +2,12 @@ package com.example.kotlinspirit
 
 class StringRuleWrapper(
     private val rule: Rule<*>
-) : BaseRule<CharSequence>() {
+) : RuleWithDefaultRepeat<CharSequence>() {
     private var stepSeekBegin = -1
     private var stepEndSeek = -1
 
-    override fun invoke(callback: (CharSequence) -> Unit): RuleWithResult<CharSequence> {
-        return RuleWithResult(this.clone(), callback)
+    override fun invoke(callback: (CharSequence) -> Unit): RuleWithDefaultRepeatResult<CharSequence> {
+        return RuleWithDefaultRepeatResult(this.clone(), callback)
     }
 
     override fun clone(): StringRuleWrapper {
