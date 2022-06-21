@@ -180,8 +180,44 @@ class DoubleTest {
     fun notMoreDot() {
         val str = ".4343343.56677"
         Assert.assertEquals(double.parse(0, str), createStepResult(
-            seek = 8,
+            seek = ".4343343".length,
             stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun startsWithDotAndMinus() {
+        val str = "-.4343343"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = str.length,
+            stepCode = StepCode.COMPLETE
+        ))
+    }
+
+    @Test
+    fun testMinusDotError() {
+        val str = "-."
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = 0,
+            stepCode = StepCode.INVALID_DOUBLE
+        ))
+    }
+
+    @Test
+    fun testMinusDotError2() {
+        val str = "-.dhfgdhg"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = 0,
+            stepCode = StepCode.INVALID_DOUBLE
+        ))
+    }
+
+    @Test
+    fun testMinusError() {
+        val str = "-"
+        Assert.assertEquals(double.parse(0, str), createStepResult(
+            seek = 0,
+            stepCode = StepCode.INVALID_DOUBLE
         ))
     }
 

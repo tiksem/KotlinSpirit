@@ -16,7 +16,24 @@ class DoubleRule : BaseRule<Double>() {
         var noMoreDots = false
         if (c == '-' || c == '.') {
             i++
+            if (i >= length) {
+                return createStepResult(
+                    seek = seek,
+                    stepCode = StepCode.INVALID_DOUBLE
+                )
+            }
+
             noMoreDots = c == '.'
+            if (c == '-' && string[i] == '.') {
+                if (++i >= length) {
+                    return createStepResult(
+                        seek = seek,
+                        stepCode = StepCode.INVALID_DOUBLE
+                    )
+                }
+                noMoreDots = true
+            }
+
             if (string[i].isDigit()) {
                 i++
                 while (i < length && string[i].isDigit()) {

@@ -6,6 +6,7 @@ internal val POWERS_OF_10 = doubleArrayOf(
     1.0,
     10.0,
     100.0,
+    1000.0,
     1.0e4,
     1.0e5,
     1.0e6,
