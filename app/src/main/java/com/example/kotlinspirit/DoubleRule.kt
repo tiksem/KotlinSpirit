@@ -182,7 +182,7 @@ class DoubleRule : BaseRule<Double>() {
                 } else {
                     i
                 }
-            } else if(c == '-') {
+            } else if(c == '-' || c == '+') {
                 if (i + 1 < length) {
                     if (string[i + 1].isDigit()) {
                         return i
