@@ -1,7 +1,5 @@
 package com.example.kotlinspirit
 
-internal const val DOUBLE_MAX_EXPONENT = 308
-
 internal val POWERS_OF_10 = doubleArrayOf(
     1.0,
     10.0,
