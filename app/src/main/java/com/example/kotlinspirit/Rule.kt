@@ -10,11 +10,28 @@ private val DEFAULT_STEP_RESULT = createStepResult(
 
 class ParseResult<T> {
     var data: T? = null
-    var stepResult: Long = DEFAULT_STEP_RESULT
+        internal set
+    internal var stepResult: Long = DEFAULT_STEP_RESULT
+
+    val errorCode: Int
+        get() {
+            val stepCode = stepResult.getStepCode()
+            return if (stepCode.isError()) {
+                stepCode
+            } else {
+                -1
+            }
+        }
+
+    val isError: Boolean
+        get() = stepResult.getStepCode().isError()
 }
 
 abstract class Rule<T : Any> {
-    open fun parse(seek: Int, string: CharSequence): Long {
+    internal var threadId = Thread.currentThread().id
+        private set
+
+    internal open fun parse(seek: Int, string: CharSequence): Long {
         resetStep()
         while (true) {
             val stepResult = parseStep(seek, string)
@@ -25,7 +42,7 @@ abstract class Rule<T : Any> {
         }
     }
 
-    open fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+    internal open fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         val parseResult = parse(seek, string)
         result.stepResult = parseResult
         if (parseResult >= 0) {
@@ -33,7 +50,7 @@ abstract class Rule<T : Any> {
         }
     }
 
-    open fun hasMatch(seek: Int, string: CharSequence): Boolean {
+    internal open fun hasMatch(seek: Int, string: CharSequence): Boolean {
         resetStep()
         while (true) {
             val code = parseStep(seek, string).getStepCode()
@@ -135,29 +152,11 @@ abstract class Rule<T : Any> {
 
     abstract fun clone(): Rule<T>
 
-    fun parseOrThrow(string: CharSequence): T {
-        val result = ParseResult<T>()
-        parseWithResult(0, string, result)
-        val stepResult = result.stepResult
-        if (stepResult.getStepCode().isError()) {
-            throw ParseException(stepResult, string)
-        } else {
-            return result.data!!
-        }
-    }
-
-    fun matchOrThrow(string: CharSequence) {
-        val result = parse(0, string)
-        if (result.getStepCode().isError()) {
-            throw ParseException(result, string)
-        }
-    }
-
-    fun hasMatch(string: CharSequence): Boolean {
-        return hasMatch(0, string)
-    }
-
     fun asStringRule(): StringRuleWrapper {
         return StringRuleWrapper(this)
+    }
+
+    fun compile(): Parser<T> {
+        return Parser(this)
     }
 }

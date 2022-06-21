@@ -9,7 +9,7 @@ class OrRuleTest {
     @Test
     fun intOrString() {
         val r = int or latinStr
-        Assert.assertEquals(242343, r.parseOrThrow("242343"))
-        Assert.assertEquals("AdsjdsjAAbbbzzz", r.parseOrThrow("AdsjdsjAAbbbzzz"))
+        Assert.assertEquals(242343, r.compile().parseGetResultOrThrow("242343"))
+        Assert.assertEquals("AdsjdsjAAbbbzzz", r.compile().parseGetResultOrThrow("AdsjdsjAAbbbzzz"))
     }
 }

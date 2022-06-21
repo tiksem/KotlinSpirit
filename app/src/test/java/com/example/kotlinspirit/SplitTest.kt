@@ -9,7 +9,7 @@ class SplitTest {
     @Test
     fun splitHelloWorld() {
         val r = str('a'..'z', 'A'..'Z') % " "
-        val e = r.parseOrThrow("hello world")
+        val e = r.compile().parseGetResultOrThrow("hello world")
         Assert.assertArrayEquals(e.toTypedArray(), arrayOf("hello", "world"))
     }
 
@@ -22,7 +22,7 @@ class SplitTest {
         } + char('!', '?').invoke {
             mark = it
         }
-        r.matchOrThrow("Hello world!")
+        r.compile().matchOrThrow("Hello world!")
         Assert.assertArrayEquals(array, arrayOf("Hello", "world"))
         Assert.assertEquals(mark, '!')
     }
