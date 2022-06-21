@@ -4,8 +4,10 @@ import com.example.kotlinspirit.Rules.char
 import com.example.kotlinspirit.Rules.double
 import com.example.kotlinspirit.Rules.str
 import com.example.kotlinspirit.Rules.lazy
+import org.json.JSONObject
 import org.junit.Assert
 import org.junit.Test
+import org.skyscreamer.jsonassert.JSONAssert
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
@@ -30,9 +32,9 @@ private val value: LazyRule<Any> = lazy {
     jsonString or double or jsonObject or jsonArray
 }
 
-private val jsonObject = object : Grammar<Map<CharSequence, Any>>() {
+private val jsonObject = object : Grammar<Map<String, Any>>() {
     var key: CharSequence = ""
-    override var result = LinkedHashMap<CharSequence, Any>()
+    override var result = LinkedHashMap<String, Any>()
         private set
 
     override fun resetResult() {
@@ -43,7 +45,7 @@ private val jsonObject = object : Grammar<Map<CharSequence, Any>>() {
         val jsonPair = skipper + jsonString {
             key = it
         } + skipper + ':' + skipper + value {
-            result[key] = it
+            result[key.toString()] = it
         } + skipper
         return char('{') + skipper + jsonPair.split(
             divider = ',',
@@ -174,5 +176,39 @@ class JsonParserTest {
                 "arr" to listOf(123, "123", 12)
             )
         )
+    }
+
+    @Test
+    fun exampleJson() {
+        val str = "{\n" +
+                "  \"data\": [{\n" +
+                "    \"type\": \"articles\",\n" +
+                "    \"id\": \"1\",\n" +
+                "    \"attributes\": {\n" +
+                "      \"title\": \"JSON:API paints my bikeshed!\",\n" +
+                "      \"body\": \"The shortest article. Ever.\",\n" +
+                "      \"created\": \"2015-05-22T14:56:29.000Z\",\n" +
+                "      \"updated\": \"2015-05-22T14:56:28.000Z\"\n" +
+                "    },\n" +
+                "    \"relationships\": {\n" +
+                "      \"author\": {\n" +
+                "        \"data\": {\"id\": \"42\", \"type\": \"people\"}\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }],\n" +
+                "  \"included\": [\n" +
+                "    {\n" +
+                "      \"type\": \"people\",\n" +
+                "      \"id\": \"42\",\n" +
+                "      \"attributes\": {\n" +
+                "        \"name\": \"John\",\n" +
+                "        \"age\": 80,\n" +
+                "        \"gender\": \"male\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}"
+        val value = jsonObject.parseOrThrow(str)
+        JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
     }
 }
