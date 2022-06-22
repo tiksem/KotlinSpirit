@@ -8,6 +8,26 @@ private val DEFAULT_STEP_RESULT = createStepResult(
     stepCode = StepCode.COMPLETE
 )
 
+class ParseSeekResult(
+    private val stepResult: Long
+) {
+    val errorCode: Int
+        get() {
+            val stepCode = stepResult.getStepCode()
+            return if (stepCode.isError()) {
+                stepCode
+            } else {
+                -1
+            }
+        }
+
+    val isError: Boolean
+        get() = stepResult.getStepCode().isError()
+
+    val seek: Int
+        get() = stepResult.getSeek()
+}
+
 class ParseResult<T> {
     var data: T? = null
         internal set
@@ -25,16 +45,21 @@ class ParseResult<T> {
 
     val isError: Boolean
         get() = stepResult.getStepCode().isError()
+
+    val seek: Int
+        get() = stepResult.getSeek()
 }
 
 abstract class Rule<T : Any> {
     internal var threadId = Thread.currentThread().id
         private set
 
-    internal open fun parse(seek: Int, string: CharSequence): Long {
+    internal fun parseUsingStep(seek: Int, string: CharSequence): Long {
         resetStep()
+        var i = seek
         while (true) {
-            val stepResult = parseStep(seek, string)
+            val stepResult = parseStep(i, string)
+            i = stepResult.getSeek()
             val stepCode = stepResult.getStepCode()
             if (stepCode.isErrorOrComplete()) {
                 return stepResult
@@ -42,8 +67,19 @@ abstract class Rule<T : Any> {
         }
     }
 
+    internal open fun parse(seek: Int, string: CharSequence): Long {
+        return parseUsingStep(seek, string)
+    }
+
     internal open fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        val parseResult = parse(seek, string)
+        parseWithResultUsingStep(seek, string, result)
+    }
+
+    internal open fun parseWithResultUsingStep(
+        seek: Int, string: CharSequence,
+        result: ParseResult<T>
+    ) {
+        val parseResult = parseUsingStep(seek, string)
         result.stepResult = parseResult
         if (parseResult >= 0) {
             result.data = getStepParserResult(string)

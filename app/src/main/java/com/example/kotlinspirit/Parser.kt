@@ -52,6 +52,17 @@ class Parser<T : Any>(
         return result.getSeek()
     }
 
+    fun parseWithResult(string: CharSequence): ParseResult<T> {
+        val result = ParseResult<T>()
+        getRule().parseWithResult(0, string, result)
+        return result
+    }
+
+    fun parse(string: CharSequence): ParseSeekResult {
+        val result = getRule().parse(0, string)
+        return ParseSeekResult(stepResult = result)
+    }
+
     fun matchOrThrow(string: CharSequence) {
         val rule = getRule()
         val result = rule.parse(0, string)
