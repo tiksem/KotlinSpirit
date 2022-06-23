@@ -94,6 +94,18 @@ class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
         TODO("Not yet implemented")
     }
 
+    infix fun or(string: String): OneOfStringRule {
+        return OneOfStringRule(listOf(string) + tree.strings)
+    }
+
+    infix fun or(anotherRule: ExactStringRule): OneOfStringRule {
+        return OneOfStringRule(listOf(anotherRule.string) + tree.strings)
+    }
+
+    infix fun or(anotherRule: OneOfStringRule): OneOfStringRule {
+        return OneOfStringRule(anotherRule.tree.strings + tree.strings)
+    }
+
     override fun clone(): OneOfStringRule {
         return OneOfStringRule(tree)
     }

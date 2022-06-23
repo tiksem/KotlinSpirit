@@ -13,12 +13,14 @@ internal class TernarySearchTree {
         var isEndOfWord = false
     }
 
+    val strings: List<CharSequence>
     private val root: Node
     private var stepNode: Node
     var mayCompleteSeek = -1
         private set
 
     constructor(strings: List<CharSequence>) {
+        this.strings = strings
         if (strings.isEmpty()) {
             throw IllegalArgumentException("strings should not be empty")
         }
@@ -43,7 +45,8 @@ internal class TernarySearchTree {
         stepNode = root
     }
 
-    private constructor(root: Node) {
+    private constructor(root: Node, strings: List<CharSequence>) {
+        this.strings = strings
         this.root = root
         this.stepNode = root
     }
@@ -226,6 +229,6 @@ internal class TernarySearchTree {
     }
 
     fun clone(): TernarySearchTree {
-        return TernarySearchTree(root)
+        return TernarySearchTree(root, strings)
     }
 }

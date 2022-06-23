@@ -1,7 +1,7 @@
 package com.example.kotlinspirit
 
 class ExactStringRule(
-    private val string: String
+    internal val string: String
 ) : RuleWithDefaultRepeat<CharSequence>() {
     private var beginSeek = -1
 
@@ -89,6 +89,14 @@ class ExactStringRule(
 
     override fun noParseStep(seek: Int, string: CharSequence): Long {
         throw UnsupportedOperationException()
+    }
+
+    infix fun or(anotherRule: ExactStringRule): OneOfStringRule {
+        return OneOfStringRule(listOf(string, anotherRule.string))
+    }
+
+    infix fun or(string: String): OneOfStringRule {
+        return OneOfStringRule(listOf(this.string, string))
     }
 
     override fun clone(): ExactStringRule {
