@@ -1,43 +1,48 @@
 package com.example.kotlinspirit
 
-import java.lang.UnsupportedOperationException
-
 class DiffRule<T : Any>(
     private val main: Rule<T>,
     private val diff: Rule<*>
 ) : RuleWithDefaultRepeat<T>() {
-    private var mainMayCompleteSeek: Int = -1
-
-    override fun resetStep() {
-        main.resetStep()
-        diff.resetStep()
-        mainMayCompleteSeek = -1
-    }
-
-    override fun getStepParserResult(string: CharSequence): T {
-        return main.getStepParserResult(string)
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        return if (diff.hasMatch(seek, string)) {
-            if (mainMayCompleteSeek < 0) {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        val mainRes = main.parse(seek, string)
+        return if (mainRes.getParseCode().isError()) {
+            mainRes
+        } else {
+            val diffRes = diff.parse(seek, string)
+            if (diffRes.getParseCode().isError()) {
+                mainRes
+            } else if (diffRes.getSeek() >= mainRes.getSeek()) {
                 createStepResult(
-                    seek, StepCode.DIFF_FAILED
+                    seek = seek,
+                    parseCode = ParseCode.DIFF_FAILED
                 )
             } else {
-                main.notifyParseStepComplete(string)
                 createStepResult(
-                    seek = mainMayCompleteSeek,
-                    stepCode = StepCode.COMPLETE
+                    seek = mainRes.getSeek(),
+                    parseCode = ParseCode.COMPLETE
                 )
             }
-        } else {
-            main.parseStep(seek, string).also {
-                if (it.getStepCode() == StepCode.MAY_COMPLETE) {
-                    mainMayCompleteSeek = it.getSeek()
-                }
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        main.parseWithResult(seek, string, result)
+        val stepResult = result.stepResult
+        if (stepResult.getParseCode().isNotError()) {
+            val diffRes = diff.parse(seek, string)
+            if (diffRes.getParseCode().isNotError() && diffRes.getSeek() >= stepResult.getSeek()) {
+                result.stepResult = createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.DIFF_FAILED
+                )
+                return
             }
         }
+    }
+
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        return main.hasMatch(seek, string) && !diff.hasMatch(seek, string)
     }
 
     override fun clone(): DiffRule<T> {
@@ -48,11 +53,25 @@ class DiffRule<T : Any>(
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
-    }
+        var i = seek
+        val length = string.length
+        while (true) {
+            val diffRes = diff.parse(i, string)
+            if (diffRes.getParseCode().isNotError()) {
+                i = diffRes.getSeek()
+            } else {
+                val mainRes = main.noParse(i, string)
+                if (mainRes >= 0) {
+                    i = mainRes
+                } else {
+                    return -mainRes
+                }
+            }
 
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        throw UnsupportedOperationException()
+            if (i >= length) {
+                return i
+            }
+        }
     }
 
     override fun not(): Rule<*> {

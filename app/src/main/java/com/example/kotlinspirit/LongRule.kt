@@ -1,16 +1,12 @@
 package com.example.kotlinspirit
 
 class LongRule : RuleWithDefaultRepeat<Long>() {
-    private var result = 0L
-    private var successFlag = false
-    private var sign = 1
-
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
             return createStepResult(
                 seek = seek,
-                stepCode = StepCode.EOF
+                parseCode = ParseCode.EOF
             )
         }
 
@@ -34,7 +30,7 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
                     } else {
                         createStepResult(
                             seek = i,
-                            stepCode = StepCode.INT_STARTED_FROM_ZERO
+                            parseCode = ParseCode.INT_STARTED_FROM_ZERO
                         )
                     }
                 }
@@ -46,7 +42,7 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
                     if (result < 0) {
                         return createStepResult(
                             seek = i,
-                            stepCode = StepCode.INT_OUT_OF_BOUNDS
+                            parseCode = ParseCode.INT_OUT_OF_BOUNDS
                         )
                     }
                 }
@@ -56,7 +52,7 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
                 else -> {
                     return createStepResult(
                         seek = i,
-                        stepCode = StepCode.INVALID_INT
+                        parseCode = ParseCode.INVALID_INT
                     )
                 }
             }
@@ -70,7 +66,7 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
         if (seek >= length) {
             r.stepResult = createStepResult(
                 seek = seek,
-                stepCode = StepCode.EOF
+                parseCode = ParseCode.EOF
             )
             return
         }
@@ -95,7 +91,7 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
                         else -> {
                             r.stepResult = createStepResult(
                                 seek = i,
-                                stepCode = StepCode.INVALID_INT
+                                parseCode = ParseCode.INVALID_INT
                             )
                         }
                     }
@@ -107,7 +103,7 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
                     } else {
                         r.stepResult = createStepResult(
                             seek = i,
-                            stepCode = StepCode.INT_STARTED_FROM_ZERO
+                            parseCode = ParseCode.INT_STARTED_FROM_ZERO
                         )
                     }
                     return
@@ -120,7 +116,7 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
                     if (result < 0) {
                         r.stepResult = createStepResult(
                             seek = i,
-                            stepCode = StepCode.INT_OUT_OF_BOUNDS
+                            parseCode = ParseCode.INT_OUT_OF_BOUNDS
                         )
                         return
                     }
@@ -133,7 +129,7 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
                 else -> {
                     r.stepResult = createStepResult(
                         seek = i,
-                        stepCode = StepCode.INVALID_INT
+                        parseCode = ParseCode.INVALID_INT
                     )
                     return
                 }
@@ -142,98 +138,6 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
 
         r.data = result * sign
         r.stepResult = createComplete(i)
-    }
-
-    override fun resetStep() {
-        result = 0
-        successFlag = false
-        sign = 1
-    }
-
-    override fun getStepParserResult(string: CharSequence): Long {
-        return sign * result
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        if (seek >= string.length) {
-            return createStepResult(
-                seek = seek,
-                stepCode = StepCode.EOF
-            )
-        }
-
-        val char = string[seek]
-        return when {
-            char == '-' -> {
-                when {
-                    successFlag -> {
-                        notifyParseStepComplete(string)
-                        createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.COMPLETE
-                        )
-                    }
-                    sign == 1 -> {
-                        sign = -1
-                        createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.HAS_NEXT
-                        )
-                    }
-                    else -> {
-                        createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.INVALID_INT
-                        )
-                    }
-                }
-            }
-            !successFlag && char == '0' -> {
-                return if (seek >= string.length || string[seek + 1] !in '0'..'9') {
-                    result = 0
-                    notifyParseStepComplete(string)
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.COMPLETE
-                    )
-                } else {
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.INT_STARTED_FROM_ZERO
-                    )
-                }
-            }
-            char in '0'..'9' -> {
-                successFlag = true
-                result *= 10
-                result += char - '0'
-                // check int bounds
-                if (result < 0) {
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.INT_OUT_OF_BOUNDS
-                    )
-                } else {
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                }
-            }
-            successFlag -> {
-                notifyParseStepComplete(string)
-                createStepResult(
-                    seek = seek + 1,
-                    stepCode = StepCode.COMPLETE
-                )
-            }
-            else -> {
-                createStepResult(
-                    seek = seek + 1,
-                    stepCode = StepCode.INVALID_INT
-                )
-            }
-        }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -287,68 +191,6 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
         } while (i < length)
 
         return i
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        val length = string.length
-        if (seek >= length) {
-            return createStepResult(
-                seek = seek,
-                stepCode = StepCode.COMPLETE
-            )
-        }
-
-        val char = string[seek]
-        return when {
-            char == '-' -> {
-                when {
-                    seek >= length - 1 -> {
-                        createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.COMPLETE
-                        )
-                    }
-                    string[seek + 1] in '0'..'9' -> {
-                        createStepResult(
-                            seek = seek,
-                            stepCode = if (successFlag) {
-                                StepCode.COMPLETE
-                            } else {
-                                StepCode.NO_FAILED
-                            }
-                        )
-                    }
-                    else -> {
-                        successFlag = true
-                        createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.MAY_COMPLETE
-                        )
-                    }
-                }
-            }
-            char in '0'..'9' -> {
-                createStepResult(
-                    seek = seek,
-                    stepCode = if (successFlag) {
-                        StepCode.COMPLETE
-                    } else {
-                        StepCode.NO_FAILED
-                    }
-                )
-            }
-            else -> {
-                successFlag = true
-                createStepResult(
-                    seek = seek + 1,
-                    stepCode = StepCode.MAY_COMPLETE
-                )
-            }
-        }
-    }
-
-    override fun resetNoStep() {
-        successFlag = false
     }
 
     override fun clone(): LongRule {

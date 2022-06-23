@@ -8,7 +8,7 @@ abstract class BaseRuleWithResult<T : Any>(
 
     override fun parse(seek: Int, string: CharSequence): Long {
         rule.parseWithResult(seek, string, result)
-        if (result.stepResult.getStepCode().isNotError()) {
+        if (result.stepResult.getParseCode().isNotError()) {
             callback(result.data ?: throw IllegalStateException("result is null"))
         }
 
@@ -17,28 +17,8 @@ abstract class BaseRuleWithResult<T : Any>(
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         rule.parseWithResult(seek, string, result)
-        if (result.stepResult.getStepCode().isNotError()) {
+        if (result.stepResult.getParseCode().isNotError()) {
             callback(result.data ?: throw IllegalStateException("result is null"))
-        }
-    }
-
-    override fun notifyParseStepComplete(string: CharSequence) {
-        callback(getStepParserResult(string))
-    }
-
-    override fun resetStep() {
-        rule.resetStep()
-    }
-
-    override fun getStepParserResult(string: CharSequence): T {
-        return rule.getStepParserResult(string)
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        return rule.parseStep(seek, string).also {
-            if (it.getStepCode() == StepCode.COMPLETE) {
-                callback(getStepParserResult(string))
-            }
         }
     }
 
@@ -46,8 +26,8 @@ abstract class BaseRuleWithResult<T : Any>(
         return noParse(seek, string)
     }
 
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        return rule.noParseStep(seek, string)
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        return rule.hasMatch(seek, string)
     }
 }
 

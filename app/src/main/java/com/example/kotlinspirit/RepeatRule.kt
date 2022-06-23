@@ -15,7 +15,7 @@ class RepeatRule<T : Any>(
         while (i < string.length && resultsCount < range.last) {
             val seekBefore = i
             val ruleRes = rule.parse(seek, string)
-            if (ruleRes.getStepCode().isError()) {
+            if (ruleRes.getParseCode().isError()) {
                 return if (resultsCount < range.first) {
                     ruleRes
                 } else {
@@ -32,7 +32,7 @@ class RepeatRule<T : Any>(
         } else {
             return createStepResult(
                 seek = i,
-                stepCode = StepCode.EOF
+                parseCode = ParseCode.EOF
             )
         }
     }
@@ -45,7 +45,7 @@ class RepeatRule<T : Any>(
             val seekBefore = i
             rule.parseWithResult(seek, string, itemResult)
             val stepResult = itemResult.stepResult
-            if (stepResult.getStepCode().isError()) {
+            if (stepResult.getParseCode().isError()) {
                 if (list.size >= range.first) {
                     result.data = list
                     result.stepResult = createComplete(seekBefore)
@@ -63,7 +63,7 @@ class RepeatRule<T : Any>(
         } else {
             result.stepResult = createStepResult(
                 seek = i,
-                stepCode = StepCode.EOF
+                parseCode = ParseCode.EOF
             )
         }
     }
@@ -78,65 +78,7 @@ class RepeatRule<T : Any>(
         return true
     }
 
-    override fun resetStep() {
-        rule.resetStep()
-        result.clear()
-    }
-
-    override fun getStepParserResult(string: CharSequence): List<T> {
-        return result
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        val stepRes = rule.parseStep(seek, string)
-        val stepCode = stepRes.getStepCode()
-        when {
-            stepCode.isError() -> {
-                return if (result.size >= range.first) {
-                    notifyParseStepComplete(string)
-                    createStepResult(
-                        seek = stepRes.getSeek(),
-                        stepCode = StepCode.COMPLETE
-                    )
-                } else {
-                    stepRes
-                }
-            }
-            stepCode == StepCode.COMPLETE -> {
-                result.add(rule.getStepParserResult(string))
-                if (result.size == range.last) {
-                    notifyParseStepComplete(string)
-                    return createStepResult(
-                        seek = stepRes.getSeek(),
-                        stepCode = StepCode.COMPLETE
-                    )
-                }
-
-                rule.resetStep()
-                return createStepResult(
-                    seek = stepRes.getSeek(),
-                    stepCode = if (result.size >= range.first) {
-                        StepCode.MAY_COMPLETE
-                    } else {
-                        StepCode.HAS_NEXT
-                    }
-                )
-            }
-            else -> {
-                return stepRes
-            }
-        }
-    }
-
     override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        throw UnsupportedOperationException()
-    }
-
-    override fun resetNoStep() {
         throw UnsupportedOperationException()
     }
 

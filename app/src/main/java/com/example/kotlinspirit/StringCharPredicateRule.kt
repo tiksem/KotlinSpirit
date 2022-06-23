@@ -5,9 +5,6 @@ import java.lang.UnsupportedOperationException
 class StringCharPredicateRule(
     private val predicate: (Char) -> Boolean
 ) : RuleWithDefaultRepeat<CharSequence>() {
-    private var stepSeekBegin = -1
-    private var result: CharSequence = ""
-
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         while (i < string.length) {
@@ -43,49 +40,7 @@ class StringCharPredicateRule(
         return true
     }
 
-    override fun resetStep() {
-        stepSeekBegin = -1
-        result = ""
-    }
-
-    override fun getStepParserResult(string: CharSequence): CharSequence {
-        return result
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        if (seek >= string.length) {
-            notifyParseStepComplete(string)
-            return createStepResult(
-                seek = seek,
-                stepCode = StepCode.COMPLETE
-            )
-        }
-
-        if (stepSeekBegin < 0) {
-            stepSeekBegin = seek
-        }
-
-        val char = string[seek]
-        return if (predicate(char)) {
-            createStepResult(
-                seek = seek + 1,
-                stepCode = StepCode.MAY_COMPLETE
-            )
-        } else {
-            result = string.subSequence(stepSeekBegin, seek)
-            notifyParseStepComplete(string)
-            createStepResult(
-                seek = seek,
-                stepCode = StepCode.COMPLETE
-            )
-        }
-    }
-
     override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
         throw UnsupportedOperationException()
     }
 

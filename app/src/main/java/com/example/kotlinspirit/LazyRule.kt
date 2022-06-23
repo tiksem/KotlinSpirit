@@ -28,28 +28,8 @@ abstract class BaseLazyRule<T : Any>(
         return initRule().hasMatch(seek, string)
     }
 
-    override fun resetStep() {
-        initRule().resetStep()
-    }
-
-    override fun getStepParserResult(string: CharSequence): T {
-        return initRule().getStepParserResult(string)
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        return initRule().parseStep(seek, string)
-    }
-
-    override fun resetNoStep() {
-        initRule().resetNoStep()
-    }
-
     override fun noParse(seek: Int, string: CharSequence): Int {
         return initRule().noParse(seek, string)
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        return initRule().noParseStep(seek, string)
     }
 }
 

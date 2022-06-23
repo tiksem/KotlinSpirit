@@ -9,7 +9,7 @@ class DoubleTestResult {
         Rules.double.parseWithResult(0, str, result)
         Assert.assertEquals(result.stepResult, createStepResult(
             seek = str.length,
-            stepCode = StepCode.COMPLETE
+            parseCode = ParseCode.COMPLETE
         ))
         Assert.assertEquals(str.toDouble(), result.data!!, 0.000000001)
     }
@@ -165,7 +165,7 @@ class DoubleTestResult {
         Rules.double.parseWithResult(0, str, result)
         Assert.assertEquals(result.stepResult, createStepResult(
             seek = ".4343343".length,
-            stepCode = StepCode.COMPLETE
+            parseCode = ParseCode.COMPLETE
         ))
         Assert.assertEquals(".4343343".toDouble(), result.data!!, 0.000000001)
     }
@@ -190,7 +190,7 @@ class DoubleTestResult {
         Assert.assertEquals(
             Rules.double.parse(0, str), createStepResult(
                 seek = 0,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         )
     }
@@ -203,7 +203,7 @@ class DoubleTestResult {
         Assert.assertEquals(
             Rules.double.parse(0, str), createStepResult(
                 seek = 0,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         )
     }
@@ -216,7 +216,7 @@ class DoubleTestResult {
         Assert.assertEquals(
             Rules.double.parse(0, str), createStepResult(
                 seek = 0,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         )
     }
@@ -229,7 +229,7 @@ class DoubleTestResult {
         Assert.assertEquals(
             Rules.double.parse(0, str), createStepResult(
                 seek = 0,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         )
     }

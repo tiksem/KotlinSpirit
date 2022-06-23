@@ -5,14 +5,12 @@ import java.lang.IllegalStateException
 class ZeroOrMoreRule<T : Any>(
     private val rule: Rule<T>
 ) : RuleWithDefaultRepeat<List<T>>() {
-    private val result = ArrayList<T>()
-
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         while (i < string.length) {
             val seekBefore = i
             val ruleRes = rule.parse(i, string)
-            if (ruleRes.getStepCode().isError()) {
+            if (ruleRes.getParseCode().isError()) {
                 return createComplete(seekBefore)
             } else {
                 i = ruleRes.getSeek()
@@ -34,7 +32,7 @@ class ZeroOrMoreRule<T : Any>(
             val seekBefore = i
             rule.parseWithResult(i, string, itemResult)
             val stepResult = itemResult.stepResult
-            if (stepResult.getStepCode().isError()) {
+            if (stepResult.getParseCode().isError()) {
                 result.stepResult = createComplete(seekBefore)
                 return
             } else {
@@ -55,50 +53,8 @@ class ZeroOrMoreRule<T : Any>(
         return true
     }
 
-    override fun resetStep() {
-        rule.resetStep()
-        result.clear()
-    }
-
-    override fun getStepParserResult(string: CharSequence): List<T> {
-        return result
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        val stepRes = rule.parseStep(seek, string)
-        val stepCode = stepRes.getStepCode()
-        when {
-            stepCode.isError() -> {
-                notifyParseStepComplete(string)
-                return createStepResult(
-                    seek = stepRes.getSeek(),
-                    stepCode = StepCode.COMPLETE
-                )
-            }
-            stepCode == StepCode.COMPLETE -> {
-                result.add(rule.getStepParserResult(string))
-                rule.resetStep()
-                return createStepResult(
-                    seek = stepRes.getSeek(),
-                    stepCode = StepCode.MAY_COMPLETE
-                )
-            }
-            else -> {
-                return stepRes
-            }
-        }
-    }
-
     override fun noParse(seek: Int, string: CharSequence): Int {
         return rule.noParse(seek, string)
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        return rule.noParseStep(seek, string)
-    }
-
-    override fun resetNoStep() {
-        rule.resetNoStep()
     }
 
     override fun clone(): ZeroOrMoreRule<T> {

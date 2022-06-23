@@ -11,7 +11,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -22,7 +22,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -33,7 +33,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -44,7 +44,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -55,7 +55,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -66,7 +66,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -77,7 +77,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -88,7 +88,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -99,7 +99,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -110,7 +110,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -121,7 +121,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -132,7 +132,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -143,7 +143,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -154,7 +154,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -165,7 +165,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -176,7 +176,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -187,7 +187,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -198,7 +198,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -209,7 +209,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -220,7 +220,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -231,7 +231,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -242,7 +242,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -253,7 +253,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -264,7 +264,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -275,7 +275,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = ".4343343".length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -286,7 +286,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -297,7 +297,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = str.length,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         )
     }
@@ -308,7 +308,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = 0,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         )
     }
@@ -319,7 +319,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = 0,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         )
     }
@@ -330,7 +330,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = 0,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         )
     }
@@ -341,7 +341,7 @@ class DoubleTest {
         Assert.assertEquals(
             double.parse(0, str), createStepResult(
                 seek = 0,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         )
     }

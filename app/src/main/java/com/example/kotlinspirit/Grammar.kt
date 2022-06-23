@@ -17,25 +17,8 @@ abstract class Grammar<T : Any> : RuleWithDefaultRepeat<T>() {
         return rule
     }
 
-    override fun resetStep() {
-        resetResult()
-        r?.resetStep()
-    }
-
-    override fun getStepParserResult(string: CharSequence): T {
-        return result
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        return initRule().parseStep(seek, string)
-    }
-
     override fun noParse(seek: Int, string: CharSequence): Int {
         return initRule().noParse(seek, string)
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        return initRule().noParseStep(seek, string)
     }
 
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -54,10 +37,6 @@ abstract class Grammar<T : Any> : RuleWithDefaultRepeat<T>() {
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return initRule().hasMatch(seek, string)
-    }
-
-    override fun resetNoStep() {
-        initRule().resetNoStep()
     }
 
     override fun clone(): Grammar<T> {

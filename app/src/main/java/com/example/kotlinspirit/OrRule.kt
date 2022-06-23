@@ -12,7 +12,7 @@ open class OrRule<T : Any>(
 
     override fun parse(seek: Int, string: CharSequence): Long {
         val aResult = a.parse(seek, string)
-        return if (aResult.getStepCode().isError()) {
+        return if (aResult.getParseCode().isError()) {
             b.parse(seek, string)
         } else {
             aResult
@@ -21,45 +21,13 @@ open class OrRule<T : Any>(
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         a.parseWithResult(seek, string, result)
-        if (result.stepResult.getStepCode().isError()) {
+        if (result.stepResult.getParseCode().isError()) {
             b.parseWithResult(seek, string, result)
         }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return a.hasMatch(seek, string) || b.hasMatch(seek, string)
-    }
-
-    override fun resetStep() {
-        activeRule = a
-        a.resetStep()
-        b.resetStep()
-        stepBeginSeek = -1
-    }
-
-    override fun getStepParserResult(string: CharSequence): T {
-        return activeRule.getStepParserResult(string)
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        if (stepBeginSeek < 0) {
-            stepBeginSeek = seek
-        }
-
-        val result = activeRule.parseStep(seek, string)
-        return if (result.getStepCode().isError()) {
-            if (activeRule == b) {
-                result
-            } else {
-                activeRule = b
-                createStepResult(
-                    seek = stepBeginSeek,
-                    stepCode = StepCode.HAS_NEXT
-                )
-            }
-        } else {
-            result
-        }
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
@@ -74,10 +42,6 @@ open class OrRule<T : Any>(
         }
 
         return min(aResult, bResult)
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        throw UnsupportedOperationException()
     }
 
     override fun clone(): OrRule<T> {

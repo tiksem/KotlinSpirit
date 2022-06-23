@@ -15,9 +15,6 @@ internal class TernarySearchTree {
 
     val strings: List<CharSequence>
     private val root: Node
-    private var stepNode: Node
-    var mayCompleteSeek = -1
-        private set
 
     constructor(strings: List<CharSequence>) {
         this.strings = strings
@@ -41,14 +38,11 @@ internal class TernarySearchTree {
                 throw IllegalStateException("String could not be empty")
             }
         }
-
-        stepNode = root
     }
 
     private constructor(root: Node, strings: List<CharSequence>) {
         this.strings = strings
         this.root = root
-        this.stepNode = root
     }
 
     private fun insert(node: Node, begin: Int, word: CharSequence) {
@@ -138,94 +132,6 @@ internal class TernarySearchTree {
 
     fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return hasMatch(root, seek, string)
-    }
-
-    fun resetStep() {
-        stepNode = root
-        mayCompleteSeek = -1
-    }
-
-    private inline fun goToLeftOrRightNode(node: Node?, seek: Int): Long {
-        if (node == null) {
-            return if (mayCompleteSeek >= 0) {
-                createStepResult(
-                    seek = mayCompleteSeek,
-                    stepCode = StepCode.COMPLETE
-                )
-            } else {
-                createStepResult(
-                    seek = seek,
-                    stepCode = StepCode.ONE_OF_STRING_NOT_FOUND
-                )
-            }
-        } else {
-            stepNode = node
-            return createStepResult(
-                seek = seek,
-                stepCode = StepCode.HAS_NEXT
-            )
-        }
-    }
-
-    fun parseStep(seek: Int, string: CharSequence): Long {
-        if (seek >= string.length) {
-            if (mayCompleteSeek >= 0) {
-                return createStepResult(
-                    seek = mayCompleteSeek,
-                    stepCode = StepCode.COMPLETE
-                )
-            }
-
-            return createStepResult(
-                seek = seek,
-                stepCode = if (root == stepNode) {
-                    StepCode.EOF
-                } else {
-                    StepCode.ONE_OF_STRING_NOT_FOUND
-                }
-            )
-        }
-
-        val ch = string[seek]
-        val nodeCh = stepNode.char
-        when {
-            ch == nodeCh -> {
-                if (stepNode.isEndOfWord) {
-                    mayCompleteSeek = seek + 1
-                    return createStepResult(
-                        seek = mayCompleteSeek,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else {
-                    val node = stepNode.eq
-                    if (node == null) {
-                        return if (mayCompleteSeek >= 0) {
-                            createStepResult(
-                                seek = mayCompleteSeek,
-                                stepCode = StepCode.COMPLETE
-                            )
-                        } else {
-                            createStepResult(
-                                seek = seek,
-                                stepCode = StepCode.ONE_OF_STRING_NOT_FOUND
-                            )
-                        }
-                    } else {
-                        stepNode = node
-                        return createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.HAS_NEXT
-                        )
-                    }
-                }
-            }
-            ch < nodeCh -> {
-                return goToLeftOrRightNode(node = stepNode.left, seek = seek)
-            }
-            else -> {
-                return goToLeftOrRightNode(node = stepNode.right, seek = seek)
-            }
-        }
     }
 
     fun clone(): TernarySearchTree {

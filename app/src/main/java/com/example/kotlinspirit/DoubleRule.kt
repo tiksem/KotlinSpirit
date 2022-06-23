@@ -1,7 +1,5 @@
 package com.example.kotlinspirit
 
-import java.lang.IllegalStateException
-
 private inline fun getPowerOf10(exp: Int): Double {
     return if (exp > POWERS_OF_10.size) {
         Double.POSITIVE_INFINITY
@@ -10,46 +8,13 @@ private inline fun getPowerOf10(exp: Int): Double {
     }
 }
 
-private const val STATE_CHECK_INTEGER_SIGN = 0
-private const val STATE_INTEGER_SIGN_CHECKED = 1
-private const val STATE_DOT_CHECKED_AFTER_SIGN = 2
-private const val STATE_DOT_CHECKED = 3
-private const val STATE_DOT_CHECKED_AFTER_INTEGER = 4
-private const val STATE_INTEGER = 5
-private const val STATE_FRACTION = 6
-private const val STATE_EXP_CHECK_SIGN = 7
-private const val STATE_EXP_CHECK_SIGN_AFTER_DOT = 8
-private const val STATE_EXP_SIGN_CHECKED = 9
-private const val STATE_EXP_SIGN_CHECKED_AFTER_DOT = 10
-private const val STATE_EXP_VALUE = 11
-
-private val seekRollBackMap = intArrayOf(0, 1, 2, 1, 1, 0, 0, 1, 2, 2, 3, 0)
-private val canCompleteStep = booleanArrayOf(
-    false, false, false, false, true, true, true, true, true, true, true, true
-)
-
-private const val NO_STEP_CHECK_SIGN_OR_DOT_STATE = 0
-private const val NO_STEP_SIGN_CHECKED = 1
-private const val NO_STEP_DOT_CHECKED = 2
-private const val NO_STEP_DOT_CHECKED_AFTER_SIGN = 3
-
 class DoubleRule : RuleWithDefaultRepeat<Double>() {
-    private var state = STATE_CHECK_INTEGER_SIGN
-    private var sign = 1.0
-    private var expMinus = false
-    private var fractionE = 10.0
-    private var integer = 0.0
-    private var fraction = 0.0
-    private var exp = 0
-
-    private var noStepSuccessFlag = false
-
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
             return createStepResult(
                 seek = seek,
-                stepCode = StepCode.EOF
+                parseCode = ParseCode.EOF
             )
         }
 
@@ -62,7 +27,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
             if (i >= length) {
                 return createStepResult(
                     seek = seek,
-                    stepCode = StepCode.INVALID_DOUBLE
+                    parseCode = ParseCode.INVALID_DOUBLE
                 )
             }
 
@@ -71,7 +36,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                 if (++i >= length) {
                     return createStepResult(
                         seek = seek,
-                        stepCode = StepCode.INVALID_DOUBLE
+                        parseCode = ParseCode.INVALID_DOUBLE
                     )
                 }
                 noMoreDots = true
@@ -85,7 +50,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
             } else {
                 return createStepResult(
                     seek = seek,
-                    stepCode = StepCode.INVALID_DOUBLE
+                    parseCode = ParseCode.INVALID_DOUBLE
                 )
             }
         } else if(c.isDigit()) {
@@ -96,7 +61,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         } else {
             return createStepResult(
                 seek = seek,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
         }
 
@@ -110,7 +75,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                     return if (i == seek) {
                         createStepResult(
                             seek = seek,
-                            stepCode = StepCode.INVALID_DOUBLE
+                            parseCode = ParseCode.INVALID_DOUBLE
                         )
                     } else {
                         createComplete(i)
@@ -199,7 +164,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         if (seek >= length) {
             result.stepResult = createStepResult(
                 seek = seek,
-                stepCode = StepCode.EOF
+                parseCode = ParseCode.EOF
             )
             return
         }
@@ -216,7 +181,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
             if (i >= length) {
                 result.stepResult = createStepResult(
                     seek = seek,
-                    stepCode = StepCode.INVALID_DOUBLE
+                    parseCode = ParseCode.INVALID_DOUBLE
                 )
                 return
             }
@@ -226,7 +191,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                 if (++i >= length) {
                     result.stepResult = createStepResult(
                         seek = seek,
-                        stepCode = StepCode.INVALID_DOUBLE
+                        parseCode = ParseCode.INVALID_DOUBLE
                     )
                     return
                 }
@@ -252,7 +217,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                 } else {
                     result.stepResult = createStepResult(
                         seek = seek,
-                        stepCode = StepCode.INVALID_DOUBLE
+                        parseCode = ParseCode.INVALID_DOUBLE
                     )
                     return
                 }
@@ -273,7 +238,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                 } else {
                     result.stepResult = createStepResult(
                         seek = seek,
-                        stepCode = StepCode.INVALID_DOUBLE
+                        parseCode = ParseCode.INVALID_DOUBLE
                     )
                     return
                 }
@@ -294,7 +259,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         } else {
             result.stepResult = createStepResult(
                 seek = seek,
-                stepCode = StepCode.INVALID_DOUBLE
+                parseCode = ParseCode.INVALID_DOUBLE
             )
             return
         }
@@ -597,359 +562,35 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         return i
     }
 
-    override fun resetStep() {
-        state = STATE_CHECK_INTEGER_SIGN
-        exp = 0
-        integer = 0.0
-        fraction = 0.0
-        sign = 1.0
-        expMinus = false
-        fractionE = 10.0
-    }
-
-    override fun getStepParserResult(string: CharSequence): Double {
-        return if (expMinus) {
-            sign * (integer + fraction) / getPowerOf10(exp)
-        } else {
-            sign * (integer + fraction) * getPowerOf10(exp)
-        }
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        if (seek >= string.length) {
-            return createStepResult(
-                seek = seek - seekRollBackMap[state],
-                stepCode = if (state == STATE_CHECK_INTEGER_SIGN) {
-                    StepCode.EOF
-                } else if (!canCompleteStep[state]) {
-                    StepCode.INVALID_DOUBLE
-                } else {
-                    StepCode.COMPLETE
-                }
-            )
-        }
-
-        val c = string[seek]
-        when (state) {
-            STATE_CHECK_INTEGER_SIGN -> {
-                if (c.isDigit()) {
-                    state = STATE_INTEGER
-                    integer = (c - '0').toDouble()
-                    return createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else if (c == '-' || c == '+') {
-                    if (c == '-') {
-                        sign = -1.0
-                    }
-
-                    state = STATE_INTEGER_SIGN_CHECKED
-                    return createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else if(c == '.') {
-                    state = STATE_DOT_CHECKED
-                    return createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else {
-                    return createStepResult(
-                        seek = seek,
-                        stepCode = StepCode.INVALID_DOUBLE
-                    )
-                }
-            }
-            STATE_INTEGER_SIGN_CHECKED -> {
-                if (c.isDigit()) {
-                    state = STATE_INTEGER
-                    integer = (c - '0').toDouble()
-                    return createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else if(c == '.') {
-                    state = STATE_DOT_CHECKED_AFTER_SIGN
-                    return createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else {
-                    return createStepResult(
-                        seek = seek - 1,
-                        stepCode = StepCode.INVALID_DOUBLE
-                    )
-                }
-            }
-            STATE_DOT_CHECKED_AFTER_SIGN, STATE_DOT_CHECKED, STATE_DOT_CHECKED_AFTER_INTEGER -> {
-                return if (c.isDigit()) {
-                    state = STATE_FRACTION
-                    fraction += (c - '0').toDouble() / fractionE
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else if (c == 'e' || c == 'E') {
-                    state = STATE_EXP_CHECK_SIGN_AFTER_DOT
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else {
-                    createStepResult(
-                        seek = seek - seekRollBackMap[state],
-                        stepCode = if (canCompleteStep[state]) {
-                            StepCode.COMPLETE
-                        } else {
-                            StepCode.INVALID_DOUBLE
-                        }
-                    )
-                }
-            }
-            STATE_INTEGER -> {
-                return if (c.isDigit()) {
-                    integer *= 10
-                    integer += (c - '0').toDouble()
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else if(c == '.') {
-                    state = STATE_DOT_CHECKED_AFTER_INTEGER
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else if(c == 'e' || c == 'E') {
-                    state = STATE_EXP_CHECK_SIGN
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else {
-                    createStepResult(
-                        seek = seek,
-                        stepCode = StepCode.COMPLETE
-                    )
-                }
-            }
-            STATE_FRACTION -> {
-                return if (c.isDigit()) {
-                    fractionE *= 10
-                    fraction += (c - '0').toDouble() / fractionE
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else if(c == 'e' || c == 'E') {
-                    state = STATE_EXP_CHECK_SIGN
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else {
-                    createStepResult(
-                        seek = seek,
-                        stepCode = StepCode.COMPLETE
-                    )
-                }
-            }
-            STATE_EXP_CHECK_SIGN, STATE_EXP_CHECK_SIGN_AFTER_DOT -> {
-                return if (c.isDigit()) {
-                    exp = c - '0'
-                    state = STATE_EXP_VALUE
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else if (c == '-') {
-                    expMinus = true
-                    state = if (state == STATE_EXP_CHECK_SIGN) {
-                        STATE_EXP_SIGN_CHECKED
-                    } else {
-                        STATE_EXP_SIGN_CHECKED_AFTER_DOT
-                    }
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else if (c == '+') {
-                    state = if (state == STATE_EXP_CHECK_SIGN) {
-                        STATE_EXP_SIGN_CHECKED
-                    } else {
-                        STATE_EXP_SIGN_CHECKED_AFTER_DOT
-                    }
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.HAS_NEXT
-                    )
-                } else {
-                    createStepResult(
-                        seek = seek - seekRollBackMap[state],
-                        stepCode = StepCode.COMPLETE
-                    )
-                }
-            }
-            STATE_EXP_SIGN_CHECKED, STATE_EXP_SIGN_CHECKED_AFTER_DOT -> {
-                return if (c.isDigit()) {
-                    exp = c - '0'
-                    state = STATE_EXP_VALUE
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else {
-                    createStepResult(
-                        seek = seek - seekRollBackMap[state],
-                        stepCode = StepCode.COMPLETE
-                    )
-                }
-            }
-            STATE_EXP_VALUE -> {
-                return if (c.isDigit()) {
-                    exp *= 10
-                    exp += c - '0'
-                    createStepResult(
-                        seek = seek + 1,
-                        stepCode = StepCode.MAY_COMPLETE
-                    )
-                } else {
-                    createStepResult(
-                        seek = seek,
-                        stepCode = StepCode.COMPLETE
-                    )
-                }
-            }
-        }
-
-        throw IllegalStateException("Invalid state")
-    }
-
-    override fun resetNoStep() {
-        noStepSuccessFlag = false
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         val length = string.length
         if (seek >= length) {
-            return createStepResult(
-                seek = seek,
-                stepCode = StepCode.COMPLETE
-            )
+            return false
         }
 
-        val char = string[seek]
-        when (state) {
-            NO_STEP_CHECK_SIGN_OR_DOT_STATE -> {
-                when {
-                    char.isDigit() -> {
-                        return createStepResult(
-                            seek = seek,
-                            stepCode = if(noStepSuccessFlag) {
-                                StepCode.COMPLETE
-                            } else {
-                                StepCode.NO_FAILED
-                            }
-                        )
+        var c = string[seek]
+        return when {
+            c.isDigit() -> {
+                true
+            }
+            c == '.' -> {
+                seek + 1 < length && string[seek + 1].isDigit()
+            }
+            c == '+' || c == '-' -> {
+                if (seek + 1 < length) {
+                    c = string[seek + 1]
+                    if (c.isDigit()) {
+                        true
+                    } else if (c == '.') {
+                        seek + 2 < length && string[seek + 2].isDigit()
+                    } else {
+                        false
                     }
-                    char == '+' || char == '-' -> {
-                        state = NO_STEP_SIGN_CHECKED
-                        return createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.HAS_NEXT
-                        )
-                    }
-                    char == '.' -> {
-                        state = NO_STEP_DOT_CHECKED
-                        return createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.HAS_NEXT
-                        )
-                    }
-                    else -> {
-                        noStepSuccessFlag = true
-                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
-                        return createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.MAY_COMPLETE
-                        )
-                    }
+                } else {
+                    false
                 }
             }
-            NO_STEP_SIGN_CHECKED -> {
-                when {
-                    char.isDigit() -> {
-                        return createStepResult(
-                            seek = seek,
-                            stepCode = if(noStepSuccessFlag) {
-                                StepCode.COMPLETE
-                            } else {
-                                StepCode.NO_FAILED
-                            }
-                        )
-                    }
-                    char == '.' -> {
-                        state = NO_STEP_DOT_CHECKED_AFTER_SIGN
-                        return createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.HAS_NEXT
-                        )
-                    }
-                    char == '+' || char == '-' -> {
-                        noStepSuccessFlag = true
-                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
-                        return createStepResult(
-                            seek = seek,
-                            stepCode = StepCode.MAY_COMPLETE
-                        )
-                    }
-                    else -> {
-                        noStepSuccessFlag = true
-                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
-                        return createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.MAY_COMPLETE
-                        )
-                    }
-                }
-            }
-            NO_STEP_DOT_CHECKED, NO_STEP_DOT_CHECKED_AFTER_SIGN -> {
-                when {
-                    char.isDigit() -> {
-                        return createStepResult(
-                            seek = if (state == NO_STEP_DOT_CHECKED) {
-                                seek -1
-                            } else {
-                                seek - 2
-                            },
-                            stepCode = if(noStepSuccessFlag) {
-                                StepCode.COMPLETE
-                            } else {
-                                StepCode.NO_FAILED
-                            }
-                        )
-                    }
-                    char == '+' || char == '-' || char == '.' -> {
-                        noStepSuccessFlag = true
-                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
-                        return createStepResult(
-                            seek = seek,
-                            stepCode = StepCode.MAY_COMPLETE
-                        )
-                    }
-                    else -> {
-                        noStepSuccessFlag = true
-                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
-                        return createStepResult(
-                            seek = seek + 1,
-                            stepCode = StepCode.MAY_COMPLETE
-                        )
-                    }
-                }
-            }
-            else -> throw IllegalStateException("Invalid state")
+            else -> false
         }
     }
 

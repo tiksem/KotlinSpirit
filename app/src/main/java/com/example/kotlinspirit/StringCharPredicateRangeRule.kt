@@ -7,9 +7,6 @@ class StringCharPredicateRangeRule(
     private val predicate: (Char) -> Boolean,
     private val range: IntRange
 ) : RuleWithDefaultRepeat<CharSequence>() {
-    private var stepSeekBegin = -1
-    private var result: CharSequence = ""
-
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         val limit = min(string.length, range.last + seek)
@@ -21,7 +18,7 @@ class StringCharPredicateRangeRule(
                 } else {
                     createStepResult(
                         seek = i,
-                        StepCode.STRING_NOT_ENOUGH_DATA
+                        ParseCode.STRING_NOT_ENOUGH_DATA
                     )
                 }
             }
@@ -34,7 +31,7 @@ class StringCharPredicateRangeRule(
         } else {
             createStepResult(
                 seek = i,
-                StepCode.STRING_NOT_ENOUGH_DATA
+                ParseCode.STRING_NOT_ENOUGH_DATA
             )
         }
     }
@@ -51,7 +48,7 @@ class StringCharPredicateRangeRule(
                 } else {
                     result.stepResult = createStepResult(
                         seek = i,
-                        StepCode.STRING_NOT_ENOUGH_DATA
+                        ParseCode.STRING_NOT_ENOUGH_DATA
                     )
                 }
                 return
@@ -66,7 +63,7 @@ class StringCharPredicateRangeRule(
         } else {
             result.stepResult = createStepResult(
                 seek = i,
-                StepCode.STRING_NOT_ENOUGH_DATA
+                ParseCode.STRING_NOT_ENOUGH_DATA
             )
         }
     }
@@ -75,64 +72,7 @@ class StringCharPredicateRangeRule(
         return seek < string.length && predicate(string[seek])
     }
 
-    override fun resetStep() {
-        stepSeekBegin = -1
-        result = ""
-    }
-
-    override fun getStepParserResult(string: CharSequence): CharSequence {
-        return result
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        if (stepSeekBegin < 0) {
-            stepSeekBegin = seek
-        }
-
-        if (seek >= string.length) {
-            return if (seek - range.first >= stepSeekBegin) {
-                result = string.subSequence(stepSeekBegin, seek)
-                notifyParseStepComplete(string)
-                createStepResult(
-                    seek = seek,
-                    stepCode = StepCode.COMPLETE
-                )
-            } else {
-                createStepResult(
-                    seek = seek,
-                    stepCode = StepCode.STRING_NOT_ENOUGH_DATA
-                )
-            }
-        }
-
-        val char = string[seek]
-        return if (predicate(char)) {
-            createStepResult(
-                seek = seek + 1,
-                stepCode = StepCode.MAY_COMPLETE
-            )
-        } else {
-            if (seek - range.first > stepSeekBegin) {
-                result = string.subSequence(stepSeekBegin, seek)
-                notifyParseStepComplete(string)
-                createStepResult(
-                    seek = seek,
-                    stepCode = StepCode.COMPLETE
-                )
-            } else {
-                createStepResult(
-                    seek = seek,
-                    stepCode = StepCode.STRING_NOT_ENOUGH_DATA
-                )
-            }
-        }
-    }
-
     override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
         throw UnsupportedOperationException()
     }
 

@@ -11,7 +11,7 @@ class CharPredicateRule(
         if (seek >= string.length) {
             return createStepResult(
                 seek = seek,
-                stepCode = StepCode.EOF
+                parseCode = ParseCode.EOF
             )
         }
 
@@ -20,7 +20,7 @@ class CharPredicateRule(
         } else {
             createStepResult(
                 seek = seek,
-                stepCode = StepCode.CHAR_PREDICATE_FAILED
+                parseCode = ParseCode.CHAR_PREDICATE_FAILED
             )
         }
     }
@@ -29,7 +29,7 @@ class CharPredicateRule(
         if (seek >= string.length) {
             result.stepResult = createStepResult(
                 seek = seek,
-                stepCode = StepCode.EOF
+                parseCode = ParseCode.EOF
             )
             return
         }
@@ -41,44 +41,13 @@ class CharPredicateRule(
         } else {
             result.stepResult = createStepResult(
                 seek = seek,
-                stepCode = StepCode.CHAR_PREDICATE_FAILED
+                parseCode = ParseCode.CHAR_PREDICATE_FAILED
             )
         }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return seek < string.length && predicate(string[seek])
-    }
-
-    override fun resetStep() {
-    }
-
-    override fun getStepParserResult(string: CharSequence): Char {
-        return result
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        if (seek >= string.length) {
-            return createStepResult(
-                seek = seek,
-                stepCode = StepCode.EOF
-            )
-        }
-
-        val char = string[seek]
-        return if (predicate(char)) {
-            result = char
-            notifyParseStepComplete(string)
-            createStepResult(
-                seek = seek + 1,
-                stepCode = StepCode.COMPLETE
-            )
-        } else {
-            createStepResult(
-                seek = seek,
-                stepCode = StepCode.CHAR_PREDICATE_FAILED
-            )
-        }
     }
 
     override fun clone(): CharPredicateRule {
@@ -104,10 +73,6 @@ class CharPredicateRule(
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
         throw UnsupportedOperationException()
     }
 

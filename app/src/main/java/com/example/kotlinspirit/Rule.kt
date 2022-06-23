@@ -5,7 +5,7 @@ import com.example.kotlinspirit.Rules.str
 
 private val DEFAULT_STEP_RESULT = createStepResult(
     seek = 0,
-    stepCode = StepCode.COMPLETE
+    parseCode = ParseCode.COMPLETE
 )
 
 class ParseSeekResult(
@@ -13,7 +13,7 @@ class ParseSeekResult(
 ) {
     val errorCode: Int
         get() {
-            val stepCode = stepResult.getStepCode()
+            val stepCode = stepResult.getParseCode()
             return if (stepCode.isError()) {
                 stepCode
             } else {
@@ -22,7 +22,7 @@ class ParseSeekResult(
         }
 
     val isError: Boolean
-        get() = stepResult.getStepCode().isError()
+        get() = stepResult.getParseCode().isError()
 
     val seek: Int
         get() = stepResult.getSeek()
@@ -35,7 +35,7 @@ class ParseResult<T> {
 
     val errorCode: Int
         get() {
-            val stepCode = stepResult.getStepCode()
+            val stepCode = stepResult.getParseCode()
             return if (stepCode.isError()) {
                 stepCode
             } else {
@@ -44,7 +44,7 @@ class ParseResult<T> {
         }
 
     val isError: Boolean
-        get() = stepResult.getStepCode().isError()
+        get() = stepResult.getParseCode().isError()
 
     val seek: Int
         get() = stepResult.getSeek()
@@ -54,60 +54,11 @@ abstract class Rule<T : Any> {
     internal var threadId = Thread.currentThread().id
         private set
 
-    internal fun parseUsingStep(seek: Int, string: CharSequence): Long {
-        resetStep()
-        var i = seek
-        while (true) {
-            val stepResult = parseStep(i, string)
-            i = stepResult.getSeek()
-            val stepCode = stepResult.getStepCode()
-            if (stepCode.isErrorOrComplete()) {
-                return stepResult
-            }
-        }
-    }
+    internal abstract fun parse(seek: Int, string: CharSequence): Long
+    internal abstract fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
 
-    internal open fun parse(seek: Int, string: CharSequence): Long {
-        return parseUsingStep(seek, string)
-    }
-
-    internal open fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        parseWithResultUsingStep(seek, string, result)
-    }
-
-    internal fun parseWithResultUsingStep(
-        seek: Int, string: CharSequence,
-        result: ParseResult<T>
-    ) {
-        val parseResult = parseUsingStep(seek, string)
-        result.stepResult = parseResult
-        if (parseResult >= 0) {
-            result.data = getStepParserResult(string)
-        }
-    }
-
-    internal open fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        resetStep()
-        while (true) {
-            val code = parseStep(seek, string).getStepCode()
-            if (code.isError()) {
-                return false
-            } else if (code.canComplete()) {
-                return true
-            }
-        }
-    }
-
-    internal abstract fun resetStep()
-    internal abstract fun getStepParserResult(string: CharSequence): T
-    internal abstract fun parseStep(seek: Int, string: CharSequence): Long
-
-    internal open fun resetNoStep() {
-        resetStep()
-    }
-
+    internal abstract fun hasMatch(seek: Int, string: CharSequence): Boolean
     internal abstract fun noParse(seek: Int, string: CharSequence): Int
-    internal abstract fun noParseStep(seek: Int, string: CharSequence): Long
 
     open operator fun not(): Rule<*> {
         return NoRule(this)
@@ -141,6 +92,14 @@ abstract class Rule<T : Any> {
 
     operator fun minus(rule: Rule<*>): DiffRule<T> {
         return DiffRule(main = this, diff = rule)
+    }
+
+    operator fun minus(string: String): DiffRule<T> {
+        return DiffRule(main = this, diff = str(string))
+    }
+
+    operator fun minus(ch: Char): DiffRule<T> {
+        return DiffRule(main = this, diff = char(ch))
     }
 
     abstract fun repeat(): Rule<*>
@@ -184,8 +143,6 @@ abstract class Rule<T : Any> {
         return rem(str(divider))
     }
 
-    internal open fun notifyParseStepComplete(string: CharSequence) {}
-
     abstract fun clone(): Rule<T>
 
     fun asStringRule(): StringRuleWrapper {
@@ -196,7 +153,72 @@ abstract class Rule<T : Any> {
         return OptionalRule(this.clone())
     }
 
-    fun compile(): Parser<T> {
-        return Parser(this)
+    fun parseGetResultOrThrow(string: CharSequence): T {
+        val result = ParseResult<T>()
+        parseWithResult(0, string, result)
+        val stepResult = result.stepResult
+        if (stepResult.getParseCode().isError()) {
+            throw ParseException(stepResult, string)
+        } else {
+            return result.data!!
+        }
+    }
+
+    fun parseOrThrow(string: CharSequence): Int {
+        val result = parse(0, string)
+        if (result.getParseCode().isError()) {
+            throw ParseException(
+                result, string
+            )
+        }
+
+        return result.getSeek()
+    }
+
+    fun tryParse(string: CharSequence): Int? {
+        val result = parse(0, string)
+        if (result.getParseCode().isError()) {
+            return null
+        }
+
+        return result.getSeek()
+    }
+
+    fun parseWithResult(string: CharSequence): ParseResult<T> {
+        val result = ParseResult<T>()
+        parseWithResult(0, string, result)
+        return result
+    }
+
+    fun parse(string: CharSequence): ParseSeekResult {
+        val result = parse(0, string)
+        return ParseSeekResult(stepResult = result)
+    }
+
+    fun matchOrThrow(string: CharSequence) {
+        val result = parse(0, string)
+        if (result.getParseCode().isError()) {
+            throw ParseException(result, string)
+        }
+
+        val seek = result.getSeek()
+        if (seek != string.length) {
+            throw ParseException(
+                result = createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.WHOLE_STRING_DOES_NOT_MATCH
+                ),
+                string = string
+            )
+        }
+    }
+
+    fun matches(string: CharSequence): Boolean {
+        val result = parse(0, string)
+        return result.getParseCode().isNotError() && result.getSeek() == string.length
+    }
+
+    fun matchesAtBeginning(string: CharSequence): Boolean {
+        return hasMatch(0, string)
     }
 }

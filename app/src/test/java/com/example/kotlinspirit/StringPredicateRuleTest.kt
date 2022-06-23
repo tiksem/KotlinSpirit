@@ -8,12 +8,12 @@ import org.junit.Test
 class StringPredicateRuleTest {
     @Test
     fun test1() {
-        (char('!', '?') + ' ').compile().matchOrThrow("! ")
+        (char('!', '?') + ' ').matchOrThrow("! ")
     }
 
     @Test
     fun test2() {
-        (char('!', '?') + ' ').compile().matchOrThrow("? ")
+        (char('!', '?') + ' ').matchOrThrow("? ")
     }
 
     @Test
@@ -29,7 +29,7 @@ class StringPredicateRuleTest {
             it.isWhitespace()
         }
 
-        rule.compile().matchOrThrow("   \n\n123\n\n\n\n  ")
+        rule.matchOrThrow("   \n\n123\n\n\n\n  ")
         Assert.assertEquals("123", result);
     }
 }

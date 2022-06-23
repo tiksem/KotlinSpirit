@@ -5,11 +5,11 @@ class ParseException(
     string: CharSequence
 ) : Exception(
     "Failed to parse token: ${string.subSequence(0, result.getSeek())}, error: ${
-        result.getStepCode().stepCodeToString()
+        result.getParseCode().parseCodeToString()
     }"
 ) {
     val errorCode: Int
-        get() = result.getStepCode()
+        get() = result.getParseCode()
 
     val seek: Int
         get() = result.getSeek()

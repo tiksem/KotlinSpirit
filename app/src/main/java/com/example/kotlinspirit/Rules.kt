@@ -7,6 +7,7 @@ object Rules {
 
     val int get() = IntRule()
     val long get() = LongRule()
+    val char get() = AnyCharRule()
 
     fun char(vararg ch: Char): CharPredicateRule {
         return CharPredicateRule(

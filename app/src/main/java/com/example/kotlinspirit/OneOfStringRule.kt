@@ -2,7 +2,6 @@ package com.example.kotlinspirit
 
 class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
     private val tree: TernarySearchTree
-    private var beginSeek = -1
 
     constructor(strings: List<CharSequence>) {
         tree = TernarySearchTree(strings)
@@ -17,12 +16,12 @@ class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
         return if (result >= 0) {
             createStepResult(
                 seek = result,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
         } else {
             createStepResult(
                 seek = seek,
-                stepCode = StepCode.ONE_OF_STRING_NOT_FOUND
+                parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
             )
         }
     }
@@ -36,40 +35,19 @@ class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
         if (r >= 0) {
             result.stepResult = createStepResult(
                 seek = r,
-                stepCode = StepCode.COMPLETE
+                parseCode = ParseCode.COMPLETE
             )
             result.data = string.subSequence(seek, r)
         } else {
             result.stepResult = createStepResult(
                 seek = seek,
-                stepCode = StepCode.ONE_OF_STRING_NOT_FOUND
+                parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
             )
         }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return tree.hasMatch(seek, string)
-    }
-
-    override fun resetNoStep() {
-        super.resetNoStep()
-    }
-
-    override fun resetStep() {
-        tree.resetStep()
-        beginSeek = -1
-    }
-
-    override fun getStepParserResult(string: CharSequence): CharSequence {
-        return string.subSequence(beginSeek, tree.mayCompleteSeek)
-    }
-
-    override fun parseStep(seek: Int, string: CharSequence): Long {
-        if (beginSeek < 0) {
-            beginSeek = seek
-        }
-
-        return tree.parseStep(seek, string)
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
@@ -88,10 +66,6 @@ class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
         } else {
             -seek
         }
-    }
-
-    override fun noParseStep(seek: Int, string: CharSequence): Long {
-        TODO("Not yet implemented")
     }
 
     infix fun or(string: String): OneOfStringRule {
