@@ -15,6 +15,7 @@ object StepCode {
     const val NO_FAILED = 11
     const val INVALID_DOUBLE = 12
     const val WHOLE_STRING_DOES_NOT_MATCH = 13
+    const val ONE_OF_STRING_NOT_FOUND = 14
 }
 
 internal inline fun Int.isError(): Boolean {
@@ -73,6 +74,7 @@ internal inline fun Int.stepCodeToString(): String {
         StepCode.NO_FAILED -> "NO_FAILED"
         StepCode.INVALID_DOUBLE -> "INVALID_DOUBLE"
         StepCode.WHOLE_STRING_DOES_NOT_MATCH -> "WHOLE_STRING_DOES_NOT_MATCH"
+        StepCode.ONE_OF_STRING_NOT_FOUND -> "ONE_OF_STRING_NOT_FOUND"
         else -> "UNKNOWN"
     }
 }

@@ -75,7 +75,7 @@ abstract class Rule<T : Any> {
         parseWithResultUsingStep(seek, string, result)
     }
 
-    internal open fun parseWithResultUsingStep(
+    internal fun parseWithResultUsingStep(
         seek: Int, string: CharSequence,
         result: ParseResult<T>
     ) {
@@ -189,7 +189,11 @@ abstract class Rule<T : Any> {
     abstract fun clone(): Rule<T>
 
     fun asStringRule(): StringRuleWrapper {
-        return StringRuleWrapper(this)
+        return StringRuleWrapper(this.clone())
+    }
+
+    fun optional(): OptionalRule {
+        return OptionalRule(this.clone())
     }
 
     fun compile(): Parser<T> {

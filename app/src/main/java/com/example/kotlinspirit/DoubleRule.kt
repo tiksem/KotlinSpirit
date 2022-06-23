@@ -28,6 +28,11 @@ private val canCompleteStep = booleanArrayOf(
     false, false, false, false, true, true, true, true, true, true, true, true
 )
 
+private const val NO_STEP_CHECK_SIGN_OR_DOT_STATE = 0
+private const val NO_STEP_SIGN_CHECKED = 1
+private const val NO_STEP_DOT_CHECKED = 2
+private const val NO_STEP_DOT_CHECKED_AFTER_SIGN = 3
+
 class DoubleRule : RuleWithDefaultRepeat<Double>() {
     private var state = STATE_CHECK_INTEGER_SIGN
     private var sign = 1.0
@@ -36,6 +41,8 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
     private var integer = 0.0
     private var fraction = 0.0
     private var exp = 0
+
+    private var noStepSuccessFlag = false
 
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
@@ -306,7 +313,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         when (string[i]) {
             '.' -> {
                 if (noMoreDots || ++i >= length) {
-                    result.stepResult = createComplete(saveI)
+                    result.stepResult = createComplete(i)
                     result.data = if (minus) {
                         -integerPart - fractionPart
                     } else {
@@ -820,8 +827,130 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         throw IllegalStateException("Invalid state")
     }
 
+    override fun resetNoStep() {
+        noStepSuccessFlag = false
+    }
+
     override fun noParseStep(seek: Int, string: CharSequence): Long {
-        TODO("Not yet implemented")
+        val length = string.length
+        if (seek >= length) {
+            return createStepResult(
+                seek = seek,
+                stepCode = StepCode.COMPLETE
+            )
+        }
+
+        val char = string[seek]
+        when (state) {
+            NO_STEP_CHECK_SIGN_OR_DOT_STATE -> {
+                when {
+                    char.isDigit() -> {
+                        return createStepResult(
+                            seek = seek,
+                            stepCode = if(noStepSuccessFlag) {
+                                StepCode.COMPLETE
+                            } else {
+                                StepCode.NO_FAILED
+                            }
+                        )
+                    }
+                    char == '+' || char == '-' -> {
+                        state = NO_STEP_SIGN_CHECKED
+                        return createStepResult(
+                            seek = seek + 1,
+                            stepCode = StepCode.HAS_NEXT
+                        )
+                    }
+                    char == '.' -> {
+                        state = NO_STEP_DOT_CHECKED
+                        return createStepResult(
+                            seek = seek + 1,
+                            stepCode = StepCode.HAS_NEXT
+                        )
+                    }
+                    else -> {
+                        noStepSuccessFlag = true
+                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
+                        return createStepResult(
+                            seek = seek + 1,
+                            stepCode = StepCode.MAY_COMPLETE
+                        )
+                    }
+                }
+            }
+            NO_STEP_SIGN_CHECKED -> {
+                when {
+                    char.isDigit() -> {
+                        return createStepResult(
+                            seek = seek,
+                            stepCode = if(noStepSuccessFlag) {
+                                StepCode.COMPLETE
+                            } else {
+                                StepCode.NO_FAILED
+                            }
+                        )
+                    }
+                    char == '.' -> {
+                        state = NO_STEP_DOT_CHECKED_AFTER_SIGN
+                        return createStepResult(
+                            seek = seek + 1,
+                            stepCode = StepCode.HAS_NEXT
+                        )
+                    }
+                    char == '+' || char == '-' -> {
+                        noStepSuccessFlag = true
+                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
+                        return createStepResult(
+                            seek = seek,
+                            stepCode = StepCode.MAY_COMPLETE
+                        )
+                    }
+                    else -> {
+                        noStepSuccessFlag = true
+                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
+                        return createStepResult(
+                            seek = seek + 1,
+                            stepCode = StepCode.MAY_COMPLETE
+                        )
+                    }
+                }
+            }
+            NO_STEP_DOT_CHECKED, NO_STEP_DOT_CHECKED_AFTER_SIGN -> {
+                when {
+                    char.isDigit() -> {
+                        return createStepResult(
+                            seek = if (state == NO_STEP_DOT_CHECKED) {
+                                seek -1
+                            } else {
+                                seek - 2
+                            },
+                            stepCode = if(noStepSuccessFlag) {
+                                StepCode.COMPLETE
+                            } else {
+                                StepCode.NO_FAILED
+                            }
+                        )
+                    }
+                    char == '+' || char == '-' || char == '.' -> {
+                        noStepSuccessFlag = true
+                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
+                        return createStepResult(
+                            seek = seek,
+                            stepCode = StepCode.MAY_COMPLETE
+                        )
+                    }
+                    else -> {
+                        noStepSuccessFlag = true
+                        state = NO_STEP_CHECK_SIGN_OR_DOT_STATE
+                        return createStepResult(
+                            seek = seek + 1,
+                            stepCode = StepCode.MAY_COMPLETE
+                        )
+                    }
+                }
+            }
+            else -> throw IllegalStateException("Invalid state")
+        }
     }
 
     override fun clone(): DoubleRule {

@@ -80,4 +80,16 @@ object Rules {
         get() = str('A'..'B', 'a'..'z')
 
     val double get() = DoubleRule()
+
+    fun oneOf(vararg strings: CharSequence): Rule<CharSequence> {
+        val withoutEmptyStrings = strings.filter {
+            it.isNotEmpty()
+        }
+
+        return if (withoutEmptyStrings.size == strings.size) {
+            OneOfStringRule(withoutEmptyStrings)
+        } else {
+            OptionalRule(OneOfStringRule(withoutEmptyStrings))
+        }
+    }
 }

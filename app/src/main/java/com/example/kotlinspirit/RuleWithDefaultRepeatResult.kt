@@ -35,7 +35,11 @@ abstract class BaseRuleWithResult<T : Any>(
     }
 
     override fun parseStep(seek: Int, string: CharSequence): Long {
-        return rule.parseStep(seek, string)
+        return rule.parseStep(seek, string).also {
+            if (it.getStepCode() == StepCode.COMPLETE) {
+                callback(getStepParserResult(string))
+            }
+        }
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
