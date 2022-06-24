@@ -23,8 +23,18 @@ class IntTest {
     }
 
     @Test
+    fun plusZero() {
+        Assert.assertEquals(0, int.parseGetResultOrThrow("+0"))
+    }
+
+    @Test
     fun minus() {
         Assert.assertEquals(-345, int.parseGetResultOrThrow("-345"))
+    }
+
+    @Test
+    fun plus() {
+        Assert.assertEquals(345, int.parseGetResultOrThrow("+345"))
     }
 
     @Test
@@ -37,5 +47,14 @@ class IntTest {
         val result = ParseResult<Int>()
         int.parseWithResult(0, "21474836473", result)
         Assert.assertEquals(ParseCode.INT_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+    }
+
+    @Test
+    fun noInt() {
+        val r = !int
+        r.matchOrThrow("+dsds")
+        r.matchOrThrow("-dsdsds")
+        r.matchOrThrow("-")
+        r.matchOrThrow("+")
     }
 }

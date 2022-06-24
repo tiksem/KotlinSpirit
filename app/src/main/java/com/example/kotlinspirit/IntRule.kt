@@ -24,6 +24,11 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
                         sign = -1
                     }
                 }
+                char == '+' -> {
+                    if (successFlag) {
+                        return createComplete(i)
+                    }
+                }
                 !successFlag && char == '0' -> {
                     return if (i >= length || string[i] !in '0'..'9') {
                         createComplete(i)
@@ -78,21 +83,19 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
         do {
             val char = string[i++]
             when {
-                char == '-' && !successFlag -> {
+                (char == '-' || char == '+') && !successFlag -> {
                     when {
-                        successFlag -> {
-                            r.data = result * sign
-                            r.parseResult = createComplete(i)
-                            return
-                        }
-                        sign == 1 -> {
-                            sign = -1
+                        i == seek + 1 -> {
+                            if (char == '-') {
+                                sign = -1
+                            }
                         }
                         else -> {
                             r.parseResult = createStepResult(
                                 seek = i,
                                 parseCode = ParseCode.INVALID_INT
                             )
+                            return
                         }
                     }
                 }
@@ -160,12 +163,12 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
             return -seek
         }
 
-        var i = seek
         var noSuccess = false
+        var i = seek
         do {
             val char = string[i]
             when {
-                char == '-' && !noSuccess -> {
+                (char == '-' || char == '+') && !noSuccess -> {
                     if (i < length - 1) {
                         if (string[i + 1] in '0'..'9') {
                             return -seek
