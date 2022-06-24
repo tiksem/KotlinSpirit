@@ -64,7 +64,7 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
     override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Int>) {
         val length = string.length
         if (seek >= length) {
-            r.stepResult = createStepResult(
+            r.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -82,14 +82,14 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
                     when {
                         successFlag -> {
                             r.data = result * sign
-                            r.stepResult = createComplete(i)
+                            r.parseResult = createComplete(i)
                             return
                         }
                         sign == 1 -> {
                             sign = -1
                         }
                         else -> {
-                            r.stepResult = createStepResult(
+                            r.parseResult = createStepResult(
                                 seek = i,
                                 parseCode = ParseCode.INVALID_INT
                             )
@@ -99,9 +99,9 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
                 !successFlag && char == '0' -> {
                     if (i >= length || string[i] !in '0'..'9') {
                         r.data = result * sign
-                        r.stepResult = createComplete(i)
+                        r.parseResult = createComplete(i)
                     } else {
-                        r.stepResult = createStepResult(
+                        r.parseResult = createStepResult(
                             seek = i,
                             parseCode = ParseCode.INT_STARTED_FROM_ZERO
                         )
@@ -114,7 +114,7 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
                     result += char - '0'
                     // check int bounds
                     if (result < 0) {
-                        r.stepResult = createStepResult(
+                        r.parseResult = createStepResult(
                             seek = i,
                             parseCode = ParseCode.INT_OUT_OF_BOUNDS
                         )
@@ -123,11 +123,11 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
                 }
                 successFlag -> {
                     r.data = result * sign
-                    r.stepResult = createComplete(i - 1)
+                    r.parseResult = createComplete(i - 1)
                     return
                 }
                 else -> {
-                    r.stepResult = createStepResult(
+                    r.parseResult = createStepResult(
                         seek = i,
                         parseCode = ParseCode.INVALID_INT
                     )
@@ -137,7 +137,7 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
         } while (i < length)
 
         r.data = result * sign
-        r.stepResult = createComplete(i)
+        r.parseResult = createComplete(i)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -191,9 +191,5 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
         } while (i < length)
 
         return i
-    }
-
-    override fun clone(): IntRule {
-        return IntRule()
     }
 }

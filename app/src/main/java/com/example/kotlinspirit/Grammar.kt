@@ -29,7 +29,7 @@ abstract class Grammar<T : Any> : RuleWithDefaultRepeat<T>() {
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         resetResult()
         val resultSeek = initRule().parse(seek, string)
-        result.stepResult = resultSeek
+        result.parseResult = resultSeek
         if (resultSeek >= 0) {
             result.data = this.result
         }
@@ -37,9 +37,5 @@ abstract class Grammar<T : Any> : RuleWithDefaultRepeat<T>() {
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return initRule().hasMatch(seek, string)
-    }
-
-    override fun clone(): Grammar<T> {
-        return this.javaClass.newInstance()
     }
 }

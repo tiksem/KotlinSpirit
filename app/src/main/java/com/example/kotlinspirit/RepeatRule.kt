@@ -7,8 +7,6 @@ class RepeatRule<T : Any>(
     private val rule: Rule<T>,
     private val range: IntRange
 ) : RuleWithDefaultRepeat<List<T>>() {
-    private val result = ArrayList<T>()
-
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         var resultsCount = 0
@@ -44,13 +42,13 @@ class RepeatRule<T : Any>(
         while (i < string.length  && list.size < range.last) {
             val seekBefore = i
             rule.parseWithResult(seek, string, itemResult)
-            val stepResult = itemResult.stepResult
+            val stepResult = itemResult.parseResult
             if (stepResult.getParseCode().isError()) {
                 if (list.size >= range.first) {
                     result.data = list
-                    result.stepResult = createComplete(seekBefore)
+                    result.parseResult = createComplete(seekBefore)
                 } else {
-                    result.stepResult = stepResult
+                    result.parseResult = stepResult
                 }
             } else {
                 list.add(itemResult.data ?: throw IllegalStateException("data should not be empty"))
@@ -59,9 +57,9 @@ class RepeatRule<T : Any>(
 
         if (list.size >= range.first) {
             result.data = list
-            result.stepResult = createComplete(i)
+            result.parseResult = createComplete(i)
         } else {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = i,
                 parseCode = ParseCode.EOF
             )
@@ -94,12 +92,5 @@ class RepeatRule<T : Any>(
                 RepeatRule(rule, 0 until range.first) + !ZeroOrMoreRule(rule)
             }
         }
-    }
-
-    override fun clone(): RepeatRule<T> {
-        return RepeatRule(
-            rule = rule.clone(),
-            range = range
-        )
     }
 }

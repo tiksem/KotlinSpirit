@@ -8,16 +8,16 @@ abstract class BaseRuleWithResult<T : Any>(
 
     override fun parse(seek: Int, string: CharSequence): Long {
         rule.parseWithResult(seek, string, result)
-        if (result.stepResult.getParseCode().isNotError()) {
+        if (result.parseResult.getParseCode().isNotError()) {
             callback(result.data ?: throw IllegalStateException("result is null"))
         }
 
-        return result.stepResult
+        return result.parseResult
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         rule.parseWithResult(seek, string, result)
-        if (result.stepResult.getParseCode().isNotError()) {
+        if (result.parseResult.getParseCode().isNotError()) {
             callback(result.data ?: throw IllegalStateException("result is null"))
         }
     }
@@ -46,10 +46,6 @@ class RuleWithDefaultRepeatResult<T : Any>(
     override fun invoke(callback: (T) -> Unit): RuleWithDefaultRepeatResult<T> {
         return RuleWithDefaultRepeatResult(rule as RuleWithDefaultRepeat<T>, callback)
     }
-
-    override fun clone(): RuleWithDefaultRepeatResult<T> {
-        return RuleWithDefaultRepeatResult(rule.clone() as RuleWithDefaultRepeat<T>, callback)
-    }
 }
 
 class CharPredicateResultRule(
@@ -66,9 +62,5 @@ class CharPredicateResultRule(
 
     override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {
         return CharPredicateResultRule(rule as CharPredicateRule, callback)
-    }
-
-    override fun clone(): CharPredicateResultRule {
-        return CharPredicateResultRule(rule.clone() as CharPredicateRule, callback)
     }
 }

@@ -40,10 +40,6 @@ class LazyCharPredicateRule(
         return StringCharPredicateRule((initRule() as CharPredicateRule).predicate)
     }
 
-    override fun clone(): LazyCharPredicateRule {
-        return LazyCharPredicateRule(ruleProvider)
-    }
-
     override fun repeat(range: IntRange): Rule<*> {
         return initRule().repeat(range)
     }
@@ -62,10 +58,6 @@ class LazyRule<T : Any>(
 
     override fun repeat(): Rule<List<T>> {
         return ZeroOrMoreRule(this)
-    }
-
-    override fun clone(): Rule<T> {
-        return LazyRule(ruleProvider)
     }
 
     override fun repeat(range: IntRange): Rule<List<T>> {

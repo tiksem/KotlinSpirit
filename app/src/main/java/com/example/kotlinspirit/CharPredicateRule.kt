@@ -27,7 +27,7 @@ class CharPredicateRule(
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         if (seek >= string.length) {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -37,9 +37,9 @@ class CharPredicateRule(
         val ch = string[seek]
         if (predicate(ch)) {
             result.data = ch
-            result.stepResult = createComplete(seek + 1)
+            result.parseResult = createComplete(seek + 1)
         } else {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.CHAR_PREDICATE_FAILED
             )
@@ -48,12 +48,6 @@ class CharPredicateRule(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return seek < string.length && predicate(string[seek])
-    }
-
-    override fun clone(): CharPredicateRule {
-        return CharPredicateRule(
-            predicate = predicate
-        )
     }
 
     override fun not(): CharPredicateRule {
@@ -77,6 +71,6 @@ class CharPredicateRule(
     }
 
     override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {
-        return CharPredicateResultRule(rule = this.clone(), callback)
+        return CharPredicateResultRule(rule = this, callback)
     }
 }

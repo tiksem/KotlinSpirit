@@ -44,9 +44,9 @@ class StringCharPredicateRangeRule(
             if (!predicate(c)) {
                 if (i - seek >= range.first) {
                     result.data = string.subSequence(seek, i)
-                    result.stepResult = createComplete(i)
+                    result.parseResult = createComplete(i)
                 } else {
-                    result.stepResult = createStepResult(
+                    result.parseResult = createStepResult(
                         seek = i,
                         ParseCode.STRING_NOT_ENOUGH_DATA
                     )
@@ -59,9 +59,9 @@ class StringCharPredicateRangeRule(
 
         if (i - seek >= range.first) {
             result.data = string.subSequence(seek, i)
-            result.stepResult = createComplete(i)
+            result.parseResult = createComplete(i)
         } else {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = i,
                 ParseCode.STRING_NOT_ENOUGH_DATA
             )
@@ -83,9 +83,5 @@ class StringCharPredicateRangeRule(
             },
             range = range
         )
-    }
-
-    override fun clone(): StringCharPredicateRangeRule {
-        return StringCharPredicateRangeRule(predicate, range)
     }
 }

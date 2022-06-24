@@ -10,8 +10,6 @@ abstract class RuleWithDefaultRepeat<T : Any> : Rule<T>() {
     }
 
     override fun invoke(callback: (T) -> Unit): RuleWithDefaultRepeatResult<T> {
-        return RuleWithDefaultRepeatResult(this.clone(), callback)
+        return RuleWithDefaultRepeatResult(this, callback)
     }
-
-    abstract override fun clone(): RuleWithDefaultRepeat<T>
 }

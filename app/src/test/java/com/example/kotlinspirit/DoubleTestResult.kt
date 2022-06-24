@@ -7,7 +7,7 @@ class DoubleTestResult {
     private fun testDouble(str: String) {
         val result = ParseResult<Double>()
         Rules.double.parseWithResult(0, str, result)
-        Assert.assertEquals(result.stepResult, createStepResult(
+        Assert.assertEquals(result.parseResult, createStepResult(
             seek = str.length,
             parseCode = ParseCode.COMPLETE
         ))
@@ -163,7 +163,7 @@ class DoubleTestResult {
         val str = ".4343343.56677"
         val result = ParseResult<Double>()
         Rules.double.parseWithResult(0, str, result)
-        Assert.assertEquals(result.stepResult, createStepResult(
+        Assert.assertEquals(result.parseResult, createStepResult(
             seek = ".4343343".length,
             parseCode = ParseCode.COMPLETE
         ))

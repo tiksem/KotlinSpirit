@@ -17,7 +17,7 @@ class AnyCharRule : Rule<Char>() {
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         if (seek >= string.length) {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -25,7 +25,7 @@ class AnyCharRule : Rule<Char>() {
         }
 
         result.data = string[seek]
-        result.stepResult = createStepResult(
+        result.parseResult = createStepResult(
             seek = seek + 1,
             parseCode = ParseCode.COMPLETE
         )
@@ -67,14 +67,6 @@ class AnyCharRule : Rule<Char>() {
             override fun invoke(callback: (Char) -> Unit): BaseRuleWithResult<Char> {
                 return rule.invoke(callback)
             }
-
-            override fun clone(): Rule<Char> {
-                TODO("Not yet implemented")
-            }
         }
-    }
-
-    override fun clone(): Rule<Char> {
-        TODO("Not yet implemented")
     }
 }

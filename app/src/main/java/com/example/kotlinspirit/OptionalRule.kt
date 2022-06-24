@@ -20,7 +20,7 @@ class OptionalRule(
     ) {
         val res = rule.parse(seek, string)
         val endSeek = res.getSeek()
-        result.stepResult = createStepResult(
+        result.parseResult = createStepResult(
             seek = endSeek,
             parseCode = ParseCode.COMPLETE
         )
@@ -33,9 +33,5 @@ class OptionalRule(
 
     override fun noParse(seek: Int, string: CharSequence): Int {
         return -seek
-    }
-
-    override fun clone(): OptionalRule {
-        return OptionalRule(rule.clone())
     }
 }

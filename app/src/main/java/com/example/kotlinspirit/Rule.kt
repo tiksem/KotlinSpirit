@@ -31,11 +31,11 @@ class ParseSeekResult(
 class ParseResult<T> {
     var data: T? = null
         internal set
-    internal var stepResult: Long = DEFAULT_STEP_RESULT
+    internal var parseResult: Long = DEFAULT_STEP_RESULT
 
     val errorCode: Int
         get() {
-            val stepCode = stepResult.getParseCode()
+            val stepCode = parseResult.getParseCode()
             return if (stepCode.isError()) {
                 stepCode
             } else {
@@ -44,16 +44,13 @@ class ParseResult<T> {
         }
 
     val isError: Boolean
-        get() = stepResult.getParseCode().isError()
+        get() = parseResult.getParseCode().isError()
 
     val seek: Int
-        get() = stepResult.getSeek()
+        get() = parseResult.getSeek()
 }
 
 abstract class Rule<T : Any> {
-    internal var threadId = Thread.currentThread().id
-        private set
-
     internal abstract fun parse(seek: Int, string: CharSequence): Long
     internal abstract fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
 
@@ -102,6 +99,10 @@ abstract class Rule<T : Any> {
         return DiffRule(main = this, diff = char(ch))
     }
 
+    fun expects(other: Rule<*>): ExpectationRule {
+        return ExpectationRule(this, other)
+    }
+
     abstract fun repeat(): Rule<*>
     abstract fun repeat(range: IntRange): Rule<*>
 
@@ -143,20 +144,18 @@ abstract class Rule<T : Any> {
         return rem(str(divider))
     }
 
-    abstract fun clone(): Rule<T>
-
     fun asStringRule(): StringRuleWrapper {
-        return StringRuleWrapper(this.clone())
+        return StringRuleWrapper(this)
     }
 
     fun optional(): OptionalRule {
-        return OptionalRule(this.clone())
+        return OptionalRule(this)
     }
 
     fun parseGetResultOrThrow(string: CharSequence): T {
         val result = ParseResult<T>()
         parseWithResult(0, string, result)
-        val stepResult = result.stepResult
+        val stepResult = result.parseResult
         if (stepResult.getParseCode().isError()) {
             throw ParseException(stepResult, string)
         } else {

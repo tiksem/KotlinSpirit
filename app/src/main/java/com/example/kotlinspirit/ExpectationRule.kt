@@ -1,16 +1,28 @@
 package com.example.kotlinspirit
 
-class SequenceRule(
+class ExpectationRule(
     private val a: Rule<*>,
     private val b: Rule<*>
 ) : RuleWithDefaultRepeat<CharSequence>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val aResult = a.parse(seek, string)
         if (aResult.getParseCode().isError()) {
-            return aResult
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.COMPLETE
+            )
         }
 
-        return b.parse(aResult.getSeek(), string)
+        val bResult = b.parse(aResult.getSeek(), string)
+        val parseCode = bResult.getParseCode()
+        return if (parseCode.isError()) {
+            createStepResult(
+                seek = seek,
+                parseCode = parseCode
+            )
+        } else {
+            bResult
+        }
     }
 
     override fun parseWithResult(
@@ -27,20 +39,19 @@ class SequenceRule(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         val aResult = a.parse(seek, string)
-        return if (aResult.getParseCode().isError()) {
-            false
-        } else {
-            b.hasMatch(aResult.getSeek(), string)
+        if (aResult.getParseCode().isError()) {
+            return true
         }
+
+        return b.hasMatch(aResult.getSeek(), string)
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        val aNoParseResult = a.noParse(seek, string)
-        return if (aNoParseResult < 0) {
-            val aParseResult = a.parse(seek, string)
-            b.noParse(aParseResult.getSeek(), string)
+        val aResult = a.parse(seek, string)
+        return if (aResult.getParseCode().isError()) {
+            -seek
         } else {
-            aNoParseResult
+            b.noParse(aResult.getSeek(), string)
         }
     }
 }

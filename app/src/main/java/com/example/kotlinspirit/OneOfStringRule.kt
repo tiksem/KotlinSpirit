@@ -33,13 +33,13 @@ class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
     ) {
         val r = tree.parse(seek, string)
         if (r >= 0) {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = r,
                 parseCode = ParseCode.COMPLETE
             )
             result.data = string.subSequence(seek, r)
         } else {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
             )
@@ -78,9 +78,5 @@ class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
 
     infix fun or(anotherRule: OneOfStringRule): OneOfStringRule {
         return OneOfStringRule(anotherRule.tree.strings + tree.strings)
-    }
-
-    override fun clone(): OneOfStringRule {
-        return OneOfStringRule(tree)
     }
 }

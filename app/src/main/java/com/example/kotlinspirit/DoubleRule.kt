@@ -162,7 +162,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Double>) {
         val length = string.length
         if (seek >= length) {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -179,7 +179,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         if (minus || c == '+' || c == '.') {
             i++
             if (i >= length) {
-                result.stepResult = createStepResult(
+                result.parseResult = createStepResult(
                     seek = seek,
                     parseCode = ParseCode.INVALID_DOUBLE
                 )
@@ -189,7 +189,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
             noMoreDots = c == '.'
             if (!noMoreDots && string[i] == '.') {
                 if (++i >= length) {
-                    result.stepResult = createStepResult(
+                    result.parseResult = createStepResult(
                         seek = seek,
                         parseCode = ParseCode.INVALID_DOUBLE
                     )
@@ -215,7 +215,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                         }
                     }
                 } else {
-                    result.stepResult = createStepResult(
+                    result.parseResult = createStepResult(
                         seek = seek,
                         parseCode = ParseCode.INVALID_DOUBLE
                     )
@@ -236,7 +236,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                         }
                     }
                 } else {
-                    result.stepResult = createStepResult(
+                    result.parseResult = createStepResult(
                         seek = seek,
                         parseCode = ParseCode.INVALID_DOUBLE
                     )
@@ -257,7 +257,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                 }
             }
         } else {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.INVALID_DOUBLE
             )
@@ -265,7 +265,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         }
 
         if (i >= length) {
-            result.stepResult = createComplete(i)
+            result.parseResult = createComplete(i)
             result.data = if (minus) {
                 -integerPart - fractionPart
             } else {
@@ -278,7 +278,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
         when (string[i]) {
             '.' -> {
                 if (noMoreDots || ++i >= length) {
-                    result.stepResult = createComplete(i)
+                    result.parseResult = createComplete(i)
                     result.data = if (minus) {
                         -integerPart - fractionPart
                     } else {
@@ -303,7 +303,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                         }
                     }
                 } else if (c != 'e' && c != 'E') {
-                    result.stepResult = createComplete(saveI)
+                    result.parseResult = createComplete(saveI)
                     result.data = if (minus) {
                         -integerPart
                     } else {
@@ -336,7 +336,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                                 break
                                             }
                                         }
-                                        result.stepResult = createComplete(i)
+                                        result.parseResult = createComplete(i)
                                         var data = if (minus) {
                                             -integerPart - fractionPart
                                         } else {
@@ -349,7 +349,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                         }
                                         result.data = data
                                     } else {
-                                        result.stepResult = createComplete(i - 2)
+                                        result.parseResult = createComplete(i - 2)
                                         result.data = if (minus) {
                                             -integerPart - fractionPart
                                         } else {
@@ -357,7 +357,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                         }
                                     }
                                 } else {
-                                    result.stepResult = createComplete(i - 2)
+                                    result.parseResult = createComplete(i - 2)
                                     result.data = if (minus) {
                                         -integerPart - fractionPart
                                     } else {
@@ -380,14 +380,14 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                             break
                                         }
                                     }
-                                    result.stepResult = createComplete(i)
+                                    result.parseResult = createComplete(i)
                                     result.data = if (minus) {
                                         -integerPart - fractionPart
                                     } else {
                                         integerPart + fractionPart
                                     } * getPowerOf10(exp)
                                 } else {
-                                    result.stepResult = createComplete(i - 1)
+                                    result.parseResult = createComplete(i - 1)
                                     result.data = if (minus) {
                                         -integerPart - fractionPart
                                     } else {
@@ -397,7 +397,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                 return
                             }
                         } else {
-                            result.stepResult = createComplete(saveI)
+                            result.parseResult = createComplete(saveI)
                             result.data = if (minus) {
                                 -integerPart - fractionPart
                             } else {
@@ -407,7 +407,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                         }
                     }
                 } else {
-                    result.stepResult = createComplete(i)
+                    result.parseResult = createComplete(i)
                     result.data = if (minus) {
                         -integerPart - fractionPart
                     } else {
@@ -438,7 +438,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                         break
                                     }
                                 }
-                                result.stepResult = createComplete(i)
+                                result.parseResult = createComplete(i)
                                 var data = if (minus) {
                                     -integerPart - fractionPart
                                 } else {
@@ -451,7 +451,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                 }
                                 result.data = data
                             } else {
-                                result.stepResult = createComplete(i - 2)
+                                result.parseResult = createComplete(i - 2)
                                 result.data = if (minus) {
                                     -integerPart - fractionPart
                                 } else {
@@ -459,7 +459,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                 }
                             }
                         } else {
-                            result.stepResult = createComplete(i - 2)
+                            result.parseResult = createComplete(i - 2)
                             result.data = if (minus) {
                                 -integerPart - fractionPart
                             } else {
@@ -482,14 +482,14 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                     break
                                 }
                             }
-                            result.stepResult = createComplete(i)
+                            result.parseResult = createComplete(i)
                             result.data = if (minus) {
                                 -integerPart - fractionPart
                             } else {
                                 integerPart + fractionPart
                             } * getPowerOf10(exp)
                         } else {
-                            result.stepResult = createComplete(i - 1)
+                            result.parseResult = createComplete(i - 1)
                             result.data = if (minus) {
                                 -integerPart - fractionPart
                             } else {
@@ -499,7 +499,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                         return
                     }
                 } else {
-                    result.stepResult = createComplete(saveI)
+                    result.parseResult = createComplete(saveI)
                     result.data = if (minus) {
                         -integerPart - fractionPart
                     } else {
@@ -509,7 +509,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
                 }
             }
             else -> {
-                result.stepResult = createComplete(i)
+                result.parseResult = createComplete(i)
                 result.data = if (minus) {
                     -integerPart - fractionPart
                 } else {
@@ -592,9 +592,5 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
             }
             else -> false
         }
-    }
-
-    override fun clone(): DoubleRule {
-        return DoubleRule()
     }
 }

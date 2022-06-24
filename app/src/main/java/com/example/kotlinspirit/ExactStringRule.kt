@@ -22,12 +22,12 @@ class ExactStringRule(
     ) {
         val str = string.subSequence(seek, string.length)
         if (str.startsWith(this.string)) {
-            result.stepResult = createComplete(
+            result.parseResult = createComplete(
                 seek = seek + this.string.length
             )
             result.data = string.subSequence(seek, this.string.length + seek)
         } else {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.STRING_DOES_NOT_MATCH
             )
@@ -53,9 +53,5 @@ class ExactStringRule(
 
     infix fun or(string: String): OneOfStringRule {
         return OneOfStringRule(listOf(this.string, string))
-    }
-
-    override fun clone(): ExactStringRule {
-        return ExactStringRule(string)
     }
 }

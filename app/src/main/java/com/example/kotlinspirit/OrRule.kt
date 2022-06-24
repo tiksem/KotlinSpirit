@@ -1,6 +1,5 @@
 package com.example.kotlinspirit
 
-import java.lang.UnsupportedOperationException
 import kotlin.math.min
 
 open class OrRule<T : Any>(
@@ -21,7 +20,7 @@ open class OrRule<T : Any>(
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         a.parseWithResult(seek, string, result)
-        if (result.stepResult.getParseCode().isError()) {
+        if (result.parseResult.getParseCode().isError()) {
             b.parseWithResult(seek, string, result)
         }
     }
@@ -42,13 +41,6 @@ open class OrRule<T : Any>(
         }
 
         return min(aResult, bResult)
-    }
-
-    override fun clone(): OrRule<T> {
-        return OrRule(
-            a = a.clone(),
-            b = b.clone()
-        )
     }
 
     override fun repeat(): Rule<List<T>> {

@@ -40,13 +40,13 @@ class OneOrMoreRule<T : Any>(
         while (i < string.length) {
             val seekBefore = i
             rule.parseWithResult(seek, string, itemResult)
-            val stepResult = itemResult.stepResult
+            val stepResult = itemResult.parseResult
             if (stepResult.getParseCode().isError()) {
                 if (list.isNotEmpty()) {
                     result.data = list
-                    result.stepResult = createComplete(seekBefore)
+                    result.parseResult = createComplete(seekBefore)
                 } else {
-                    result.stepResult = stepResult
+                    result.parseResult = stepResult
                 }
                 return
             } else {
@@ -57,9 +57,9 @@ class OneOrMoreRule<T : Any>(
 
         if (list.isNotEmpty()) {
             result.data = list
-            result.stepResult = createComplete(i)
+            result.parseResult = createComplete(i)
         } else {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = i,
                 parseCode = ParseCode.EOF
             )
@@ -72,11 +72,5 @@ class OneOrMoreRule<T : Any>(
 
     override fun noParse(seek: Int, string: CharSequence): Int {
         return rule.noParse(seek, string)
-    }
-
-    override fun clone(): OneOrMoreRule<T> {
-        return OneOrMoreRule(
-            rule = rule.clone()
-        )
     }
 }

@@ -43,9 +43,9 @@ class StringOneOrMoreCharPredicateRule(
             if (!predicate(c)) {
                 if (i - seek >= 1) {
                     result.data = string.subSequence(seek, i)
-                    result.stepResult = createComplete(i)
+                    result.parseResult = createComplete(i)
                 } else {
-                    result.stepResult = createStepResult(
+                    result.parseResult = createStepResult(
                         seek = i,
                         ParseCode.STRING_NOT_ENOUGH_DATA
                     )
@@ -58,9 +58,9 @@ class StringOneOrMoreCharPredicateRule(
 
         if (i - seek >= 1) {
             result.data = string.subSequence(seek, i)
-            result.stepResult = createComplete(i)
+            result.parseResult = createComplete(i)
         } else {
-            result.stepResult = createStepResult(
+            result.parseResult = createStepResult(
                 seek = i,
                 ParseCode.STRING_NOT_ENOUGH_DATA
             )
@@ -81,9 +81,5 @@ class StringOneOrMoreCharPredicateRule(
                 !predicate(it)
             }
         )
-    }
-
-    override fun clone(): StringOneOrMoreCharPredicateRule {
-        return StringOneOrMoreCharPredicateRule(predicate)
     }
 }

@@ -17,7 +17,7 @@ object ParseCode {
 }
 
 internal inline fun Int.isError(): Boolean {
-    return this > ParseCode.COMPLETE
+    return this != ParseCode.COMPLETE
 }
 
 internal inline fun Int.isNotError(): Boolean {

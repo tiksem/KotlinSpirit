@@ -25,7 +25,7 @@ class StringCharPredicateRule(
             val c = string[i]
             if (!predicate(c)) {
                 result.data = string.subSequence(seek, i)
-                result.stepResult = createComplete(i)
+                result.parseResult = createComplete(i)
                 return
             }
 
@@ -33,7 +33,7 @@ class StringCharPredicateRule(
         }
 
         result.data = string.subSequence(seek, i)
-        result.stepResult = createComplete(i)
+        result.parseResult = createComplete(i)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -50,9 +50,5 @@ class StringCharPredicateRule(
                 !predicate(it)
             }
         )
-    }
-
-    override fun clone(): StringCharPredicateRule {
-        return StringCharPredicateRule(predicate)
     }
 }

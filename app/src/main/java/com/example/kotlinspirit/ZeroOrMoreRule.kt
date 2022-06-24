@@ -31,14 +31,14 @@ class ZeroOrMoreRule<T : Any>(
         while (i < string.length) {
             val seekBefore = i
             rule.parseWithResult(i, string, itemResult)
-            val stepResult = itemResult.stepResult
+            val stepResult = itemResult.parseResult
             if (stepResult.getParseCode().isError()) {
-                result.stepResult = createComplete(seekBefore)
+                result.parseResult = createComplete(seekBefore)
                 return
             } else {
                 i = stepResult.getSeek()
                 if (i == seekBefore) {
-                    result.stepResult = createComplete(i)
+                    result.parseResult = createComplete(i)
                     return
                 }
 
@@ -46,7 +46,7 @@ class ZeroOrMoreRule<T : Any>(
             }
         }
 
-        result.stepResult = createComplete(i)
+        result.parseResult = createComplete(i)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -55,11 +55,5 @@ class ZeroOrMoreRule<T : Any>(
 
     override fun noParse(seek: Int, string: CharSequence): Int {
         return rule.noParse(seek, string)
-    }
-
-    override fun clone(): ZeroOrMoreRule<T> {
-        return ZeroOrMoreRule(
-            rule = rule.clone()
-        )
     }
 }

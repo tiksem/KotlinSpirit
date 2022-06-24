@@ -7,11 +7,7 @@ class StringRuleWrapper(
     private var stepEndSeek = -1
 
     override fun invoke(callback: (CharSequence) -> Unit): RuleWithDefaultRepeatResult<CharSequence> {
-        return RuleWithDefaultRepeatResult(this.clone(), callback)
-    }
-
-    override fun clone(): StringRuleWrapper {
-        return StringRuleWrapper(rule.clone())
+        return RuleWithDefaultRepeatResult(this, callback)
     }
 
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -24,7 +20,7 @@ class StringRuleWrapper(
         result: ParseResult<CharSequence>
     ) {
         val parseResult = rule.parse(seek, string)
-        result.stepResult = parseResult
+        result.parseResult = parseResult
         if (parseResult.getParseCode().isNotError()) {
             result.data = string.subSequence(seek, parseResult.getSeek())
         }

@@ -55,8 +55,4 @@ class SplitRule<T : Any>(
     override fun resetResult() {
         result = ArrayList()
     }
-
-    override fun clone(): SplitRule<T> {
-        return SplitRule(r.clone(), divider.clone(), range)
-    }
 }

@@ -17,8 +17,8 @@ class NoRule(
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
-        result.stepResult = parse(seek, string)
-        val stepResult = result.stepResult
+        result.parseResult = parse(seek, string)
+        val stepResult = result.parseResult
         if (!stepResult.getParseCode().isNotError()) {
             result.data = string.subSequence(seek, stepResult.getSeek())
         }
@@ -26,10 +26,6 @@ class NoRule(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return !rule.hasMatch(seek, string)
-    }
-
-    override fun clone(): NoRule {
-        return NoRule(rule = rule.clone())
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {

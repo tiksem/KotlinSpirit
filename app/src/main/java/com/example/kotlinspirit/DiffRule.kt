@@ -28,11 +28,11 @@ class DiffRule<T : Any>(
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         main.parseWithResult(seek, string, result)
-        val stepResult = result.stepResult
+        val stepResult = result.parseResult
         if (stepResult.getParseCode().isNotError()) {
             val diffRes = diff.parse(seek, string)
             if (diffRes.getParseCode().isNotError() && diffRes.getSeek() >= stepResult.getSeek()) {
-                result.stepResult = createStepResult(
+                result.parseResult = createStepResult(
                     seek = seek,
                     parseCode = ParseCode.DIFF_FAILED
                 )
@@ -43,13 +43,6 @@ class DiffRule<T : Any>(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return main.hasMatch(seek, string) && !diff.hasMatch(seek, string)
-    }
-
-    override fun clone(): DiffRule<T> {
-        return DiffRule(
-            main = main.clone(),
-            diff = diff.clone()
-        )
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
@@ -76,8 +69,8 @@ class DiffRule<T : Any>(
 
     override fun not(): Rule<*> {
         return DiffRule(
-            main = diff.clone(),
-            diff = main.clone()
+            main = diff,
+            diff = main
         )
     }
 }

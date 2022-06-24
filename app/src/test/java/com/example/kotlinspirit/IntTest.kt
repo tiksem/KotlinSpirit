@@ -36,6 +36,6 @@ class IntTest {
     fun outOfRange() {
         val result = ParseResult<Int>()
         int.parseWithResult(0, "21474836473", result)
-        Assert.assertEquals(ParseCode.INT_OUT_OF_BOUNDS, result.stepResult.getParseCode())
+        Assert.assertEquals(ParseCode.INT_OUT_OF_BOUNDS, result.parseResult.getParseCode())
     }
 }
