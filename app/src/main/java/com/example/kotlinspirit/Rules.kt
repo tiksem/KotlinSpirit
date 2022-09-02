@@ -30,6 +30,10 @@ object Rules {
         )
     }
 
+    fun charIf(predicate: (Char) -> Boolean): CharPredicateRule {
+        return CharPredicateRule(predicate)
+    }
+
     fun nonEmptyStr(vararg chars: Char): StringOneOrMoreCharPredicateRule {
         return StringOneOrMoreCharPredicateRule(
             CharPredicates.from(*chars)
