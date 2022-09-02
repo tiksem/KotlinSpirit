@@ -522,7 +522,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
     override fun noParse(seek: Int, string: CharSequence): Int {
         val length = string.length
         if (seek >= length) {
-            return -seek
+            return seek
         }
 
         var i = seek
@@ -530,7 +530,7 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
             val c = string[i]
             if (c.isDigit()) {
                 return if (i == seek) {
-                    -seek
+                    -seek - 1
                 } else {
                     i
                 }
@@ -592,5 +592,9 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
             }
             else -> false
         }
+    }
+
+    override fun clone(): DoubleRule {
+        return this
     }
 }

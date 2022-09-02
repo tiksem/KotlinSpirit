@@ -3,8 +3,6 @@ package com.example.kotlinspirit
 class StringRuleWrapper(
     private val rule: Rule<*>
 ) : RuleWithDefaultRepeat<CharSequence>() {
-    private var stepSeekBegin = -1
-    private var stepEndSeek = -1
 
     override fun invoke(callback: (CharSequence) -> Unit): RuleWithDefaultRepeatResult<CharSequence> {
         return RuleWithDefaultRepeatResult(this, callback)
@@ -32,5 +30,9 @@ class StringRuleWrapper(
 
     override fun noParse(seek: Int, string: CharSequence): Int {
         return rule.noParse(seek, string)
+    }
+
+    override fun clone(): StringRuleWrapper {
+        return StringRuleWrapper(rule = rule.clone())
     }
 }

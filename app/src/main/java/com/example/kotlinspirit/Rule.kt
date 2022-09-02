@@ -87,19 +87,19 @@ abstract class Rule<T : Any> {
         return SequenceRule(c, ExactStringRule(string))
     }
 
-    operator fun minus(rule: Rule<*>): DiffRule<T> {
-        return DiffRule(main = this, diff = rule)
+    open operator fun minus(rule: Rule<*>): Rule<T> {
+        return DiffRuleWithDefaultRepeat(main = this, diff = rule)
     }
 
-    operator fun minus(string: String): DiffRule<T> {
-        return DiffRule(main = this, diff = str(string))
+    open operator fun minus(string: String): Rule<T> {
+        return DiffRuleWithDefaultRepeat(main = this, diff = str(string))
     }
 
-    operator fun minus(ch: Char): DiffRule<T> {
-        return DiffRule(main = this, diff = char(ch))
+    open operator fun minus(ch: Char): Rule<T> {
+        return DiffRuleWithDefaultRepeat(main = this, diff = char(ch))
     }
 
-    fun expects(other: Rule<*>): ExpectationRule {
+    fun expect(other: Rule<*>): ExpectationRule {
         return ExpectationRule(this, other)
     }
 
@@ -148,76 +148,13 @@ abstract class Rule<T : Any> {
         return StringRuleWrapper(this)
     }
 
-    fun optional(): OptionalRule {
+    operator fun unaryMinus(): OptionalRule<T> {
         return OptionalRule(this)
     }
 
-    fun parseGetResultOrThrow(string: CharSequence): T {
-        val result = ParseResult<T>()
-        parseWithResult(0, string, result)
-        val stepResult = result.parseResult
-        if (stepResult.getParseCode().isError()) {
-            throw ParseException(stepResult, string)
-        } else {
-            return result.data!!
-        }
-    }
+    abstract fun clone(): Rule<T>
 
-    fun parseOrThrow(string: CharSequence): Int {
-        val result = parse(0, string)
-        if (result.getParseCode().isError()) {
-            throw ParseException(
-                result, string
-            )
-        }
-
-        return result.getSeek()
-    }
-
-    fun tryParse(string: CharSequence): Int? {
-        val result = parse(0, string)
-        if (result.getParseCode().isError()) {
-            return null
-        }
-
-        return result.getSeek()
-    }
-
-    fun parseWithResult(string: CharSequence): ParseResult<T> {
-        val result = ParseResult<T>()
-        parseWithResult(0, string, result)
-        return result
-    }
-
-    fun parse(string: CharSequence): ParseSeekResult {
-        val result = parse(0, string)
-        return ParseSeekResult(stepResult = result)
-    }
-
-    fun matchOrThrow(string: CharSequence) {
-        val result = parse(0, string)
-        if (result.getParseCode().isError()) {
-            throw ParseException(result, string)
-        }
-
-        val seek = result.getSeek()
-        if (seek != string.length) {
-            throw ParseException(
-                result = createStepResult(
-                    seek = seek,
-                    parseCode = ParseCode.WHOLE_STRING_DOES_NOT_MATCH
-                ),
-                string = string
-            )
-        }
-    }
-
-    fun matches(string: CharSequence): Boolean {
-        val result = parse(0, string)
-        return result.getParseCode().isNotError() && result.getSeek() == string.length
-    }
-
-    fun matchesAtBeginning(string: CharSequence): Boolean {
-        return hasMatch(0, string)
+    fun compile(): Parser<T> {
+        return Parser(originRule = this)
     }
 }

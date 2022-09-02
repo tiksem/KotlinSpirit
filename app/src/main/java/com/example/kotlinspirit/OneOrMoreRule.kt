@@ -73,4 +73,8 @@ class OneOrMoreRule<T : Any>(
     override fun noParse(seek: Int, string: CharSequence): Int {
         return rule.noParse(seek, string)
     }
+
+    override fun clone(): OneOrMoreRule<T> {
+        return OneOrMoreRule(rule.clone())
+    }
 }

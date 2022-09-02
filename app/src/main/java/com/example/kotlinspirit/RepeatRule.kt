@@ -1,6 +1,5 @@
 package com.example.kotlinspirit
 
-import java.lang.IllegalStateException
 import java.lang.UnsupportedOperationException
 
 class RepeatRule<T : Any>(
@@ -51,7 +50,7 @@ class RepeatRule<T : Any>(
                     result.parseResult = stepResult
                 }
             } else {
-                list.add(itemResult.data ?: throw IllegalStateException("data should not be empty"))
+                list.add(itemResult.data ?: continue)
             }
         }
 
@@ -68,7 +67,7 @@ class RepeatRule<T : Any>(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         repeat (range.first) {
-            if (rule.parse(seek, string) < 0) {
+            if (rule.parse(seek, string).getParseCode().isError()) {
                 return false
             }
         }
@@ -92,5 +91,9 @@ class RepeatRule<T : Any>(
                 RepeatRule(rule, 0 until range.first) + !ZeroOrMoreRule(rule)
             }
         }
+    }
+
+    override fun clone(): RepeatRule<T> {
+        return RepeatRule(rule.clone(), range)
     }
 }

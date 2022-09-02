@@ -54,6 +54,10 @@ class ZeroOrMoreRule<T : Any>(
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        return rule.noParse(seek, string)
+        return -seek-1
+    }
+
+    override fun clone(): ZeroOrMoreRule<T> {
+        return ZeroOrMoreRule(rule = rule.clone())
     }
 }

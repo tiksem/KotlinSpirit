@@ -38,4 +38,8 @@ abstract class Grammar<T : Any> : RuleWithDefaultRepeat<T>() {
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return initRule().hasMatch(seek, string)
     }
+
+    override fun clone(): Grammar<T> {
+        return javaClass.newInstance()
+    }
 }

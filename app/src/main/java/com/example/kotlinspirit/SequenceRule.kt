@@ -43,4 +43,8 @@ class SequenceRule(
             aNoParseResult
         }
     }
+
+    override fun clone(): SequenceRule {
+        return SequenceRule(a.clone(), b.clone())
+    }
 }

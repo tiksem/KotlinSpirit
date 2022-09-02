@@ -41,9 +41,13 @@ class ExactStringRule(
     override fun noParse(seek: Int, string: CharSequence): Int {
         val findIndex = string.indexOf(this.string, seek)
         return if (findIndex == seek) {
-            -seek
+            -seek - 1
         } else {
-            findIndex
+            if (findIndex < 0) {
+                string.length
+            } else {
+                findIndex
+            }
         }
     }
 
@@ -53,5 +57,9 @@ class ExactStringRule(
 
     infix fun or(string: String): OneOfStringRule {
         return OneOfStringRule(listOf(this.string, string))
+    }
+
+    override fun clone(): ExactStringRule {
+        return this
     }
 }

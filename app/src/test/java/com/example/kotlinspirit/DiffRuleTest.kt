@@ -16,7 +16,7 @@ class DiffRuleTest {
     }
 
     private fun <T : Any> verifyDiffSuccess(rule: Rule<T>, str: String) {
-        Assert.assertEquals(rule.parseOrThrow(str), str.length)
+        Assert.assertEquals(rule.compile().parseOrThrow(str), str.length)
     }
 
     @Test

@@ -9,7 +9,7 @@ class OneOfRuleTest {
     @Test
     fun test1() {
         var result: ParseResult<CharSequence>
-        val rule = oneOf("Igor", "Vasia", "Petia", "Igorian")
+        val rule = oneOf("Igor", "Vasia", "Petia", "Igorian").compile()
         result = rule.parseWithResult("Igor")
         Assert.assertEquals(result.seek, "Igor".length)
         Assert.assertEquals(result.data!!.toString(), "Igor")
@@ -38,7 +38,7 @@ class OneOfRuleTest {
     @Test
     fun test2() {
         var result: ParseResult<CharSequence>
-        val rule = (str("Igor") or "Vasia" or "Petia" or "Igorian")
+        val rule = (str("Igor") or "Vasia" or "Petia" or "Igorian").compile()
         result = rule.parseWithResult("Igor")
         Assert.assertEquals(result.seek, "Igor".length)
         Assert.assertEquals(result.data!!.toString(), "Igor")

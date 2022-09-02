@@ -8,7 +8,7 @@ private fun Array<out CharRange>.contains(char: Char): Boolean {
     }
 }
 
-object CharPredicates {
+internal object CharPredicates {
     fun from(vararg chars: Char): (Char) -> Boolean {
         return if (chars.size == 1) {
             val char = chars[0]

@@ -49,9 +49,13 @@ class ExpectationRule(
     override fun noParse(seek: Int, string: CharSequence): Int {
         val aResult = a.parse(seek, string)
         return if (aResult.getParseCode().isError()) {
-            -seek
+            -seek - 1
         } else {
             b.noParse(aResult.getSeek(), string)
         }
+    }
+
+    override fun clone(): ExpectationRule {
+        return ExpectationRule(a.clone(), b.clone())
     }
 }

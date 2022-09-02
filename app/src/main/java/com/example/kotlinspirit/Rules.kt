@@ -9,29 +9,30 @@ object Rules {
     val long get() = LongRule()
     val char get() = AnyCharRule()
 
-    fun char(vararg ch: Char): CharPredicateRule {
+    fun char(vararg chars: Char): CharPredicateRule {
         return CharPredicateRule(
-            CharPredicates.from(*ch)
+            CharPredicateData(chars)
         )
     }
 
-    fun char(vararg range: CharRange): CharPredicateRule {
+    fun char(vararg ranges: CharRange): CharPredicateRule {
         return CharPredicateRule(
-            CharPredicates.from(*range)
+            CharPredicateData(ranges)
         )
     }
 
     fun char(chars: CharArray, ranges: Array<CharRange>): CharPredicateRule {
         return CharPredicateRule(
-            CharPredicates.from(
-                ranges, chars
+            CharPredicateData(
+                chars = chars.toSortedSet(),
+                ranges = ranges.toList()
             )
         )
     }
 
-    fun nonEmptyStr(vararg ch: Char): StringOneOrMoreCharPredicateRule {
+    fun nonEmptyStr(vararg chars: Char): StringOneOrMoreCharPredicateRule {
         return StringOneOrMoreCharPredicateRule(
-            CharPredicates.from(*ch)
+            CharPredicates.from(*chars)
         )
     }
 

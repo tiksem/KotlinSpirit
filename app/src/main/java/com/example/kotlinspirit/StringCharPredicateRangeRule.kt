@@ -1,6 +1,5 @@
 package com.example.kotlinspirit
 
-import java.lang.UnsupportedOperationException
 import kotlin.math.min
 
 class StringCharPredicateRangeRule(
@@ -73,15 +72,45 @@ class StringCharPredicateRangeRule(
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
+        var i = seek
+        val length = string.length
+        while (i < length) {
+            val c = string[i]
+            if (predicate(c)) {
+                break
+            }
+
+            i++
+        }
+
+        var j = i
+        do {
+            val c = string[j]
+            if (!predicate(c)) {
+                break
+            }
+
+            j++
+        }  while(j < length)
+
+        return if (j - i >= range.first) {
+            if (i == seek) {
+                -i - 1
+            } else {
+                i
+            }
+        } else {
+            noParse(j + 1, string).let {
+                if (it < 0) {
+                    j + 1
+                } else {
+                    it
+                }
+            }
+        }
     }
 
-    override fun not(): StringCharPredicateRangeRule {
-        return StringCharPredicateRangeRule(
-            predicate = {
-                !predicate(it)
-            },
-            range = range
-        )
+    override fun clone(): StringCharPredicateRangeRule {
+        return this
     }
 }

@@ -1,14 +1,9 @@
 package com.example.kotlinspirit
 
-class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
-    private val tree: TernarySearchTree
+class OneOfStringRule internal constructor(private val tree: TernarySearchTree) :
+    RuleWithDefaultRepeat<CharSequence>() {
 
-    constructor(strings: List<CharSequence>) {
-        tree = TernarySearchTree(strings)
-    }
-
-    private constructor(tree: TernarySearchTree) {
-        this.tree = tree.clone()
+    constructor(strings: List<CharSequence>) : this(TernarySearchTree(strings)) {
     }
 
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -64,7 +59,7 @@ class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
         return if (i != seek) {
             i
         } else {
-            -seek
+            -seek - 1
         }
     }
 
@@ -78,5 +73,9 @@ class OneOfStringRule : RuleWithDefaultRepeat<CharSequence> {
 
     infix fun or(anotherRule: OneOfStringRule): OneOfStringRule {
         return OneOfStringRule(anotherRule.tree.strings + tree.strings)
+    }
+
+    override fun clone(): OneOfStringRule {
+        return OneOfStringRule(this.tree)
     }
 }

@@ -134,7 +134,7 @@ class JsonParserTest {
     fun stringTest() {
         Assert.assertEquals(
             "some str",
-            jsonString.parseGetResultOrThrow("\"some str\"")
+            jsonString.compile().parseGetResultOrThrow("\"some str\"")
         )
     }
 
@@ -142,7 +142,7 @@ class JsonParserTest {
     fun valueStringTest() {
         Assert.assertEquals(
             "some str",
-            value.parseGetResultOrThrow("\"some str\"")
+            value.compile().parseGetResultOrThrow("\"some str\"")
         )
     }
 
@@ -150,7 +150,7 @@ class JsonParserTest {
     fun testArray() {
         Assert.assertArrayEquals(
             arrayOf(1223233.0, "aaaaaa", 123456.0),
-            jsonArray.parseGetResultOrThrow("[  1223233, \"aaaaaa\", 123456]").toTypedArray()
+            jsonArray.compile().parseGetResultOrThrow("[  1223233, \"aaaaaa\", 123456]").toTypedArray()
         )
     }
 
@@ -159,13 +159,13 @@ class JsonParserTest {
         val scanner = Scanner("")
         Assert.assertArrayEquals(
             arrayOf(),
-            jsonArray.parseGetResultOrThrow("[]").toTypedArray()
+            jsonArray.compile().parseGetResultOrThrow("[]").toTypedArray()
         )
     }
 
     @Test
     fun testObject() {
-        val res = jsonObject.parseGetResultOrThrow(
+        val res = jsonObject.compile().parseGetResultOrThrow(
             "{\"str\": \n\n\n\"value\", \"int\": 1234345, \"arr\": [123, \"123\", \n\n12]   }"
         )
 
@@ -208,7 +208,7 @@ class JsonParserTest {
                 "    }\n" +
                 "  ]\n" +
                 "}"
-        val value = jsonObject.parseGetResultOrThrow(str)
+        val value = jsonObject.compile().parseGetResultOrThrow(str)
         JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
     }
 }

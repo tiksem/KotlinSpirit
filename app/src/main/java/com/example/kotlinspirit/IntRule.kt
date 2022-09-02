@@ -160,7 +160,7 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
     override fun noParse(seek: Int, string: CharSequence): Int {
         val length = string.length
         if (seek >= length) {
-            return -seek
+            return seek
         }
 
         var noSuccess = false
@@ -171,7 +171,7 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
                 (char == '-' || char == '+') && !noSuccess -> {
                     if (i < length - 1) {
                         if (string[i + 1] in '0'..'9') {
-                            return -seek
+                            return -seek - 1
                         } else {
                             noSuccess = true
                             i+=2
@@ -184,7 +184,7 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
                     return if (noSuccess) {
                         i
                     } else {
-                        -i
+                        -i - 1
                     }
                 }
                 else -> {
@@ -194,5 +194,9 @@ class IntRule : RuleWithDefaultRepeat<Int>() {
         } while (i < length)
 
         return i
+    }
+
+    override fun clone(): IntRule {
+        return this
     }
 }

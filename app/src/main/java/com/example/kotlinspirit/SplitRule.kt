@@ -1,12 +1,13 @@
 package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.str
+import kotlin.reflect.KMutableProperty0
 
 class SplitRule<T : Any>(
     private val r: Rule<T>,
     private val divider: Rule<*>,
     private val range: IntRange
-) : Grammar<List<T>>() {
+) : Grammar<ArrayList<T>>() {
     override var result = ArrayList<T>()
         private set
 

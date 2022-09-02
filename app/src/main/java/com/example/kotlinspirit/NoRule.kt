@@ -17,10 +17,18 @@ class NoRule(
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
-        result.parseResult = parse(seek, string)
-        val stepResult = result.parseResult
-        if (!stepResult.getParseCode().isNotError()) {
-            result.data = string.subSequence(seek, stepResult.getSeek())
+        val parseResult = rule.noParse(seek, string)
+        if (parseResult >= 0) {
+            result.data = string.subSequence(seek, parseResult)
+            result.parseResult = createStepResult(
+                seek = parseResult,
+                parseCode = ParseCode.COMPLETE
+            )
+        } else {
+            result.parseResult = createStepResult(
+                seek = -parseResult + 1,
+                parseCode = ParseCode.NO_FAILED
+            )
         }
     }
 
@@ -33,8 +41,12 @@ class NoRule(
             if (it.getParseCode().isNotError()) {
                 it.getSeek()
             } else {
-                -it.getSeek()
+                -it.getSeek() - 1
             }
         }
+    }
+
+    override fun clone(): NoRule {
+        return NoRule(rule.clone())
     }
 }

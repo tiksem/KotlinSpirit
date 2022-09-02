@@ -1,10 +1,8 @@
 package com.example.kotlinspirit
 
-class OptionalRule(
-    private val rule: Rule<*>
-) : RuleWithDefaultRepeat<CharSequence>() {
-    private var stepBeginSeek = -1
-    private var stepEndSeek = -1
+class OptionalRule<T : Any>(
+    private val rule: Rule<T>
+) : RuleWithDefaultRepeat<T>() {
 
     override fun parse(seek: Int, string: CharSequence): Long {
         return createStepResult(
@@ -16,15 +14,14 @@ class OptionalRule(
     override fun parseWithResult(
         seek: Int,
         string: CharSequence,
-        result: ParseResult<CharSequence>
+        result: ParseResult<T>
     ) {
-        val res = rule.parse(seek, string)
-        val endSeek = res.getSeek()
+        result.data = null
+        val ruleRes = rule.parse(seek, string)
         result.parseResult = createStepResult(
-            seek = endSeek,
+            seek = ruleRes.getSeek(),
             parseCode = ParseCode.COMPLETE
         )
-        result.data = string.subSequence(seek, endSeek)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -32,6 +29,10 @@ class OptionalRule(
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        return -seek
+        return -seek - 1
+    }
+
+    override fun clone(): OptionalRule<T> {
+        return OptionalRule(rule)
     }
 }

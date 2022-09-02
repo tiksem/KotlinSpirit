@@ -1,7 +1,5 @@
 package com.example.kotlinspirit
 
-import java.lang.UnsupportedOperationException
-
 class StringCharPredicateRule(
     private val predicate: (Char) -> Boolean
 ) : RuleWithDefaultRepeat<CharSequence>() {
@@ -41,14 +39,25 @@ class StringCharPredicateRule(
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
+        var i = seek
+        val length = string.length
+        while (i < length) {
+            val c = string[i]
+            if (predicate(c)) {
+                break
+            }
+
+            i++
+        }
+
+        return if (i == seek) {
+            -seek - 1
+        } else {
+            i
+        }
     }
 
-    override fun not(): StringCharPredicateRule {
-        return StringCharPredicateRule(
-            predicate = {
-                !predicate(it)
-            }
-        )
+    override fun clone(): StringCharPredicateRule {
+        return this
     }
 }

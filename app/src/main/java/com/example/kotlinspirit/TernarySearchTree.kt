@@ -133,8 +133,4 @@ internal class TernarySearchTree {
     fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return hasMatch(root, seek, string)
     }
-
-    fun clone(): TernarySearchTree {
-        return TernarySearchTree(root, strings)
-    }
 }

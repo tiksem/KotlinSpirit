@@ -34,7 +34,7 @@ abstract class BaseLazyRule<T : Any>(
 }
 
 class LazyCharPredicateRule(
-    private val ruleProvider: () -> CharPredicateRule
+    ruleProvider: () -> CharPredicateRule
 ) : BaseLazyRule<Char>(ruleProvider) {
     override fun repeat(): StringCharPredicateRule {
         return StringCharPredicateRule((initRule() as CharPredicateRule).predicate)
@@ -47,10 +47,14 @@ class LazyCharPredicateRule(
     override fun invoke(callback: (Char) -> Unit): BaseRuleWithResult<Char> {
         return initRule().invoke(callback)
     }
+
+    override fun clone(): LazyCharPredicateRule {
+        return this
+    }
 }
 
 class LazyRule<T : Any>(
-    private val ruleProvider: () -> RuleWithDefaultRepeat<T>
+    ruleProvider: () -> RuleWithDefaultRepeat<T>
 ) : BaseLazyRule<T>(ruleProvider) {
     override fun initRule(): RuleWithDefaultRepeat<T> {
         return super.initRule() as RuleWithDefaultRepeat<T>
@@ -66,5 +70,9 @@ class LazyRule<T : Any>(
 
     override fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T> {
         return RuleWithDefaultRepeatResult(initRule(), callback)
+    }
+
+    override fun clone(): LazyRule<T> {
+        return this
     }
 }

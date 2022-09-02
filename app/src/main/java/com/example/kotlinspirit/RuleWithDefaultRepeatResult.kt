@@ -46,6 +46,10 @@ class RuleWithDefaultRepeatResult<T : Any>(
     override fun invoke(callback: (T) -> Unit): RuleWithDefaultRepeatResult<T> {
         return RuleWithDefaultRepeatResult(rule as RuleWithDefaultRepeat<T>, callback)
     }
+
+    override fun clone(): Rule<T> {
+        return RuleWithDefaultRepeatResult((rule as RuleWithDefaultRepeat<T>).clone(), callback)
+    }
 }
 
 class CharPredicateResultRule(
@@ -62,5 +66,18 @@ class CharPredicateResultRule(
 
     override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {
         return CharPredicateResultRule(rule as CharPredicateRule, callback)
+    }
+
+    override fun not(): CharPredicateRule {
+        val rule = rule as CharPredicateRule
+        return CharPredicateRule(
+            predicate = {
+                !rule.predicate(it)
+            }
+        )
+    }
+
+    override fun clone(): CharPredicateResultRule {
+        return CharPredicateResultRule((rule as CharPredicateRule).clone(), callback)
     }
 }

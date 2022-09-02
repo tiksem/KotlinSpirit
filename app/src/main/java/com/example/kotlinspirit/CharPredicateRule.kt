@@ -1,11 +1,23 @@
 package com.example.kotlinspirit
 
-import java.lang.UnsupportedOperationException
+class CharPredicateRule : CharRule {
+    internal val predicate: (Char) -> Boolean
+    internal val data: CharPredicateData?
 
-class CharPredicateRule(
-    val predicate: (Char) -> Boolean
-) : Rule<Char>() {
-    private var result = 0.toChar()
+    private constructor(data: CharPredicateData?, predicate: (Char) -> Boolean) {
+        this.data = data
+        this.predicate = predicate
+    }
+
+    internal constructor(data: CharPredicateData) {
+        this.data = data
+        this.predicate = data.toPredicate()
+    }
+
+    internal constructor(predicate: (Char) -> Boolean) {
+        this.predicate = predicate
+        this.data = null
+    }
 
     override fun parse(seek: Int, string: CharSequence): Long {
         if (seek >= string.length) {
@@ -51,11 +63,42 @@ class CharPredicateRule(
     }
 
     override fun not(): CharPredicateRule {
+        val predicate = this.predicate
         return CharPredicateRule(
             predicate = {
                 !predicate(it)
             }
         )
+    }
+
+    infix fun or(rule: CharPredicateRule): CharPredicateRule {
+        val data = this.data
+        val otherData = rule.data
+
+        return if (data != null && otherData != null) {
+            CharPredicateRule(data + otherData)
+        } else {
+            val thisPredicate = this.predicate
+            val otherPredicate = rule.predicate
+            CharPredicateRule {
+                thisPredicate(it) || otherPredicate(it)
+            }
+        }
+    }
+
+    operator fun minus(rule: CharPredicateRule): CharPredicateRule {
+        val data = this.data
+        val otherData = rule.data
+
+        return if (data != null && otherData != null) {
+            CharPredicateRule(data - otherData)
+        } else {
+            val otherPredicate = rule.predicate
+            val thisPredicate = this.predicate
+            CharPredicateRule {
+                thisPredicate(it) && !otherPredicate(it)
+            }
+        }
     }
 
     override fun repeat(): StringCharPredicateRule {
@@ -67,10 +110,22 @@ class CharPredicateRule(
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
+        if (seek >= string.length) {
+            return -seek - 1
+        }
+
+        return if (!predicate(string[seek])) {
+            seek + 1
+        } else {
+            -seek - 1
+        }
     }
 
     override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {
         return CharPredicateResultRule(rule = this, callback)
+    }
+
+    override fun clone(): CharPredicateRule {
+        return CharPredicateRule(data, predicate)
     }
 }
