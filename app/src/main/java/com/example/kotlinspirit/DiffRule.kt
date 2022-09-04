@@ -1,8 +1,5 @@
 package com.example.kotlinspirit
 
-import com.example.kotlinspirit.Rules.char
-import com.example.kotlinspirit.Rules.str
-
 private fun internalParse(seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>): Long {
     val mainRes = main.parse(seek, string)
     return if (mainRes.getParseCode().isError()) {
@@ -11,15 +8,10 @@ private fun internalParse(seek: Int, string: CharSequence, main: Rule<*>, diff: 
         val diffRes = diff.parse(seek, string)
         if (diffRes.getParseCode().isError()) {
             mainRes
-        } else if (diffRes.getSeek() >= mainRes.getSeek()) {
-            createStepResult(
+        } else {
+            return createStepResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED
-            )
-        } else {
-            createStepResult(
-                seek = mainRes.getSeek(),
-                parseCode = ParseCode.COMPLETE
             )
         }
     }
@@ -32,7 +24,7 @@ private fun <T : Any> internalParseWithResult(
     val stepResult = result.parseResult
     if (stepResult.getParseCode().isNotError()) {
         val diffRes = diff.parse(seek, string)
-        if (diffRes.getParseCode().isNotError() && diffRes.getSeek() >= stepResult.getSeek()) {
+        if (diffRes.getParseCode().isNotError()) {
             result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED

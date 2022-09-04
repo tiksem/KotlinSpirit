@@ -46,6 +46,10 @@ abstract class CharRule : Rule<Char>() {
         return RepeatRule(this, range).asStringRule()
     }
 
+    override fun unaryMinus(): OptionalCharRule {
+        return OptionalCharRule(this)
+    }
+
     abstract override fun clone(): CharRule
 }
 

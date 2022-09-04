@@ -8,6 +8,7 @@ object Rules {
     val int get() = IntRule()
     val long get() = LongRule()
     val char get() = AnyCharRule()
+    val digit = char('0'..'9')
 
     fun char(vararg chars: Char): CharPredicateRule {
         return CharPredicateRule(

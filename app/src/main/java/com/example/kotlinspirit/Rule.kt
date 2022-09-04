@@ -148,7 +148,7 @@ abstract class Rule<T : Any> {
         return StringRuleWrapper(this)
     }
 
-    operator fun unaryMinus(): OptionalRule<T> {
+    open operator fun unaryMinus(): OptionalRule<T> {
         return OptionalRule(this)
     }
 

@@ -1,6 +1,7 @@
 package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.char
+import com.example.kotlinspirit.Rules.digit
 import com.example.kotlinspirit.Rules.double
 import com.example.kotlinspirit.Rules.int
 import com.example.kotlinspirit.Rules.str
@@ -20,13 +21,6 @@ class DiffRuleTest {
     }
 
     @Test
-    fun doubleButNotInt() {
-        val rule = double - int
-        verifyDiffFailed(rule, "234")
-        verifyDiffSuccess(rule, "234.56")
-    }
-
-    @Test
     fun comment() {
         val rule = str("/*") + (char - "*/").repeat() + "*/"
         verifyDiffSuccess(rule, "/*Hello world*/")
@@ -35,14 +29,16 @@ class DiffRuleTest {
     @Test
     fun intButNo2() {
         val rule = int - '2'
-        verifyDiffSuccess(rule, "243334")
+        verifyDiffSuccess(rule, "343334")
+        verifyDiffFailed(rule, "22323")
         verifyDiffFailed(rule, "2")
     }
 
     @Test
     fun intButNo232() {
         val rule = int - "232"
-        verifyDiffSuccess(rule, "2324343")
+        verifyDiffFailed(rule, "2324343")
         verifyDiffFailed(rule, "232")
+        verifyDiffSuccess(rule, "3232")
     }
 }

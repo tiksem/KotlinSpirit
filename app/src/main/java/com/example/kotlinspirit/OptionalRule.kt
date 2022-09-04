@@ -1,7 +1,7 @@
 package com.example.kotlinspirit
 
-class OptionalRule<T : Any>(
-    private val rule: Rule<T>
+open class OptionalRule<T : Any>(
+    protected val rule: Rule<T>
 ) : RuleWithDefaultRepeat<T>() {
 
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -34,5 +34,11 @@ class OptionalRule<T : Any>(
 
     override fun clone(): OptionalRule<T> {
         return OptionalRule(rule)
+    }
+}
+
+class OptionalCharRule(rule: CharRule) : OptionalRule<Char>(rule) {
+    override fun clone(): OptionalCharRule {
+        return OptionalCharRule((rule as CharRule).clone())
     }
 }
