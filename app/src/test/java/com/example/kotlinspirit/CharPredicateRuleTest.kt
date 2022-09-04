@@ -65,4 +65,14 @@ class CharPredicateRuleTest {
         Assert.assertEquals(r.tryParse("ayz"), null)
         Assert.assertEquals(r.tryParse("5ayz"), 1)
     }
+
+    @Test
+    fun test8() {
+        val r = char(ranges = arrayOf('a'..'z', '0'..'3', 'e'..'d'), chars = charArrayOf('|')).compile()
+        Assert.assertEquals(r.tryParse("ayz"), 1)
+        Assert.assertEquals(r.tryParse("dfgjdfhjghj"), 1)
+        Assert.assertEquals(r.tryParse("zzzzzzzz"), 1)
+        Assert.assertEquals(r.tryParse("\\"), null)
+        Assert.assertEquals(r.tryParse("|"), 1)
+    }
 }
