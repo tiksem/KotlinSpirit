@@ -33,7 +33,7 @@ private val value: LazyRule<Any> = lazy {
 }
 
 private val jsonObject = object : Grammar<Map<String, Any>>() {
-    var key: CharSequence = ""
+    private var key: CharSequence = ""
     override var result = LinkedHashMap<String, Any>()
         private set
 
@@ -52,7 +52,7 @@ private val jsonObject = object : Grammar<Map<String, Any>>() {
             range = 0..Int.MAX_VALUE
         ) + '}'
     }
-}
+}.recursive()
 
 private val jsonArray = object : Grammar<List<Any>>() {
     override var result = ArrayList<Any>()
@@ -67,7 +67,7 @@ private val jsonArray = object : Grammar<List<Any>>() {
             result.add(it)
         } + skipper).split(',', 0..Int.MAX_VALUE) + ']'
     }
-}
+}.recursive()
 
 private val json = object : Grammar<Any>() {
     override var result: Any = ""
@@ -78,7 +78,7 @@ private val json = object : Grammar<Any>() {
             result = it
         } + skipper
     }
-}
+}.recursive()
 
 private fun Map<out Any, Any>.contentEquals(other: Map<out Any, Any>): Boolean {
     if (size != other.size) {
