@@ -14,6 +14,7 @@ object ParseCode {
     const val INVALID_DOUBLE = 10
     const val WHOLE_STRING_DOES_NOT_MATCH = 11
     const val ONE_OF_STRING_NOT_FOUND = 12
+    const val FAIL_PREDICATE = 13
 }
 
 internal inline fun Int.isError(): Boolean {
@@ -59,6 +60,7 @@ internal inline fun Int.parseCodeToString(): String {
         ParseCode.INVALID_DOUBLE -> "INVALID_DOUBLE"
         ParseCode.WHOLE_STRING_DOES_NOT_MATCH -> "WHOLE_STRING_DOES_NOT_MATCH"
         ParseCode.ONE_OF_STRING_NOT_FOUND -> "ONE_OF_STRING_NOT_FOUND"
+        ParseCode.FAIL_PREDICATE -> "FAIL_PREDICATE"
         else -> "UNKNOWN"
     }
 }

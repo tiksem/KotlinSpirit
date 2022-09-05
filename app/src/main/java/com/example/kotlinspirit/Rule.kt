@@ -152,6 +152,10 @@ abstract class Rule<T : Any> {
         return OptionalRule(this)
     }
 
+    open fun failIf(predicate: (T) -> Boolean): FailIfRule<T> {
+        return FailIfRule(this, predicate)
+    }
+
     abstract fun clone(): Rule<T>
 
     fun compile(): Parser<T> {
