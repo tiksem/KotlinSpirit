@@ -1,5 +1,7 @@
 package com.example.kotlinspirit
 
+import java.lang.IllegalArgumentException
+
 object Rules {
     fun <T : Any> lazy(ruleProvider: () -> RuleWithDefaultRepeat<T>): LazyRule<T> {
         return LazyRule(ruleProvider)
@@ -11,6 +13,10 @@ object Rules {
     val digit = char('0'..'9')
 
     fun char(vararg chars: Char): CharPredicateRule {
+        if (chars.isEmpty()) {
+            throw IllegalArgumentException("char(...) chars should not be empty")
+        }
+
         return CharPredicateRule(
             CharPredicateData(chars)
         )

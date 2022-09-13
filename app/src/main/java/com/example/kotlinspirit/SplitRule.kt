@@ -1,9 +1,9 @@
 package com.example.kotlinspirit
 
 open class SplitRule<T : Any>(
-    private val r: Rule<T>,
-    private val divider: Rule<*>,
-    private val range: IntRange
+    protected val r: Rule<T>,
+    protected val divider: Rule<*>,
+    protected val range: IntRange
 ) : RuleWithDefaultRepeat<List<T>>() {
     init {
         if (range.first < 0) {
@@ -172,6 +172,10 @@ private class DebugSplitRule<T : Any>(
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): SplitRule<T> {
+        return DebugSplitRule(name, r.clone(), divider.clone(), range)
     }
 }
 

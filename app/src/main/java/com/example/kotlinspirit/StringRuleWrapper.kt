@@ -1,7 +1,7 @@
 package com.example.kotlinspirit
 
 open class StringRuleWrapper(
-    private val rule: Rule<*>
+    protected val rule: Rule<*>
 ) : RuleWithDefaultRepeat<CharSequence>() {
 
     override fun invoke(callback: (CharSequence) -> Unit): RuleWithDefaultRepeatResult<CharSequence> {
@@ -65,5 +65,9 @@ private class DebugStringRuleWrapper(
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): StringRuleWrapper {
+        return DebugStringRuleWrapper(name, rule.clone())
     }
 }

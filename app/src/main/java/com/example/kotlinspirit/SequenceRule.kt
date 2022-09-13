@@ -1,8 +1,8 @@
 package com.example.kotlinspirit
 
 open class SequenceRule(
-    private val a: Rule<*>,
-    private val b: Rule<*>
+    protected val a: Rule<*>,
+    protected val b: Rule<*>
 ) : RuleWithDefaultRepeat<CharSequence>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val aResult = a.parse(seek, string)
@@ -54,18 +54,20 @@ open class SequenceRule(
     override fun debug(name: String?): SequenceRule {
         val a = a.internalDebug()
         val b = b.internalDebug()
+        val aName = if (a is SequenceRule) a.debugName else a.debugNameWrapIfNeed
+        val bName = if (b is SequenceRule) b.debugName else b.debugNameWrapIfNeed
         return DebugSequenceRule(
-            name = name ?: "${a.debugNameWrapIfNeed} + ${b.debugNameWrapIfNeed}",
+            name = name ?: "$aName + $bName",
             a, b
         )
     }
 }
 
 private class DebugSequenceRule(
-    val name: String,
+    override val name: String,
     a: Rule<*>,
     b: Rule<*>
-): SequenceRule(a, b) {
+): SequenceRule(a, b), DebugRule {
     override fun parse(seek: Int, string: CharSequence): Long {
         DebugEngine.ruleParseStarted(this, seek)
         return super.parse(seek, string).also {
@@ -79,5 +81,9 @@ private class DebugSequenceRule(
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): SequenceRule {
+        return DebugSequenceRule(name, a.clone(), b.clone())
     }
 }

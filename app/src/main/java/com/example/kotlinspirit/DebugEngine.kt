@@ -38,6 +38,8 @@ class RuleDebugTreeNode(
                 }
                 it.put("afterToken", token)
             }
+            it.put("start", startSeek)
+            it.put("end", endSeek)
             if (children.isNotEmpty()) {
                 val arr = JSONArray().apply {
                     children.forEach { child ->

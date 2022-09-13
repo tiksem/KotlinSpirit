@@ -91,7 +91,7 @@ open class StringOneOrMoreCharPredicateRule(
     }
 
     override fun clone(): StringOneOrMoreCharPredicateRule {
-        return StringOneOrMoreCharPredicateRule(predicate)
+        return this
     }
 
     override val debugNameShouldBeWrapped: Boolean

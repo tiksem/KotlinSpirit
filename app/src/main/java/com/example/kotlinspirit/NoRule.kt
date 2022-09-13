@@ -1,7 +1,7 @@
 package com.example.kotlinspirit
 
 open class NoRule(
-    private val rule: Rule<*>
+    protected val rule: Rule<*>
 ) : RuleWithDefaultRepeat<CharSequence>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         return rule.noParse(seek, string).let {
@@ -79,5 +79,9 @@ private class DebugNoRule(
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): NoRule {
+        return DebugNoRule(name, rule.clone())
     }
 }

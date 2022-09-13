@@ -3,8 +3,8 @@ package com.example.kotlinspirit
 import java.lang.UnsupportedOperationException
 
 open class RepeatRule<T : Any>(
-    private val rule: Rule<T>,
-    private val range: IntRange
+    protected val rule: Rule<T>,
+    protected val range: IntRange
 ) : RuleWithDefaultRepeat<List<T>>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
@@ -127,5 +127,9 @@ private class DebugRepeatRule<T : Any>(
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): RepeatRule<T> {
+        return DebugRepeatRule(name, rule.clone(), range)
     }
 }

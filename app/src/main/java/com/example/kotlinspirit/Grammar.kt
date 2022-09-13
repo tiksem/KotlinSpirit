@@ -149,7 +149,7 @@ open class RecursiveGrammar<T : Any>(protected val grammar: Rule<T>) : RuleWithD
         return grammar.noParse(seek, string)
     }
 
-    override fun clone(): RuleWithDefaultRepeat<T> {
+    override fun clone(): RecursiveGrammar<T> {
         return RecursiveGrammar(grammar.clone())
     }
 
@@ -174,4 +174,8 @@ private class DebugRecursiveGrammar<T: Any>(
 ) : RecursiveGrammar<T>(grammar), DebugRule {
     override val name: String
         get() = (grammar as? DebugRule)?.name ?: "error"
+
+    override fun clone(): RecursiveGrammar<T> {
+        return DebugRecursiveGrammar(grammar.clone())
+    }
 }

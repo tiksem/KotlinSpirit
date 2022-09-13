@@ -94,5 +94,9 @@ private class DebugOptionalCharRule(
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
     }
+
+    override fun clone(): OptionalCharRule {
+        return DebugOptionalCharRule(name, rule.clone() as CharRule)
+    }
 }
 

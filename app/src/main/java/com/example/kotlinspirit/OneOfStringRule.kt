@@ -85,7 +85,7 @@ open class OneOfStringRule internal constructor(private val strings: List<CharSe
     }
 
     override fun clone(): OneOfStringRule {
-        return OneOfStringRule(strings, tree)
+        return this
     }
 
     override val debugNameShouldBeWrapped: Boolean

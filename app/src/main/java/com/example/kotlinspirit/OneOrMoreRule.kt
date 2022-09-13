@@ -3,7 +3,7 @@ package com.example.kotlinspirit
 import java.lang.IllegalStateException
 
 open class OneOrMoreRule<T : Any>(
-    private val rule: Rule<T>
+    protected val rule: Rule<T>
 ) : RuleWithDefaultRepeat<List<T>>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
@@ -107,5 +107,9 @@ private class DebugOneOrMoreRule<T : Any>(
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): OneOrMoreRule<T> {
+        return DebugOneOrMoreRule(name, rule.clone())
     }
 }
