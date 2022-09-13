@@ -78,10 +78,7 @@ abstract class Rule<T : Any> {
     }
 
     operator fun plus(char: Char): SequenceRule {
-        val c = this
-        return SequenceRule(c, CharPredicateRule {
-            it == char
-        })
+        return SequenceRule(this, ExactCharRule(char))
     }
 
     operator fun plus(string: String): SequenceRule {

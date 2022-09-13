@@ -10,7 +10,7 @@ class PerformanceTest {
 //    val pattern = Regex("([AZ]+)@([09]+)")
 //    val parser = (char('A'..'Z').repeat() + '@' + digit.repeat()).compile()
 
-    val pattern = Regex("([AZ]+|(?:Ivan|Vasil|Eblan)+)@([09]+)")
+    val pattern = Regex("(?:[AZ]+|(?:Ivan|Vasil|Eblan)+)@[09]+")
     val parser = (
             (oneOf("Ivan", "Vasil", "Eblan") or char('A'..'Z'))
                 .repeat().asString() + '@' + digit.repeat()
