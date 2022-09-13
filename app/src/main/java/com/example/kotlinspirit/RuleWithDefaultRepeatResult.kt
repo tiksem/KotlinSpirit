@@ -50,6 +50,13 @@ class RuleWithDefaultRepeatResult<T : Any>(
     override fun clone(): Rule<T> {
         return RuleWithDefaultRepeatResult((rule as RuleWithDefaultRepeat<T>).clone(), callback)
     }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = rule.debugNameShouldBeWrapped
+
+    override fun debug(name: String?): RuleWithDefaultRepeatResult<T> {
+        return RuleWithDefaultRepeatResult(rule.debug(name) as RuleWithDefaultRepeat<T>, callback)
+    }
 }
 
 class CharPredicateResultRule(
@@ -79,5 +86,12 @@ class CharPredicateResultRule(
 
     override fun clone(): CharPredicateResultRule {
         return CharPredicateResultRule((rule as CharPredicateRule).clone(), callback)
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = rule.debugNameShouldBeWrapped
+
+    override fun debug(name: String?): CharPredicateResultRule {
+        return CharPredicateResultRule(rule.debug(name) as CharPredicateRule, callback)
     }
 }

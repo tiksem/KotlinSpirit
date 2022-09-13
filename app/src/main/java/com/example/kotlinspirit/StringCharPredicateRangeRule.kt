@@ -2,7 +2,7 @@ package com.example.kotlinspirit
 
 import kotlin.math.min
 
-class StringCharPredicateRangeRule(
+open class StringCharPredicateRangeRule(
     private val predicate: (Char) -> Boolean,
     private val range: IntRange
 ) : RuleWithDefaultRepeat<CharSequence>() {
@@ -112,5 +112,36 @@ class StringCharPredicateRangeRule(
 
     override fun clone(): StringCharPredicateRangeRule {
         return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): RuleWithDefaultRepeat<CharSequence> {
+        return DebugStringCharPredicateRangeRule(
+            name = name ?: "stringPredicate[$range]",
+            predicate, range
+        )
+    }
+}
+
+private class DebugStringCharPredicateRangeRule(
+    override val name: String,
+    predicate: (Char) -> Boolean,
+    range: IntRange,
+) : StringCharPredicateRangeRule(predicate, range), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<CharSequence>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

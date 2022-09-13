@@ -1,15 +1,15 @@
 package com.example.kotlinspirit
 
-class CharResultRule(
+open class CharResultRule(
     rule: CharRule,
     callback: (Char) -> Unit
 ) : BaseRuleWithResult<Char>(rule, callback) {
     override fun repeat(): Rule<CharSequence> {
-        return ZeroOrMoreRule(this).asStringRule()
+        return ZeroOrMoreRule(this).asString()
     }
 
     override fun repeat(range: IntRange): Rule<CharSequence> {
-        return RepeatRule(this, range).asStringRule()
+        return RepeatRule(this, range).asString()
     }
 
     override fun invoke(callback: (Char) -> Unit): CharResultRule {
@@ -19,6 +19,13 @@ class CharResultRule(
     override fun clone(): CharResultRule {
         return CharResultRule(rule.clone() as CharRule, callback)
     }
+
+    override fun debug(name: String?): CharResultRule {
+        return CharResultRule(rule.internalDebug(name) as CharRule, callback)
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = rule.debugNameShouldBeWrapped
 }
 
 abstract class CharRule : Rule<Char>() {
@@ -39,11 +46,11 @@ abstract class CharRule : Rule<Char>() {
     }
 
     override fun repeat(): Rule<CharSequence> {
-        return ZeroOrMoreRule(this).asStringRule()
+        return ZeroOrMoreRule(this).asString()
     }
 
     override fun repeat(range: IntRange): Rule<CharSequence> {
-        return RepeatRule(this, range).asStringRule()
+        return RepeatRule(this, range).asString()
     }
 
     override fun unaryMinus(): OptionalCharRule {
@@ -51,9 +58,10 @@ abstract class CharRule : Rule<Char>() {
     }
 
     abstract override fun clone(): CharRule
+    abstract override fun debug(name: String?): CharRule
 }
 
-class AnyCharRule : CharRule() {
+open class AnyCharRule : CharRule() {
     override fun parse(seek: Int, string: CharSequence): Long {
         if (seek >= string.length) {
             return createStepResult(
@@ -100,6 +108,13 @@ class AnyCharRule : CharRule() {
         return this
     }
 
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): AnyCharRule {
+        return DebugAnyCharRule(name ?: "char")
+    }
+
     override fun repeat(): StringCharPredicateRule {
         //TODO: Optimise
         return StringCharPredicateRule { true }
@@ -109,5 +124,20 @@ class AnyCharRule : CharRule() {
         return StringCharPredicateRangeRule(predicate = {
             true
         }, range = range)
+    }
+}
+
+private class DebugAnyCharRule(override val name: String) : AnyCharRule(), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

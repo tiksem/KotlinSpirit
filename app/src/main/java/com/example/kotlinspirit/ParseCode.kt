@@ -15,6 +15,8 @@ object ParseCode {
     const val WHOLE_STRING_DOES_NOT_MATCH = 11
     const val ONE_OF_STRING_NOT_FOUND = 12
     const val FAIL_PREDICATE = 13
+    const val EXPECTATION_FAILED = 14
+    const val SPLIT_NOT_ENOUGH_DATA = 15
 }
 
 internal inline fun Int.isError(): Boolean {
@@ -61,6 +63,7 @@ internal inline fun Int.parseCodeToString(): String {
         ParseCode.WHOLE_STRING_DOES_NOT_MATCH -> "WHOLE_STRING_DOES_NOT_MATCH"
         ParseCode.ONE_OF_STRING_NOT_FOUND -> "ONE_OF_STRING_NOT_FOUND"
         ParseCode.FAIL_PREDICATE -> "FAIL_PREDICATE"
+        ParseCode.EXPECTATION_FAILED -> "EXPECTATION_FAILED"
         else -> "UNKNOWN"
     }
 }

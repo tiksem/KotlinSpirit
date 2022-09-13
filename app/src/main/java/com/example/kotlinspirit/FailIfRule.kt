@@ -2,9 +2,9 @@ package com.example.kotlinspirit
 
 import java.lang.IllegalStateException
 
-class FailIfRule<T : Any>(
-    private val rule: Rule<T>,
-    private val failPredicate: (T) -> Boolean
+open class FailIfRule<T : Any>(
+    protected val rule: Rule<T>,
+    protected val failPredicate: (T) -> Boolean
 ) : RuleWithDefaultRepeat<T>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val result = ParseResult<T>()
@@ -70,5 +70,35 @@ class FailIfRule<T : Any>(
 
     override fun clone(): RuleWithDefaultRepeat<T> {
         return FailIfRule(rule.clone(), failPredicate)
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = rule.debugNameShouldBeWrapped
+
+    override fun debug(name: String?): FailIfRule<T> {
+        return DebugFailIfRule(name ?: "failIf", rule.internalDebug(), failPredicate)
+    }
+}
+
+private class DebugFailIfRule<T : Any>(
+    override val name: String,
+    rule: Rule<T>,
+    failPredicate: (T) -> Boolean
+) : FailIfRule<T>(rule, failPredicate), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): RuleWithDefaultRepeat<T> {
+        return DebugFailIfRule(name, rule.clone(), failPredicate)
     }
 }

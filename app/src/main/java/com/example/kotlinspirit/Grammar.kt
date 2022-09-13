@@ -4,8 +4,8 @@ abstract class Grammar<T : Any> : RuleWithDefaultRepeat<T>() {
     private var r: Rule<*>? = null
 
     abstract val result: T
-    protected abstract fun defineRule(): Rule<*>
-    protected open fun resetResult() {}
+    internal abstract fun defineRule(): Rule<*>
+    internal open fun resetResult() {}
 
     protected fun initRule(): Rule<*> {
         var rule = this.r
@@ -44,16 +44,80 @@ abstract class Grammar<T : Any> : RuleWithDefaultRepeat<T>() {
         return javaClass.newInstance()
     }
 
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override val isGrammar: Boolean
+        get() = true
+
+    override fun debug(name: String?): RuleWithDefaultRepeat<T> {
+        return DebugGrammar(name ?: "grammar", this)
+    }
+
     fun recursive(): RecursiveGrammar<T> {
         return RecursiveGrammar(this)
     }
 }
 
-class RecursiveGrammar<T : Any>(private val grammar: Grammar<T>) : RuleWithDefaultRepeat<T>() {
+private class DebugGrammar<T : Any>(
+    override val name: String,
+    private val grammar: Grammar<T>
+) : RuleWithDefaultRepeat<T>(), DebugRule {
+    private var r: Rule<*>? = null
+
+    fun initRule(): Rule<*> {
+        var rule = this.r
+        if (rule == null) {
+            rule = grammar.defineRule().debug(name)
+            this.r = rule
+        }
+
+        return rule
+    }
+
+    override fun noParse(seek: Int, string: CharSequence): Int {
+        return initRule().noParse(seek, string)
+    }
+
+    override fun parse(seek: Int, string: CharSequence): Long {
+        return initRule().parse(seek, string).also {
+            grammar.resetResult()
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        val resultSeek = initRule().parse(seek, string)
+        result.parseResult = resultSeek
+        if (resultSeek >= 0) {
+            result.data = grammar.result
+        }
+        grammar.resetResult()
+    }
+
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        return initRule().hasMatch(seek, string)
+    }
+
+    override fun clone(): RuleWithDefaultRepeat<T> {
+        return grammar.clone().debug(name) as RuleWithDefaultRepeat<T>
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override val isGrammar: Boolean
+        get() = true
+
+    override fun debug(name: String?): RuleWithDefaultRepeat<T> {
+        return grammar.debug(name)
+    }
+}
+
+open class RecursiveGrammar<T : Any>(protected val grammar: Rule<T>) : RuleWithDefaultRepeat<T>() {
     private val stack = arrayListOf(grammar)
     private var stackSeek = 0
 
-    private fun getGrammar(): Grammar<T> {
+    private fun initGrammar(): Rule<T> {
         return if (stackSeek == stack.size) {
             grammar.clone().also {
                 stack.add(it)
@@ -66,13 +130,13 @@ class RecursiveGrammar<T : Any>(private val grammar: Grammar<T>) : RuleWithDefau
     }
 
     override fun parse(seek: Int, string: CharSequence): Long {
-        return getGrammar().parse(seek, string).also {
+        return initGrammar().parse(seek, string).also {
             --stackSeek
         }
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        return getGrammar().parseWithResult(seek, string, result).also {
+        return initGrammar().parseWithResult(seek, string, result).also {
             --stackSeek
         }
     }
@@ -88,4 +152,26 @@ class RecursiveGrammar<T : Any>(private val grammar: Grammar<T>) : RuleWithDefau
     override fun clone(): RuleWithDefaultRepeat<T> {
         return RecursiveGrammar(grammar.clone())
     }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override val isGrammar: Boolean
+        get() = true
+
+    override fun debug(name: String?): RecursiveGrammar<T> {
+        val grammar = this.grammar
+        return if (grammar is DebugGrammar) {
+            DebugRecursiveGrammar(grammar = grammar.debug(name))
+        } else {
+            DebugRecursiveGrammar(grammar = DebugGrammar(name ?: "grammar", grammar as Grammar<T>))
+        }
+    }
+}
+
+private class DebugRecursiveGrammar<T: Any>(
+    grammar: Rule<T>
+) : RecursiveGrammar<T>(grammar), DebugRule {
+    override val name: String
+        get() = (grammar as? DebugRule)?.name ?: "error"
 }

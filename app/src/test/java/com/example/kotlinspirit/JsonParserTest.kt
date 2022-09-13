@@ -18,7 +18,7 @@ private val jsonString = object : Grammar<CharSequence>() {
 
     override fun defineRule(): Rule<*> {
         val ch = !char('"') or str("\\\"")
-        return char('"') + (ch.repeat().asStringRule()) {
+        return char('"') + (ch.repeat().asString()) {
             result = it
         } + char('"')
     }

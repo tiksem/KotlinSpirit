@@ -6,8 +6,8 @@ internal class CharPredicateData(
     chars: SortedSet<Char>,
     ranges: List<CharRange>
 ) {
-    private val chars: SortedSet<Char>
-    private val ranges: List<CharRange>
+    val chars: SortedSet<Char>
+    val ranges: List<CharRange>
 
     init {
         this.ranges = ranges.filter {

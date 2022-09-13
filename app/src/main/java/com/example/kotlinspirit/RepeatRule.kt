@@ -2,7 +2,7 @@ package com.example.kotlinspirit
 
 import java.lang.UnsupportedOperationException
 
-class RepeatRule<T : Any>(
+open class RepeatRule<T : Any>(
     private val rule: Rule<T>,
     private val range: IntRange
 ) : RuleWithDefaultRepeat<List<T>>() {
@@ -95,5 +95,37 @@ class RepeatRule<T : Any>(
 
     override fun clone(): RepeatRule<T> {
         return RepeatRule(rule.clone(), range)
+    }
+
+    override fun debug(name: String?): RepeatRule<T> {
+        val debug = rule.internalDebug()
+        return DebugRepeatRule(
+            name = name ?: "${debug.debugNameWrapIfNeed}.repeat(${range.first}..${range.last})",
+            debug, range
+        )
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+}
+
+private class DebugRepeatRule<T : Any>(
+    override val name: String,
+    rule: Rule<T>,
+    range: IntRange
+): RepeatRule<T>(rule, range), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<List<T>>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

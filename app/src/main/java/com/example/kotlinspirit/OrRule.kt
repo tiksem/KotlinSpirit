@@ -3,8 +3,8 @@ package com.example.kotlinspirit
 import kotlin.math.min
 
 open class OrRule<T : Any>(
-    private val a: Rule<T>,
-    private val b: Rule<T>
+    protected val a: Rule<T>,
+    protected val b: Rule<T>
 ) : RuleWithDefaultRepeat<T>() {
     private var activeRule = a
     private var stepBeginSeek = -1
@@ -50,6 +50,67 @@ open class OrRule<T : Any>(
     override fun clone(): OrRule<T> {
         return OrRule(a.clone(), b.clone())
     }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = true
+
+    override fun debug(name: String?): OrRule<T> {
+        return DebugOrRule(
+            name = name ?: "${a.debugNameWrapIfNeed} or ${b.debugNameWrapIfNeed}",
+            a.internalDebug(), b.internalDebug()
+        )
+    }
 }
 
-class AnyOrRule(a: Rule<Any>, b: Rule<Any>) : OrRule<Any>(a, b) {}
+private class DebugOrRule<T : Any>(
+    override val name: String,
+    a: Rule<T>,
+    b: Rule<T>
+) : OrRule<T>(a, b), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<T>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+}
+
+open class AnyOrRule(a: Rule<Any>, b: Rule<Any>) : OrRule<Any>(a, b) {
+    override fun debug(name: String?): OrRule<Any> {
+        val a = a.internalDebug()
+        val b = b.internalDebug()
+        return DebugAnyOrRule(
+            name = name ?: "${a.debugNameWrapIfNeed} or ${b.debugNameWrapIfNeed}",
+            a, b
+        )
+    }
+}
+
+private class DebugAnyOrRule(
+    override val name: String,
+    a: Rule<Any>,
+    b: Rule<Any>
+) : AnyOrRule(a, b), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<Any>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+}

@@ -1,10 +1,10 @@
 package com.example.kotlinspirit
 
-class CharPredicateRule : CharRule {
+open class CharPredicateRule : CharRule {
     internal val predicate: (Char) -> Boolean
     internal val data: CharPredicateData?
 
-    private constructor(data: CharPredicateData?, predicate: (Char) -> Boolean) {
+    internal constructor(data: CharPredicateData?, predicate: (Char) -> Boolean) {
         this.data = data
         this.predicate = predicate
     }
@@ -126,6 +126,51 @@ class CharPredicateRule : CharRule {
     }
 
     override fun clone(): CharPredicateRule {
-        return CharPredicateRule(data, predicate)
+        return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    private fun generateDebugName(): String {
+        val data = data
+        if (data != null) {
+            val chars = if (data.chars.isEmpty()) {
+                ""
+            } else {
+                "(" + data.chars.joinToString(",") {
+                    if (it == ',') "`,`" else it.toString()
+                } + ")"
+            }
+            val ranges = data.ranges.joinToString("") {
+                "[${it.first}..${it.last}]"
+            }
+            return "char$chars$ranges"
+        } else {
+            return "charWithCustomPredicate"
+        }
+    }
+
+    override fun debug(name: String?): CharPredicateRule {
+        return DebugCharPredicateRule(name ?: generateDebugName(), data, predicate)
+    }
+}
+
+private class DebugCharPredicateRule(
+    override val name: String,
+    data: CharPredicateData?,
+    predicate: (Char) -> Boolean
+) : CharPredicateRule(data, predicate), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

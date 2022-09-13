@@ -8,7 +8,7 @@ private inline fun getPowerOf10(exp: Int): Double {
     }
 }
 
-class DoubleRule : RuleWithDefaultRepeat<Double>() {
+open class DoubleRule : RuleWithDefaultRepeat<Double>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -596,5 +596,27 @@ class DoubleRule : RuleWithDefaultRepeat<Double>() {
 
     override fun clone(): DoubleRule {
         return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): DoubleRule {
+        return DebugDoubleRule(name ?: "double")
+    }
+}
+
+private class DebugDoubleRule(override val name: String) : DoubleRule(), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Double>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

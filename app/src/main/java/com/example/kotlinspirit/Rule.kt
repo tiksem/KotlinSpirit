@@ -2,6 +2,8 @@ package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.char
 import com.example.kotlinspirit.Rules.str
+import com.example.kotlinspirit.ext.containsAny
+import com.example.kotlinspirit.ext.quoteIf
 
 private val DEFAULT_STEP_RESULT = createStepResult(
     seek = 0,
@@ -99,7 +101,7 @@ abstract class Rule<T : Any> {
         return DiffRuleWithDefaultRepeat(main = this, diff = char(ch))
     }
 
-    fun expect(other: Rule<*>): ExpectationRule {
+    fun expect(other: Rule<*>): ExpectationRule<T> {
         return ExpectationRule(this, other)
     }
 
@@ -144,7 +146,7 @@ abstract class Rule<T : Any> {
         return rem(str(divider))
     }
 
-    fun asStringRule(): StringRuleWrapper {
+    fun asString(): StringRuleWrapper {
         return StringRuleWrapper(this)
     }
 
@@ -158,7 +160,32 @@ abstract class Rule<T : Any> {
 
     abstract fun clone(): Rule<T>
 
+    abstract val debugNameShouldBeWrapped: Boolean
+    open val isGrammar: Boolean
+        get() = false
+
     fun compile(): Parser<T> {
         return Parser(originRule = this)
     }
+
+    abstract fun debug(name: String? = null): Rule<T>
+    internal fun internalDebug(name: String? = null): Rule<T> {
+        return if (this is DebugRule) {
+            if (name == null || this.name == name) {
+                this
+            } else {
+                debug(name)
+            }
+        } else {
+            debug(name)
+        }
+    }
+
+    internal val debugName: String
+        get() = (this as? DebugRule)?.name ?: "error"
+
+    internal val debugNameWrapIfNeed: String
+        get() = (this as? DebugRule)?.name?.quoteIf('(', ')',
+            debugNameShouldBeWrapped && debugName.containsAny("() \n\t")
+        ) ?: "error"
 }

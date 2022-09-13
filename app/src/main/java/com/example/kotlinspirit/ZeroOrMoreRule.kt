@@ -2,7 +2,7 @@ package com.example.kotlinspirit
 
 import java.lang.IllegalStateException
 
-class ZeroOrMoreRule<T : Any>(
+open class ZeroOrMoreRule<T : Any>(
     private val rule: Rule<T>
 ) : RuleWithDefaultRepeat<List<T>>() {
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -59,5 +59,36 @@ class ZeroOrMoreRule<T : Any>(
 
     override fun clone(): ZeroOrMoreRule<T> {
         return ZeroOrMoreRule(rule = rule.clone())
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): ZeroOrMoreRule<T> {
+        val debug = rule.internalDebug()
+        return DebugZeroOrMoreRule(
+            name = name ?: "${debug.debugNameWrapIfNeed}.repeat(0..<)",
+            rule = debug
+        )
+    }
+}
+
+private class DebugZeroOrMoreRule<T : Any>(
+    override val name: String,
+    rule: Rule<T>
+) : ZeroOrMoreRule<T>(rule), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<List<T>>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

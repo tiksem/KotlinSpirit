@@ -1,6 +1,6 @@
 package com.example.kotlinspirit
 
-class ExactCharRule(
+open class ExactCharRule(
     private val char: Char
 ) : CharRule() {
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -61,5 +61,30 @@ class ExactCharRule(
 
     override fun clone(): ExactCharRule {
         return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): ExactCharRule {
+        return DebugExactCharRule(name ?: "char($char)", char)
+    }
+}
+
+private class DebugExactCharRule(override val name: String, char: Char) :
+    ExactCharRule(char),
+    DebugRule
+{
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

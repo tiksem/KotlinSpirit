@@ -1,6 +1,6 @@
 package com.example.kotlinspirit
 
-class ExactStringRule(
+open class ExactStringRule(
     internal val string: String
 ) : RuleWithDefaultRepeat<CharSequence>() {
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -61,5 +61,30 @@ class ExactStringRule(
 
     override fun clone(): ExactStringRule {
         return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): ExactStringRule {
+        return DebugExactStringRule(name ?: "str($string)", string)
+    }
+}
+
+private class DebugExactStringRule(override val name: String, string: String) :
+    ExactStringRule(string),
+    DebugRule
+{
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

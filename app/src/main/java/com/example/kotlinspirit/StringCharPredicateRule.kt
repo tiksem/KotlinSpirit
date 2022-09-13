@@ -1,6 +1,6 @@
 package com.example.kotlinspirit
 
-class StringCharPredicateRule(
+open class StringCharPredicateRule(
     private val predicate: (Char) -> Boolean
 ) : RuleWithDefaultRepeat<CharSequence>() {
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -59,5 +59,32 @@ class StringCharPredicateRule(
 
     override fun clone(): StringCharPredicateRule {
         return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): RuleWithDefaultRepeat<CharSequence> {
+        return DebugStringCharPredicateRule(name ?: "stringPredicate", predicate)
+    }
+}
+
+private class DebugStringCharPredicateRule(
+    override val name: String,
+    predicate: (Char) -> Boolean
+) : StringCharPredicateRule(predicate), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<CharSequence>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

@@ -1,7 +1,7 @@
 package com.example.kotlinspirit
 
 abstract class BaseLazyRule<T : Any>(
-    private val ruleProvider: () -> Rule<T>
+    protected val ruleProvider: () -> Rule<T>
 ): Rule<T>() {
     private var rule: Rule<T>? = null
 
@@ -51,9 +51,18 @@ class LazyCharPredicateRule(
     override fun clone(): LazyCharPredicateRule {
         return this
     }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): LazyCharPredicateRule {
+        return LazyCharPredicateRule {
+            ruleProvider().debug(name ?: "lazy") as CharPredicateRule
+        }
+    }
 }
 
-class LazyRule<T : Any>(
+open class LazyRule<T : Any>(
     ruleProvider: () -> RuleWithDefaultRepeat<T>
 ) : BaseLazyRule<T>(ruleProvider) {
     override fun initRule(): RuleWithDefaultRepeat<T> {
@@ -74,5 +83,16 @@ class LazyRule<T : Any>(
 
     override fun clone(): LazyRule<T> {
         return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = true
+
+    override fun debug(name: String?): LazyRule<T> {
+        return LazyRule(
+            ruleProvider = {
+                ruleProvider().debug(name ?: "lazy") as RuleWithDefaultRepeat<T>
+            }
+        )
     }
 }

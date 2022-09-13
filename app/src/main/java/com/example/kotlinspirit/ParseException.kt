@@ -2,7 +2,8 @@ package com.example.kotlinspirit
 
 class ParseException(
     private val result: Long,
-    string: CharSequence
+    string: CharSequence,
+    val debugTree: RuleDebugTreeNode?
 ) : Exception(
     "Failed to parse token: ${string.subSequence(0, result.getSeek())}, error: ${
         result.getParseCode().parseCodeToString()

@@ -14,4 +14,5 @@ abstract class RuleWithDefaultRepeat<T : Any> : Rule<T>() {
     }
 
     abstract override fun clone(): RuleWithDefaultRepeat<T>
+    abstract override fun debug(name: String?): RuleWithDefaultRepeat<T>
 }

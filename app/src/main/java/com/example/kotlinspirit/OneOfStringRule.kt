@@ -1,11 +1,11 @@
 package com.example.kotlinspirit
 
-class OneOfStringRule internal constructor(private val strings: List<CharSequence>) :
+open class OneOfStringRule internal constructor(private val strings: List<CharSequence>) :
     RuleWithDefaultRepeat<CharSequence>() {
 
     private var tree: TernarySearchTree? = null
 
-    private constructor(strings: List<CharSequence>, tree: TernarySearchTree?) : this(strings) {
+    internal constructor(strings: List<CharSequence>, tree: TernarySearchTree?) : this(strings) {
         this.tree = tree
     }
 
@@ -86,5 +86,39 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
 
     override fun clone(): OneOfStringRule {
         return OneOfStringRule(strings, tree)
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    private fun generateDebugName(): String {
+        return strings.joinToString("|") {
+            it.toString().replace("|", "`|`")
+        }
+    }
+
+    override fun debug(name: String?): OneOfStringRule {
+        return DebugOneOfStringRule(name ?: generateDebugName(), strings, tree)
+    }
+}
+
+private class DebugOneOfStringRule(
+    override val name: String,
+    strings: List<CharSequence>,
+    tree: TernarySearchTree?
+) : OneOfStringRule(strings, tree), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<CharSequence>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

@@ -1,6 +1,6 @@
 package com.example.kotlinspirit
 
-class LongRule : RuleWithDefaultRepeat<Long>() {
+open class LongRule : RuleWithDefaultRepeat<Long>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -195,5 +195,27 @@ class LongRule : RuleWithDefaultRepeat<Long>() {
 
     override fun clone(): LongRule {
         return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): LongRule {
+        return DebugLongRule(name ?: "long")
+    }
+}
+
+private class DebugLongRule(override val name: String): LongRule(), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Long>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, r)
+        DebugEngine.ruleParseEnded(this, r.parseResult)
     }
 }

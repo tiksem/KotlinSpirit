@@ -1,59 +1,177 @@
 package com.example.kotlinspirit
 
-import com.example.kotlinspirit.Rules.str
-import kotlin.reflect.KMutableProperty0
-
-class SplitRule<T : Any>(
+open class SplitRule<T : Any>(
     private val r: Rule<T>,
     private val divider: Rule<*>,
     private val range: IntRange
-) : Grammar<ArrayList<T>>() {
-    override var result = ArrayList<T>()
-        private set
-
+) : RuleWithDefaultRepeat<List<T>>() {
     init {
         if (range.first < 0) {
             throw IllegalStateException("negative range.first value")
         }
     }
 
-    override fun defineRule(): Rule<*> {
-        return when {
-            range.first == 1 && range.last == Int.MAX_VALUE -> {
-                r {
-                    result.add(it)
-                } + (divider + r {
-                    result.add(it)
-                }).repeat()
+    override fun parse(seek: Int, string: CharSequence): Long {
+        var numberOfSplitItems = 0
+        val max = range.last
+        var i = seek
+        var seekAfterRule = i
+        while (numberOfSplitItems < max) {
+            val res = r.parse(i, string)
+            if (res.getParseCode().isError()) {
+                i = seekAfterRule
+                break
             }
+            seekAfterRule = res.getSeek()
+            numberOfSplitItems++
 
-            range.first == 0 && range.last == Int.MAX_VALUE -> {
-                (r {
-                    result.add(it)
-                } + (divider + r {
-                    result.add(it)
-                }).repeat()) or str("")
+            val dividerRes = divider.parse(seekAfterRule, string)
+            if (dividerRes.getParseCode().isError()) {
+                i = seekAfterRule
+                break
             }
+            i = dividerRes.getSeek()
+        }
 
-            range.first == 0 -> {
-                (r {
-                    result.add(it)
-                } + (divider + r {
-                    result.add(it)
-                }).repeat(IntRange(range.first - 1, range.last - 1))) or str("")
-            }
-
-            else -> {
-                r {
-                    result.add(it)
-                } + (divider + r {
-                    result.add(it)
-                }).repeat(IntRange(range.first - 1, range.last - 1))
-            }
+        return if (numberOfSplitItems < range.first) {
+            createStepResult(
+                seek = seek,
+                parseCode = ParseCode.SPLIT_NOT_ENOUGH_DATA
+            )
+        } else {
+            createComplete(seek = i)
         }
     }
 
-    override fun resetResult() {
-        result = ArrayList()
+    private fun parseSaveSeekOnError(seek: Int, string: CharSequence): Long {
+        var numberOfSplitItems = 0
+        val max = range.last
+        var i = seek
+        var seekAfterRule = i
+        while (numberOfSplitItems < max) {
+            val res = r.parse(i, string)
+            if (res.getParseCode().isError()) {
+                i = seekAfterRule
+                break
+            }
+            seekAfterRule = res.getSeek()
+            numberOfSplitItems++
+
+            val dividerRes = divider.parse(seekAfterRule, string)
+            if (dividerRes.getParseCode().isError()) {
+                i = seekAfterRule
+                break
+            }
+            i = dividerRes.getSeek()
+        }
+
+        return if (numberOfSplitItems < range.first) {
+            createStepResult(
+                seek = seekAfterRule,
+                parseCode = ParseCode.SPLIT_NOT_ENOUGH_DATA
+            )
+        } else {
+            createComplete(seek = i)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
+        val list = ArrayList<T>()
+        val max = range.last
+        var i = seek
+        var seekAfterRule = i
+        val itemResult = ParseResult<T>()
+        while (list.size < max) {
+            r.parseWithResult(i, string, itemResult)
+            if (itemResult.isError) {
+                i = seekAfterRule
+                break
+            }
+            seekAfterRule = itemResult.seek
+            list.add(itemResult.data ?: throw IllegalStateException("item result should not be null"))
+
+            val dividerRes = divider.parse(seekAfterRule, string)
+            if (dividerRes.getParseCode().isError()) {
+                i = seekAfterRule
+                break
+            }
+            i = dividerRes.getSeek()
+        }
+        result.data = list
+
+        result.parseResult = if (list.size < range.first) {
+            createStepResult(
+                seek = seek,
+                parseCode = ParseCode.SPLIT_NOT_ENOUGH_DATA
+            )
+        } else {
+            createComplete(seek = i)
+        }
+    }
+
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        return parse(seek, string).getParseCode().isNotError()
+    }
+
+    override fun noParse(seek: Int, string: CharSequence): Int {
+        if (range.first == 0) {
+            return -seek-1
+        }
+
+        val noParse = r.noParse(seek, string)
+        if (noParse < 0) {
+            return noParse
+        }
+
+        val res = parseSaveSeekOnError(seek, string)
+        if (res.getParseCode().isError()) {
+            val noRes = noParse(res.getSeek(), string)
+            return if (noRes < 0) {
+                res.getSeek()
+            } else {
+                noRes
+            }
+        } else {
+            return noParse
+        }
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun clone(): SplitRule<T> {
+        return SplitRule(r.clone(), divider.clone(), range)
+    }
+
+    override fun debug(name: String?): SplitRule<T> {
+        val r = r.internalDebug()
+        val divider = divider.internalDebug()
+        return DebugSplitRule(
+            name = name ?: "${r.debugNameWrapIfNeed}.split(${divider.debugName} , $range)",
+            r, divider, range
+        )
     }
 }
+
+private class DebugSplitRule<T : Any>(
+    override val name: String,
+    r: Rule<T>,
+    divider: Rule<*>,
+    range: IntRange
+) : SplitRule<T>(r, divider, range), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<List<T>>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+}
+

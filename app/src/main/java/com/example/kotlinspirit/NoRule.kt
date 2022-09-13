@@ -1,6 +1,6 @@
 package com.example.kotlinspirit
 
-class NoRule(
+open class NoRule(
     private val rule: Rule<*>
 ) : RuleWithDefaultRepeat<CharSequence>() {
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -48,5 +48,36 @@ class NoRule(
 
     override fun clone(): NoRule {
         return NoRule(rule.clone())
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): NoRule {
+        val debug = rule.internalDebug()
+        return DebugNoRule(
+            name = name ?: "!(${debug.debugName})",
+            rule = debug
+        )
+    }
+}
+
+private class DebugNoRule(
+    override val name: String,
+    rule: Rule<*>
+) : NoRule(rule), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<CharSequence>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

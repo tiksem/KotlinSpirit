@@ -35,10 +35,64 @@ open class OptionalRule<T : Any>(
     override fun clone(): OptionalRule<T> {
         return OptionalRule(rule)
     }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun debug(name: String?): OptionalRule<T> {
+        return DebugOptionalRule(name ?: "optional(${rule.debugName})", rule.internalDebug())
+    }
 }
 
-class OptionalCharRule(rule: CharRule) : OptionalRule<Char>(rule) {
+private class DebugOptionalRule<T : Any>(
+    override val name: String,
+    rule: Rule<T>
+): OptionalRule<T>(rule), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<T>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+}
+
+open class OptionalCharRule(rule: CharRule) : OptionalRule<Char>(rule) {
     override fun clone(): OptionalCharRule {
         return OptionalCharRule((rule as CharRule).clone())
     }
+
+    override fun debug(name: String?): OptionalCharRule {
+        val debug = rule.internalDebug()
+        return DebugOptionalCharRule(name ?: "optional(${debug.debugName})",
+            debug as CharRule)
+    }
 }
+
+private class DebugOptionalCharRule(
+    override val name: String,
+    rule: CharRule
+): OptionalCharRule(rule), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(
+        seek: Int, string: CharSequence, result: ParseResult<Char>
+    ) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+}
+
