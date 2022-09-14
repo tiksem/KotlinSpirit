@@ -104,6 +104,7 @@ abstract class Rule<T : Any> {
 
     abstract fun repeat(): Rule<*>
     abstract fun repeat(range: IntRange): Rule<*>
+    abstract operator fun unaryPlus(): Rule<*>
 
     abstract operator fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T>
 

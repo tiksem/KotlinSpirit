@@ -9,6 +9,10 @@ abstract class RuleWithDefaultRepeat<T : Any> : Rule<T>() {
         return RepeatRule(this, range)
     }
 
+    override fun unaryPlus(): Rule<List<T>> {
+        return OneOrMoreRule(this)
+    }
+
     override fun invoke(callback: (T) -> Unit): RuleWithDefaultRepeatResult<T> {
         return RuleWithDefaultRepeatResult(this, callback)
     }

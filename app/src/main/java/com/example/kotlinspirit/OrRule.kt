@@ -81,6 +81,10 @@ private class DebugOrRule<T : Any>(
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
     }
+
+    override fun clone(): OrRule<T> {
+        return DebugOrRule(name, a.clone(), b.clone())
+    }
 }
 
 open class AnyOrRule(a: Rule<Any>, b: Rule<Any>) : OrRule<Any>(a, b) {
@@ -91,6 +95,10 @@ open class AnyOrRule(a: Rule<Any>, b: Rule<Any>) : OrRule<Any>(a, b) {
             name = name ?: "${a.debugNameWrapIfNeed} or ${b.debugNameWrapIfNeed}",
             a, b
         )
+    }
+
+    override fun clone(): AnyOrRule {
+        return AnyOrRule(a.clone(), b.clone())
     }
 }
 
@@ -112,5 +120,9 @@ private class DebugAnyOrRule(
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, result)
         DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): AnyOrRule {
+        return DebugAnyOrRule(name, a.clone(), b.clone())
     }
 }

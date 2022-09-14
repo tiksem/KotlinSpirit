@@ -3,27 +3,35 @@ package com.example.kotlinspirit
 open class CharPredicateRule : CharRule {
     internal val predicate: (Char) -> Boolean
     internal val data: CharPredicateData?
+    internal val eofParseCode: Int
 
-    internal constructor(data: CharPredicateData?, predicate: (Char) -> Boolean) {
+    internal constructor(
+        data: CharPredicateData?,
+        predicate: (Char) -> Boolean,
+        eofParseCode: Int = ParseCode.EOF
+    ) {
         this.data = data
         this.predicate = predicate
+        this.eofParseCode = eofParseCode
     }
 
-    internal constructor(data: CharPredicateData) {
+    internal constructor(data: CharPredicateData, eofParseCode: Int = ParseCode.EOF) {
         this.data = data
         this.predicate = data.toPredicate()
+        this.eofParseCode = eofParseCode
     }
 
-    internal constructor(predicate: (Char) -> Boolean) {
+    internal constructor(predicate: (Char) -> Boolean, eofParseCode: Int = ParseCode.EOF) {
         this.predicate = predicate
         this.data = null
+        this.eofParseCode = eofParseCode
     }
 
     override fun parse(seek: Int, string: CharSequence): Long {
         if (seek >= string.length) {
             return createStepResult(
                 seek = seek,
-                parseCode = ParseCode.EOF
+                parseCode = eofParseCode
             )
         }
 
@@ -41,7 +49,7 @@ open class CharPredicateRule : CharRule {
         if (seek >= string.length) {
             result.parseResult = createStepResult(
                 seek = seek,
-                parseCode = ParseCode.EOF
+                parseCode = eofParseCode
             )
             return
         }
@@ -67,7 +75,8 @@ open class CharPredicateRule : CharRule {
         return CharPredicateRule(
             predicate = {
                 !predicate(it)
-            }
+            },
+            eofParseCode = ParseCode.COMPLETE
         )
     }
 
@@ -80,9 +89,9 @@ open class CharPredicateRule : CharRule {
         } else {
             val thisPredicate = this.predicate
             val otherPredicate = rule.predicate
-            CharPredicateRule {
+            CharPredicateRule(predicate = {
                 thisPredicate(it) || otherPredicate(it)
-            }
+            })
         }
     }
 
@@ -95,9 +104,9 @@ open class CharPredicateRule : CharRule {
         } else {
             val otherPredicate = rule.predicate
             val thisPredicate = this.predicate
-            CharPredicateRule {
+            CharPredicateRule(predicate = {
                 thisPredicate(it) && !otherPredicate(it)
-            }
+            })
         }
     }
 
@@ -107,6 +116,10 @@ open class CharPredicateRule : CharRule {
 
     override fun repeat(range: IntRange): StringCharPredicateRangeRule {
         return StringCharPredicateRangeRule(predicate, range)
+    }
+
+    override fun unaryPlus(): StringOneOrMoreCharPredicateRule {
+        return StringOneOrMoreCharPredicateRule(predicate)
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
@@ -152,15 +165,21 @@ open class CharPredicateRule : CharRule {
     }
 
     override fun debug(name: String?): CharPredicateRule {
-        return DebugCharPredicateRule(name ?: generateDebugName(), data, predicate)
+        return DebugCharPredicateRule(
+            name = name ?: generateDebugName(),
+            data = data,
+            predicate = predicate,
+            eofParseCode = eofParseCode
+        )
     }
 }
 
 private class DebugCharPredicateRule(
     override val name: String,
     data: CharPredicateData?,
-    predicate: (Char) -> Boolean
-) : CharPredicateRule(data, predicate), DebugRule {
+    predicate: (Char) -> Boolean,
+    eofParseCode: Int
+) : CharPredicateRule(data, predicate, eofParseCode), DebugRule {
     override fun parse(seek: Int, string: CharSequence): Long {
         DebugEngine.ruleParseStarted(this, seek)
         return super.parse(seek, string).also {

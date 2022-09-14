@@ -12,6 +12,10 @@ open class CharResultRule(
         return RepeatRule(this, range).asString()
     }
 
+    override fun unaryPlus(): Rule<CharSequence> {
+        return OneOrMoreRule(this).asString()
+    }
+
     override fun invoke(callback: (Char) -> Unit): CharResultRule {
         return CharResultRule(rule as CharRule, callback)
     }
@@ -37,7 +41,7 @@ abstract class CharRule : Rule<Char>() {
         return CharDiffRule(main = this, diff = Rules.str(string))
     }
 
-    override fun minus(ch: Char): CharDiffRule {
+    override fun minus(ch: Char): CharRule {
         return CharDiffRule(main = this, diff = Rules.char(ch))
     }
 
@@ -51,6 +55,10 @@ abstract class CharRule : Rule<Char>() {
 
     override fun repeat(range: IntRange): Rule<CharSequence> {
         return RepeatRule(this, range).asString()
+    }
+
+    override fun unaryPlus(): Rule<CharSequence> {
+        return OneOrMoreRule(this).asString()
     }
 
     override fun unaryMinus(): OptionalCharRule {
@@ -120,10 +128,28 @@ open class AnyCharRule : CharRule() {
         return StringCharPredicateRule { true }
     }
 
+    override fun unaryPlus(): StringOneOrMoreCharPredicateRule {
+        //TODO: Optimise
+        return StringOneOrMoreCharPredicateRule { true }
+    }
+
     override fun repeat(range: IntRange): StringCharPredicateRangeRule {
         return StringCharPredicateRangeRule(predicate = {
             true
         }, range = range)
+    }
+
+    override operator fun minus(ch: Char): CharPredicateRule {
+        return CharPredicateRule(predicate = {
+            it != ch
+        })
+    }
+
+    open operator fun minus(rule: CharPredicateRule): CharPredicateRule {
+        val predicate = rule.predicate
+        return CharPredicateRule(predicate = {
+            !predicate(it)
+        })
     }
 }
 

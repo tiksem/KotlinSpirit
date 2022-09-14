@@ -39,8 +39,12 @@ class RuleWithDefaultRepeatResult<T : Any>(
         return rule.repeat() as Rule<List<T>>
     }
 
-    override fun repeat(range: IntRange): Rule<*> {
+    override fun repeat(range: IntRange): Rule<List<T>> {
         return rule.repeat(range) as Rule<List<T>>
+    }
+
+    override fun unaryPlus(): Rule<List<T>> {
+        return +rule as Rule<List<T>>
     }
 
     override fun invoke(callback: (T) -> Unit): RuleWithDefaultRepeatResult<T> {
@@ -69,6 +73,10 @@ class CharPredicateResultRule(
 
     override fun repeat(range: IntRange): StringCharPredicateRangeRule {
         return (rule as CharPredicateRule).repeat(range)
+    }
+
+    override fun unaryPlus(): StringOneOrMoreCharPredicateRule {
+        return +(rule as CharPredicateRule)
     }
 
     override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {

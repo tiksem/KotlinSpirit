@@ -40,8 +40,12 @@ class LazyCharPredicateRule(
         return StringCharPredicateRule((initRule() as CharPredicateRule).predicate)
     }
 
-    override fun repeat(range: IntRange): Rule<*> {
-        return initRule().repeat(range)
+    override fun repeat(range: IntRange): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule((initRule() as CharPredicateRule).predicate, range)
+    }
+
+    override fun unaryPlus(): StringOneOrMoreCharPredicateRule {
+        return StringOneOrMoreCharPredicateRule((initRule() as CharPredicateRule).predicate)
     }
 
     override fun invoke(callback: (Char) -> Unit): BaseRuleWithResult<Char> {
@@ -70,11 +74,15 @@ open class LazyRule<T : Any>(
     }
 
     override fun repeat(): Rule<List<T>> {
-        return ZeroOrMoreRule(this)
+        return initRule().repeat()
     }
 
     override fun repeat(range: IntRange): Rule<List<T>> {
         return initRule().repeat(range)
+    }
+
+    override fun unaryPlus(): Rule<List<T>> {
+        return +initRule()
     }
 
     override fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T> {

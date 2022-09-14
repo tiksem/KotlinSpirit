@@ -1,6 +1,7 @@
 package com.example.kotlinspirit
 
 import com.example.kotlinspirit.Rules.char
+import com.example.kotlinspirit.Rules.space
 import com.example.kotlinspirit.Rules.str
 import org.junit.Assert
 import org.junit.Test
@@ -27,55 +28,13 @@ class SplitTest {
         Assert.assertEquals(mark, '!')
     }
 
-//    @Test
-//    fun splitExactInt() {
-//        val rule = int.split(',', 3)
-//        val res = rule.parseOrThrow("34,-23,45")
-//        Assert.assertArrayEquals(res.toTypedArray(), arrayOf(34, -23, 45))
-//    }
-//
-//    @Test
-//    fun splitInt() {
-//        val rule = int % ','
-//        val res = rule.parseOrThrow("34,-23,45,345")
-//        Assert.assertArrayEquals(res.toTypedArray(), arrayOf(34, -23, 45, 345))
-//    }
-//
-//    @Test
-//    fun splitIntDividerString() {
-//        val rule = int % "aabibu"
-//        val res = rule.parseOrThrow("34aabibu-23aabibu45aabibu345")
-//        Assert.assertArrayEquals(res.toTypedArray(), arrayOf(34, -23, 45, 345))
-//    }
-//
-//    @Test
-//    fun splitIntDividerStringRange() {
-//        val rule = int.split("aabibu", 4..6)
-//        val res = rule.parseOrThrow("34aabibu-23aabibu45aabibu345")
-//        Assert.assertArrayEquals(res.toTypedArray(), arrayOf(34, -23, 45, 345))
-//    }
-//
-//    @Test
-//    fun splitIntDividerCharRange() {
-//        val rule = int.split("a", 4..6)
-//        val res = rule.parseOrThrow("34a-23a45a345")
-//        Assert.assertArrayEquals(res.toTypedArray(), arrayOf(34, -23, 45, 345))
-//    }
-//
-//    @Test
-//    fun splitComplexDivider() {
-//        val rule = int % !int
-//        val res = rule.parseOrThrow("1,,,,,-12443|0435663546-+-")
-//        Assert.assertArrayEquals(res.toTypedArray(), arrayOf(1, -12443, 435663546))
-//    }
-//
-//    @Test
-//    fun splitSequence() {
-//        val rule = (int + '|' + latinStr) % ','
-//        var res = rule.parseOrThrow("123|abcd,1234|abcde,-567|asdf")
-//        Assert.assertArrayEquals(res.toTypedArray(), arrayOf("123|abcd", "1234|abcde", "-567|asdf"))
-//
-//        res = rule.parseOrThrow(" 123   | abcd,    1234\n\n\n| abcde,   -567 |   asdf   ", skipper = spaceStr)
-//        Assert.assertArrayEquals(res.toTypedArray(), arrayOf("123|abcd", "1234|abcde", "-567|asdf"))
-//    }
+    @Test
+    fun words() {
+        val r = +(char - space) % space
+        Assert.assertArrayEquals(r.compile().parseGetResultOrThrow("hi my dear friend")
+            .map { it.toString() }.toTypedArray(), arrayOf("hi", "my", "dear", "friend"))
+        Assert.assertArrayEquals(r.compile().parseGetResultOrThrow("hi my dear  friend")
+            .map { it.toString() }.toTypedArray(), arrayOf("hi", "my", "dear"))
+        Assert.assertEquals(r.compile().tryParse(" hi my dear  friend"), null)
+    }
 }

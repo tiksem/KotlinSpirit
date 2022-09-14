@@ -11,7 +11,7 @@ open class RepeatRule<T : Any>(
         var resultsCount = 0
         while (i < string.length && resultsCount < range.last) {
             val seekBefore = i
-            val ruleRes = rule.parse(seek, string)
+            val ruleRes = rule.parse(i, string)
             if (ruleRes.getParseCode().isError()) {
                 return if (resultsCount < range.first) {
                     ruleRes

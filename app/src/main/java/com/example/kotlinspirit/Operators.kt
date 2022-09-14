@@ -1,5 +1,7 @@
 package com.example.kotlinspirit
 
+import com.example.kotlinspirit.Rules.char
+
 operator fun Char.plus(rule: Rule<*>): SequenceRule {
     return ExactCharRule(this) + rule
 }
@@ -10,4 +12,16 @@ operator fun Char.plus(rule: CharRule): StringRuleWrapper {
 
 operator fun Char.plus(rule: OptionalCharRule): StringRuleWrapper {
     return (ExactCharRule(this) + rule).asString()
+}
+
+infix fun Char.or(rule: Rule<*>): OrRule<*> {
+    return ExactCharRule(this) or rule
+}
+
+infix fun Char.or(rule: CharPredicateRule): CharPredicateRule {
+    return char(this) or rule
+}
+
+fun Char.expect(rule: Rule<*>): ExpectationRule<Char> {
+    return ExpectationRule(ExactCharRule(this), rule)
 }
