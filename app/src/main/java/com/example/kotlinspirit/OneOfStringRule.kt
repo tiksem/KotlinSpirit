@@ -55,10 +55,11 @@ open class OneOfStringRule internal constructor(private val strings: List<CharSe
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
+        val tree = getTree()
         var i = seek
         val length = string.length
         while (i < length) {
-            if (!getTree().hasMatch(i, string)) {
+            if (!tree.hasMatch(i, string)) {
                 i++
             } else {
                 break

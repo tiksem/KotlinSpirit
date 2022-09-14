@@ -56,7 +56,7 @@ open class NoRule(
     override fun debug(name: String?): NoRule {
         val debug = rule.internalDebug()
         return DebugNoRule(
-            name = name ?: "!(${debug.debugName})",
+            name = name ?: "!${debug.debugNameWrapIfNeed}",
             rule = debug
         )
     }
