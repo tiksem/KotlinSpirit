@@ -208,7 +208,18 @@ class JsonParserTest {
                 "    }\n" +
                 "  ]\n" +
                 "}"
-        val value = jsonObject.compile().parseGetResultOrThrow(str)
+        val p = jsonObject.compile()
+        var time = System.currentTimeMillis()
+        repeat(1000) {
+            JSONObject(str)
+        }
+        System.out.println(System.currentTimeMillis() - time)
+        time = System.currentTimeMillis()
+        repeat(999) {
+            p.parseGetResultOrThrow(str)
+        }
+        val value = p.parseGetResultOrThrow(str)
+        System.out.println(System.currentTimeMillis() - time)
         JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
     }
 }

@@ -2,7 +2,7 @@ package com.example.kotlinspirit
 
 class ParseException(
     private val result: Long,
-    string: CharSequence,
+    private val string: CharSequence,
     val debugTree: RuleDebugTreeNode?
 ) : Exception(
     "Failed to parse token: ${string.subSequence(0, result.getSeek())}, error: ${
@@ -14,4 +14,14 @@ class ParseException(
 
     val seek: Int
         get() = result.getSeek()
+
+    val token: CharSequence
+        get() = string.subSequence(0..seek)
+
+    // Started from 0
+    val lineNumber: Int
+        get() = token.count { it == '\n' }
+
+    val seekInLine: Int
+        get() = seek - token.lastIndexOf('\n')
 }

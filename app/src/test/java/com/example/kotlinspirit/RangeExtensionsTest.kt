@@ -1,5 +1,7 @@
 package com.example.kotlinspirit
 
+import com.example.kotlinspirit.ext.minus
+import com.example.kotlinspirit.ext.plus
 import org.junit.Assert
 import org.junit.Test
 

@@ -1,5 +1,9 @@
 package com.example.kotlinspirit
 
+import com.example.kotlinspirit.ext.excludeRanges
+import com.example.kotlinspirit.ext.includeRanges
+import com.example.kotlinspirit.ext.minus
+import com.example.kotlinspirit.ext.plus
 import java.util.*
 
 internal class CharPredicateData(

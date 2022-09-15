@@ -5,10 +5,12 @@ open class OptionalRule<T : Any>(
 ) : RuleWithDefaultRepeat<T>() {
 
     override fun parse(seek: Int, string: CharSequence): Long {
-        return createStepResult(
-            seek = rule.parse(seek, string).getSeek(),
-            parseCode = ParseCode.COMPLETE
-        )
+        val res = rule.parse(seek, string)
+        if (res.getParseCode().isNotError()) {
+            return res
+        }
+
+        return createComplete(seek)
     }
 
     override fun parseWithResult(
@@ -16,10 +18,12 @@ open class OptionalRule<T : Any>(
         string: CharSequence,
         result: ParseResult<T>
     ) {
-        result.data = null
-        val ruleRes = rule.parse(seek, string)
+        rule.parseWithResult(seek, string, result)
+        if (result.isError) {
+            result.data = null
+        }
         result.parseResult = createStepResult(
-            seek = ruleRes.getSeek(),
+            seek = result.seek,
             parseCode = ParseCode.COMPLETE
         )
     }

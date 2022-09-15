@@ -99,7 +99,7 @@ private class DebugGrammar<T : Any>(
     }
 
     override fun clone(): RuleWithDefaultRepeat<T> {
-        return grammar.clone().debug(name) as RuleWithDefaultRepeat<T>
+        return grammar.clone().debug(name)
     }
 
     override val debugNameShouldBeWrapped: Boolean

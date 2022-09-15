@@ -42,7 +42,7 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
                     if (result < 0) {
                         return createStepResult(
                             seek = i,
-                            parseCode = ParseCode.INT_OUT_OF_BOUNDS
+                            parseCode = ParseCode.LONG_OUT_OF_BOUNDS
                         )
                     }
                 }
@@ -116,7 +116,7 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
                     if (result < 0) {
                         r.parseResult = createStepResult(
                             seek = i,
-                            parseCode = ParseCode.INT_OUT_OF_BOUNDS
+                            parseCode = ParseCode.LONG_OUT_OF_BOUNDS
                         )
                         return
                     }

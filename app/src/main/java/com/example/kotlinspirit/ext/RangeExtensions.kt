@@ -1,4 +1,4 @@
-package com.example.kotlinspirit
+package com.example.kotlinspirit.ext
 
 internal operator fun CharRange.minus(range: CharRange): List<CharRange> {
     if (range.first <= this.first && range.last >= this.last) {

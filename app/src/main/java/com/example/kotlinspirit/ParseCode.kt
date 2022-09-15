@@ -6,17 +6,18 @@ object ParseCode {
     const val INVALID_INT = 2
     const val INT_STARTED_FROM_ZERO = 3
     const val INT_OUT_OF_BOUNDS = 4
-    const val DIFF_FAILED = 5
-    const val CHAR_PREDICATE_FAILED = 6
-    const val STRING_NOT_ENOUGH_DATA = 7
-    const val STRING_DOES_NOT_MATCH = 8
-    const val NO_FAILED = 9
-    const val INVALID_DOUBLE = 10
-    const val WHOLE_STRING_DOES_NOT_MATCH = 11
-    const val ONE_OF_STRING_NOT_FOUND = 12
-    const val FAIL_PREDICATE = 13
-    const val EXPECTATION_FAILED = 14
-    const val SPLIT_NOT_ENOUGH_DATA = 15
+    const val LONG_OUT_OF_BOUNDS = 5
+    const val DIFF_FAILED = 6
+    const val CHAR_PREDICATE_FAILED = 7
+    const val STRING_NOT_ENOUGH_DATA = 8
+    const val STRING_DOES_NOT_MATCH = 9
+    const val NO_FAILED = 10
+    const val INVALID_DOUBLE = 11
+    const val WHOLE_STRING_DOES_NOT_MATCH = 12
+    const val ONE_OF_STRING_NOT_FOUND = 13
+    const val FAIL_PREDICATE = 14
+    const val EXPECTATION_FAILED = 15
+    const val SPLIT_NOT_ENOUGH_DATA = 16
 }
 
 internal inline fun Int.isError(): Boolean {
@@ -54,6 +55,7 @@ internal inline fun Int.parseCodeToString(): String {
         ParseCode.INVALID_INT -> "INVALID_INT"
         ParseCode.INT_STARTED_FROM_ZERO -> "INT_STARTED_FROM_ZERO"
         ParseCode.INT_OUT_OF_BOUNDS -> "INT_OUT_OF_BOUNDS"
+        ParseCode.LONG_OUT_OF_BOUNDS -> "LONG_OUT_OF_BOUNDS"
         ParseCode.DIFF_FAILED -> "DIFF_FAILED"
         ParseCode.CHAR_PREDICATE_FAILED -> "CHAR_PREDICATE_FAILED"
         ParseCode.STRING_NOT_ENOUGH_DATA -> "STRING_NOT_ENOUGH_DATA"
