@@ -7,7 +7,7 @@ open class NoRule(
         return rule.noParse(seek, string).let {
             if (it < 0) {
                 return createStepResult(
-                    seek = -it + 1,
+                    seek = -it - 1,
                     parseCode = ParseCode.NO_FAILED
                 )
             } else {
@@ -26,7 +26,7 @@ open class NoRule(
             )
         } else {
             result.parseResult = createStepResult(
-                seek = -parseResult + 1,
+                seek = -parseResult - 1,
                 parseCode = ParseCode.NO_FAILED
             )
         }
