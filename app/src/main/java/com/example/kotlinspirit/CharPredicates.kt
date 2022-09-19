@@ -1,5 +1,7 @@
 package com.example.kotlinspirit
 
+import com.example.kotlinspirit.ext.binarySearchContains
+import com.example.kotlinspirit.ext.contains
 import java.lang.IllegalStateException
 
 private fun Array<out CharRange>.contains(char: Char): Boolean {
