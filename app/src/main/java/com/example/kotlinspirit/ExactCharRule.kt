@@ -2,7 +2,7 @@ package com.example.kotlinspirit
 
 open class ExactCharRule(
     private val char: Char
-) : CharRule() {
+) : CharPredicateRule(data = CharPredicateData(chars = charArrayOf(char))) {
     override fun parse(seek: Int, string: CharSequence): Long {
         if (seek >= string.length) {
             return createStepResult(
@@ -52,10 +52,10 @@ open class ExactCharRule(
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        if (string[seek] != char) {
-            return seek + 1
+        return if (string[seek] != char) {
+            seek + 1
         } else {
-            return -seek - 1
+            -seek - 1
         }
     }
 

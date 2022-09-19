@@ -20,6 +20,10 @@ object Rules {
             throw IllegalArgumentException("char(...) chars should not be empty")
         }
 
+        if (chars.size == 1) {
+            return ExactCharRule(chars[0])
+        }
+
         return CharPredicateRule(
             CharPredicateData(chars)
         )
@@ -96,6 +100,7 @@ object Rules {
         get() = str('A'..'B', 'a'..'z')
 
     val double get() = DoubleRule()
+    val float get() = FloatRule()
 
     fun oneOf(vararg strings: CharSequence): Rule<CharSequence> {
         val withoutEmptyStrings = strings.filter {

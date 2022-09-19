@@ -32,4 +32,9 @@ class RangeExtensionsTest {
         Assert.assertArrayEquals((('1'..'2') + ('4'..'5')).toTypedArray(), arrayOf('1'..'2', '4'..'5'))
         Assert.assertArrayEquals((('4'..'5') + ('1'..'2')).toTypedArray(), arrayOf('4'..'5', '1'..'2'))
     }
+
+    @Test
+    fun test1() {
+        Assert.assertArrayEquals((('a'..'f') - ('z'..'z')).toTypedArray(), arrayOf('a'..'f'))
+    }
 }

@@ -13,7 +13,7 @@ internal operator fun CharRange.minus(range: CharRange): List<CharRange> {
         listOf(
             (range.last + 1)..this.last
         )
-    } else if (range.first > this.first && range.last >= this.last) {
+    } else if (range.first > this.first && range.last >= this.last && range.first <= this.last) {
         listOf(
             this.first until range.first
         )
@@ -65,15 +65,26 @@ internal fun List<CharRange>.includeRanges(ranges: List<CharRange>): List<CharRa
     }.optimizeRanges()
 }
 
-internal fun List<CharRange>.excludeRanges(ranges: List<CharRange>): List<CharRange> {
+internal fun List<CharRange>.excludeRange(range: CharRange): List<CharRange> {
     val result = ArrayList<CharRange>()
     for (thisRange in this) {
-        for (range in ranges) {
-            result.addAll(thisRange - range)
-        }
+        result.addAll(thisRange - range)
     }
 
-    return result.sortedBy {
+    return result
+}
+
+internal fun List<CharRange>.excludeRanges(ranges: List<CharRange>): List<CharRange> {
+    if (ranges.isEmpty()) {
+        return this
+    }
+
+    var list = this
+    for (range in ranges) {
+        list = list.excludeRange(range)
+    }
+
+    return list.sortedBy {
         it.first
     }.optimizeRanges()
 }

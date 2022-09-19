@@ -1,10 +1,10 @@
 package com.example.kotlinspirit
 
+import com.example.kotlinspirit.ext.*
 import com.example.kotlinspirit.ext.excludeRanges
 import com.example.kotlinspirit.ext.includeRanges
-import com.example.kotlinspirit.ext.minus
-import com.example.kotlinspirit.ext.plus
 import java.util.*
+import kotlin.collections.ArrayList
 
 internal class CharPredicateData(
     chars: SortedSet<Char>,
@@ -43,9 +43,25 @@ internal class CharPredicateData(
     }
 
     operator fun minus(other: CharPredicateData): CharPredicateData {
+        val rangesToExclude = if (other.chars.isEmpty()) {
+            other.ranges
+        } else {
+            ArrayList(other.ranges).also { arr ->
+                arr.addAll(other.chars.map {
+                    it..it
+                })
+            }
+        }
+        val chars = TreeSet(chars)
+        chars.removeAll(other.chars)
+        chars.eraseIf { ch ->
+            other.ranges.any {
+                it.contains(ch)
+            }
+        }
         return CharPredicateData(
             chars = chars - other.chars,
-            ranges = ranges.excludeRanges(other.ranges)
+            ranges = ranges.excludeRanges(rangesToExclude)
         )
     }
 
@@ -54,6 +70,10 @@ internal class CharPredicateData(
             ranges = ranges.toTypedArray(),
             chars = chars.toCharArray()
         )
+    }
+
+    fun isExactChar(): Boolean {
+        return chars.size == 1 && ranges.isEmpty()
     }
 
     override fun equals(other: Any?): Boolean {

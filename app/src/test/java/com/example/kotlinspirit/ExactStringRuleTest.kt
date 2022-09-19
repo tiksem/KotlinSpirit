@@ -22,4 +22,13 @@ class ExactStringRuleTest {
             arrayOf<CharSequence>("some", "some", "some")
         )
     }
+
+    @Test
+    fun noTest() {
+        val r = !str("some")
+        Assert.assertEquals(r.compile().tryParse("some"), null)
+        Assert.assertEquals(r.compile().tryParse("somefddffd"), null)
+        Assert.assertEquals(r.compile().tryParse("dsdsdssome"), "dsdsds".length)
+        Assert.assertEquals(r.compile().tryParse(""), 0)
+    }
 }

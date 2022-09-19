@@ -100,7 +100,12 @@ open class CharPredicateRule : CharRule {
         val otherData = rule.data
 
         return if (data != null && otherData != null) {
-            CharPredicateRule(data - otherData)
+            val resultData = data - otherData
+            if (resultData.isExactChar()) {
+                ExactCharRule(resultData.chars.first())
+            } else {
+                CharPredicateRule(resultData)
+            }
         } else {
             val otherPredicate = rule.predicate
             val thisPredicate = this.predicate
