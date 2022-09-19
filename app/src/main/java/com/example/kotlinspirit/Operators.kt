@@ -25,3 +25,19 @@ infix fun Char.or(rule: CharPredicateRule): CharPredicateRule {
 fun Char.expect(rule: Rule<*>): ExpectationRule<Char> {
     return ExpectationRule(ExactCharRule(this), rule)
 }
+
+infix fun String.or(rule: ExactStringRule): OneOfStringRule {
+    return ExactStringRule(this) or rule
+}
+
+infix fun String.or(rule: String): OneOfStringRule {
+    return ExactStringRule(this) or rule
+}
+
+infix fun String.or(rule: Rule<*>): AnyOrRule {
+    return ExactStringRule(this) or rule
+}
+
+fun String.expect(rule: Rule<*>): ExpectationRule<CharSequence> {
+    return ExpectationRule(ExactStringRule(this), rule)
+}

@@ -52,7 +52,11 @@ private fun internalNoParse(seek: Int, string: CharSequence, main: Rule<*>, diff
             if (mainRes >= 0) {
                 i = mainRes
             } else {
-                return -mainRes - 1
+                return if (i == seek) {
+                    mainRes
+                } else {
+                    i
+                }
             }
         }
 
