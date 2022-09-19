@@ -188,6 +188,7 @@ open class IntRule : RuleWithDefaultRepeat<Int>() {
                     }
                 }
                 else -> {
+                    noSuccess = true
                     i++
                 }
             }

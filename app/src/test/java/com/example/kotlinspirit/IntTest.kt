@@ -54,6 +54,7 @@ class IntTest {
         val r = (!int).compile()
         r.matchOrThrow("+dsds")
         r.matchOrThrow("-dsdsds")
+        r.matchOrThrow("dsdsds")
         r.matchOrThrow("-")
         r.matchOrThrow("+")
     }
