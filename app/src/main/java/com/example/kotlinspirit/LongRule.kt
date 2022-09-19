@@ -11,8 +11,8 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
         }
 
         var i = seek
-        var result = 0
-        var sign = 1
+        var result = 0L
+        var sign = 1L
         var successFlag = false
         do {
             val char = string[i++]
@@ -20,8 +20,13 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
                 char == '-' -> {
                     if (successFlag) {
                         return createComplete(i)
-                    } else if (sign == 1) {
-                        sign = -1
+                    } else if (sign == 1L) {
+                        sign = -1L
+                    }
+                }
+                char == '+' -> {
+                    if (successFlag) {
+                        return createComplete(i)
                     }
                 }
                 !successFlag && char == '0' -> {
@@ -72,27 +77,25 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
         }
 
         var i = seek
-        var sign = 1
+        var sign = 1L
         var result = 0L
         var successFlag = false
         do {
             val char = string[i++]
             when {
-                char == '-' && !successFlag -> {
+                (char == '-' || char == '+') && !successFlag -> {
                     when {
-                        successFlag -> {
-                            r.data = result * sign
-                            r.parseResult = createComplete(i)
-                            return
-                        }
-                        sign == 1 -> {
-                            sign = -1
+                        i == seek + 1 -> {
+                            if (char == '-') {
+                                sign = -1
+                            }
                         }
                         else -> {
                             r.parseResult = createStepResult(
                                 seek = i,
                                 parseCode = ParseCode.INVALID_INT
                             )
+                            return
                         }
                     }
                 }
@@ -116,7 +119,7 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
                     if (result < 0) {
                         r.parseResult = createStepResult(
                             seek = i,
-                            parseCode = ParseCode.LONG_OUT_OF_BOUNDS
+                            parseCode = ParseCode.INT_OUT_OF_BOUNDS
                         )
                         return
                     }
@@ -160,12 +163,12 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
             return seek
         }
 
-        var i = seek
         var noSuccess = false
+        var i = seek
         do {
             val char = string[i]
             when {
-                char == '-' && !noSuccess -> {
+                (char == '-' || char == '+') && !noSuccess -> {
                     if (i < length - 1) {
                         if (string[i + 1] in '0'..'9') {
                             return -seek - 1
@@ -185,6 +188,7 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
                     }
                 }
                 else -> {
+                    noSuccess = true
                     i++
                 }
             }
@@ -201,7 +205,7 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
         get() = false
 
     override fun debug(name: String?): LongRule {
-        return DebugLongRule(name ?: "long")
+        return DebugLongRule(name ?: "int")
     }
 }
 
