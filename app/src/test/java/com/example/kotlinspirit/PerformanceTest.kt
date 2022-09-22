@@ -18,7 +18,7 @@ class PerformanceTest {
 
         val input = StringBuilder()
         val arr = arrayOf("Ivan", "Vasil", "Eblan")
-        repeat(50000) {
+        repeat(500) {
             if (Random.nextBoolean()) {
                 input.append(Random.nextInt('A'.code, 'Z'.code + 1).toChar())
             } else {
@@ -27,15 +27,19 @@ class PerformanceTest {
             input.append(arr.random())
         }
         input.append('@')
-        repeat(50000) {
+        repeat(500) {
             input.append(Random.nextInt(0, 10).digitToChar())
         }
 
         var time = System.currentTimeMillis()
-        parser.parseOrThrow(input)
+        repeat(1000) {
+            parser.parseOrThrow(input)
+        }
         System.out.println(System.currentTimeMillis() - time)
         time = System.currentTimeMillis()
-        val e = pattern.matches(input)
+        repeat(1000) {
+            pattern.matches(input)
+        }
         System.out.println(System.currentTimeMillis() - time)
     }
 }
