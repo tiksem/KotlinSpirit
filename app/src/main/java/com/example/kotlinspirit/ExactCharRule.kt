@@ -67,7 +67,7 @@ open class ExactCharRule(
         get() = false
 
     override fun debug(name: String?): ExactCharRule {
-        return DebugExactCharRule(name ?: "char($char)", char)
+        return DebugExactCharRule(name ?: "'$char'", char)
     }
 }
 

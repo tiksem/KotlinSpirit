@@ -117,6 +117,8 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
                         } else {
                             return createComplete(saveI)
                         }
+                    } else {
+                        return createComplete(i - 1)
                     }
                 } else {
                     return createComplete(saveI)
