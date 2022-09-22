@@ -336,6 +336,15 @@ class DoubleTest {
     }
 
     @Test
+    fun testSpaceAfterDouble() {
+        val result = ParseResult<Double>()
+        double.parseWithResult(0 , "5.0  ", result)
+        Assert.assertEquals(result.data ?: -1.0, 5.0, 0.00001)
+        Assert.assertEquals(result.parseResult.getParseCode(), ParseCode.COMPLETE)
+        Assert.assertEquals(result.seek, "5.0".length)
+    }
+
+    @Test
     fun notMoreDotError() {
         val str = ".."
         Assert.assertEquals(

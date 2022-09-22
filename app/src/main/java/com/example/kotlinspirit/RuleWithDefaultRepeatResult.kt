@@ -31,7 +31,7 @@ abstract class BaseRuleWithResult<T : Any>(
     }
 }
 
-class RuleWithDefaultRepeatResult<T : Any>(
+open class RuleWithDefaultRepeatResult<T : Any>(
     rule: RuleWithDefaultRepeat<T>,
     callback: (T) -> Unit
 ) : BaseRuleWithResult<T>(rule, callback) {
@@ -59,11 +59,19 @@ class RuleWithDefaultRepeatResult<T : Any>(
         get() = rule.debugNameShouldBeWrapped
 
     override fun debug(name: String?): RuleWithDefaultRepeatResult<T> {
-        return RuleWithDefaultRepeatResult(rule.debug(name) as RuleWithDefaultRepeat<T>, callback)
+        return DebugRuleWithDefaultRepeatResult(rule.debug(name) as RuleWithDefaultRepeat<T>, callback)
     }
 }
 
-class CharPredicateResultRule(
+private class DebugRuleWithDefaultRepeatResult<T : Any>(
+    rule: RuleWithDefaultRepeat<T>,
+    callback: (T) -> Unit
+) : RuleWithDefaultRepeatResult<T>(rule, callback), DebugRule {
+    override val name: String
+        get() = rule.debugName
+}
+
+open class CharPredicateResultRule(
     rule: CharPredicateRule,
     callback: (Char) -> Unit
 ) : BaseRuleWithResult<Char>(rule, callback) {
@@ -100,6 +108,14 @@ class CharPredicateResultRule(
         get() = rule.debugNameShouldBeWrapped
 
     override fun debug(name: String?): CharPredicateResultRule {
-        return CharPredicateResultRule(rule.debug(name) as CharPredicateRule, callback)
+        return DebugCharPredicateResultRule(rule.debug(name) as CharPredicateRule, callback)
     }
+}
+
+private class DebugCharPredicateResultRule(
+    rule: CharPredicateRule,
+    callback: (Char) -> Unit
+) : CharPredicateResultRule(rule, callback), DebugRule {
+    override val name: String
+        get() = rule.debugName
 }

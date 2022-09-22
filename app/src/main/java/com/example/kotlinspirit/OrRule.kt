@@ -55,9 +55,11 @@ open class OrRule<T : Any>(
         get() = true
 
     override fun debug(name: String?): OrRule<T> {
+        val a = a.internalDebug()
+        val b = b.internalDebug()
         return DebugOrRule(
             name = name ?: "${a.debugNameWrapIfNeed} or ${b.debugNameWrapIfNeed}",
-            a.internalDebug(), b.internalDebug()
+            a, b
         )
     }
 }

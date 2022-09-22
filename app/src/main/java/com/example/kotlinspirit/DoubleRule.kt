@@ -405,6 +405,13 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
                             }
                             return
                         }
+                    } else {
+                        result.parseResult = createComplete(i - 1)
+                        result.data = if (minus) {
+                            -integerPart - fractionPart
+                        } else {
+                            integerPart + fractionPart
+                        }
                     }
                 } else {
                     result.parseResult = createComplete(i)
