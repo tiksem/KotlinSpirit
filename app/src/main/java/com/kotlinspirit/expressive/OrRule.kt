@@ -70,6 +70,10 @@ open class OrRule<T : Any>(
             a, b
         )
     }
+
+    override fun isThreadSafe(): Boolean {
+        return a.isThreadSafe() && b.isThreadSafe()
+    }
 }
 
 private class DebugOrRule<T : Any>(

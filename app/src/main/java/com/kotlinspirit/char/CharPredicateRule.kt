@@ -188,6 +188,10 @@ open class CharPredicateRule : CharRule {
             eofParseCode = eofParseCode
         )
     }
+
+    override fun isThreadSafe(): Boolean {
+        return true
+    }
 }
 
 private class DebugCharPredicateRule(

@@ -1,6 +1,5 @@
 package com.kotlinspirit.str
 
-import com.kotlinspirit.*
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.createComplete
@@ -73,6 +72,10 @@ open class StringCharPredicateRule(
 
     override fun debug(name: String?): RuleWithDefaultRepeat<CharSequence> {
         return DebugStringCharPredicateRule(name ?: "stringPredicate", predicate)
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return true
     }
 }
 

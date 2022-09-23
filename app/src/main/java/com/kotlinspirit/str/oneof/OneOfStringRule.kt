@@ -11,20 +11,18 @@ import com.kotlinspirit.str.ExactStringRule
 open class OneOfStringRule internal constructor(private val strings: List<CharSequence>) :
     RuleWithDefaultRepeat<CharSequence>() {
 
-    private var tree: TernarySearchTree? = null
+    private var tree: TernarySearchTree
 
-    internal constructor(strings: List<CharSequence>, tree: TernarySearchTree?) : this(strings) {
+    init {
+        tree = TernarySearchTree(strings)
+    }
+
+    internal constructor(strings: List<CharSequence>, tree: TernarySearchTree) : this(strings) {
         this.tree = tree
     }
 
-    private fun getTree(): TernarySearchTree {
-        return tree ?: TernarySearchTree(strings).also {
-            tree = it
-        }
-    }
-
     override fun parse(seek: Int, string: CharSequence): Long {
-        val result = getTree().parse(seek, string)
+        val result = tree.parse(seek, string)
         return if (result >= 0) {
             createStepResult(
                 seek = result,
@@ -43,7 +41,7 @@ open class OneOfStringRule internal constructor(private val strings: List<CharSe
         string: CharSequence,
         result: ParseResult<CharSequence>
     ) {
-        val r = getTree().parse(seek, string)
+        val r = tree.parse(seek, string)
         if (r >= 0) {
             result.parseResult = createStepResult(
                 seek = r,
@@ -59,11 +57,10 @@ open class OneOfStringRule internal constructor(private val strings: List<CharSe
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return getTree().hasMatch(seek, string)
+        return tree.hasMatch(seek, string)
     }
 
     override fun noParse(seek: Int, string: CharSequence): Int {
-        val tree = getTree()
         var i = seek
         val length = string.length
         while (i < length) {
@@ -109,12 +106,16 @@ open class OneOfStringRule internal constructor(private val strings: List<CharSe
     override fun debug(name: String?): OneOfStringRule {
         return DebugOneOfStringRule(name ?: generateDebugName(), strings, tree)
     }
+
+    override fun isThreadSafe(): Boolean {
+        return false
+    }
 }
 
 private class DebugOneOfStringRule(
     override val name: String,
     strings: List<CharSequence>,
-    tree: TernarySearchTree?
+    tree: TernarySearchTree
 ) : OneOfStringRule(strings, tree), DebugRule {
     override fun parse(seek: Int, string: CharSequence): Long {
         DebugEngine.ruleParseStarted(this, seek)

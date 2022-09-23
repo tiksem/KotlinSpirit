@@ -116,6 +116,10 @@ open class DiffRuleWithDefaultRepeat<T : Any>(
             diff = diff
         )
     }
+
+    override fun isThreadSafe(): Boolean {
+        return main.isThreadSafe() && diff.isThreadSafe()
+    }
 }
 
 private class DebugDiffRuleWithDefaultRepeat<T : Any>(
@@ -177,6 +181,10 @@ open class CharDiffRule(
             main = main,
             diff = diff
         )
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return main.isThreadSafe() && diff.isThreadSafe()
     }
 }
 

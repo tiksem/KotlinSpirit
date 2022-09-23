@@ -213,7 +213,11 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
         get() = false
 
     override fun debug(name: String?): LongRule {
-        return DebugLongRule(name ?: "int")
+        return DebugLongRule(name ?: "long")
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return true
     }
 }
 

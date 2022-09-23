@@ -215,6 +215,10 @@ open class IntRule : RuleWithDefaultRepeat<Int>() {
     override fun debug(name: String?): IntRule {
         return DebugIntRule(name ?: "int")
     }
+
+    override fun isThreadSafe(): Boolean {
+        return true
+    }
 }
 
 private class DebugIntRule(override val name: String): IntRule(), DebugRule {

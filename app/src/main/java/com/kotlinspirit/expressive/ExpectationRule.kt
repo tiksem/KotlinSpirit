@@ -88,6 +88,10 @@ open class ExpectationRule<T : Any>(
         val b = b.internalDebug()
         return DebugExpectationRule(name ?: "${a.debugName} expects ${b.debugName}", a, b)
     }
+
+    override fun isThreadSafe(): Boolean {
+        return a.isThreadSafe() && b.isThreadSafe()
+    }
 }
 
 private class DebugExpectationRule<T : Any>(

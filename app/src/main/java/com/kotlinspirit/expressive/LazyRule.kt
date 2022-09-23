@@ -41,6 +41,10 @@ abstract class BaseLazyRule<T : Any>(
     override fun noParse(seek: Int, string: CharSequence): Int {
         return initRule().noParse(seek, string)
     }
+
+    override fun isThreadSafe(): Boolean {
+        return false
+    }
 }
 
 class LazyCharPredicateRule(

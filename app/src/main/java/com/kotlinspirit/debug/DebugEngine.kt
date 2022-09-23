@@ -67,10 +67,6 @@ internal class DebugEngine {
 
     fun startDebugSession(string: CharSequence) {
         this.string = string
-    }
-
-    fun endDebugSession() {
-        this.string = ""
         root = null
         seek = null
     }
@@ -117,10 +113,6 @@ internal class DebugEngine {
 
         fun startDebugSession(string: CharSequence) {
             getEngine().startDebugSession(string)
-        }
-
-        fun endDebugSession() {
-            getEngine().endDebugSession()
         }
 
         fun ruleParseStarted(rule: Rule<*>, startSeek: Int) {

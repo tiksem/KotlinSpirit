@@ -1,6 +1,5 @@
 package com.kotlinspirit.str
 
-import com.kotlinspirit.*
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.createComplete
@@ -130,6 +129,10 @@ open class StringCharPredicateRangeRule(
             name = name ?: "stringPredicate[$range]",
             predicate, range
         )
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return true
     }
 }
 

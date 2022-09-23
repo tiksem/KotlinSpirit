@@ -67,6 +67,10 @@ open class NoRule(
             rule = debug
         )
     }
+
+    override fun isThreadSafe(): Boolean {
+        return rule.isThreadSafe()
+    }
 }
 
 private class DebugNoRule(

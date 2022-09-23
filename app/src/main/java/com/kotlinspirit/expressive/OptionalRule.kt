@@ -54,6 +54,10 @@ open class OptionalRule<T : Any>(
     override fun debug(name: String?): OptionalRule<T> {
         return DebugOptionalRule(name ?: "optional(${rule.debugName})", rule.internalDebug())
     }
+
+    override fun isThreadSafe(): Boolean {
+        return rule.isThreadSafe()
+    }
 }
 
 private class DebugOptionalRule<T : Any>(

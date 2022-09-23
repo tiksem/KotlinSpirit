@@ -78,6 +78,10 @@ open class ExactStringRule(
     override fun debug(name: String?): ExactStringRule {
         return DebugExactStringRule(name ?: "str($string)", string)
     }
+
+    override fun isThreadSafe(): Boolean {
+        return true
+    }
 }
 
 private class DebugExactStringRule(override val name: String, string: String) :

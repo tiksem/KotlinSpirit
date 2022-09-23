@@ -621,6 +621,10 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
     override fun debug(name: String?): DoubleRule {
         return DebugDoubleRule(name ?: "double")
     }
+
+    override fun isThreadSafe(): Boolean {
+        return true
+    }
 }
 
 private class DebugDoubleRule(override val name: String) : DoubleRule(), DebugRule {

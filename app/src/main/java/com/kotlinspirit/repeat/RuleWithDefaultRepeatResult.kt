@@ -38,6 +38,10 @@ open class RuleWithDefaultRepeatResult<T : Any>(
     override fun debug(name: String?): RuleWithDefaultRepeatResult<T> {
         return DebugRuleWithDefaultRepeatResult(rule.debug(name) as RuleWithDefaultRepeat<T>, callback)
     }
+
+    override fun isThreadSafe(): Boolean {
+        return rule.isThreadSafe()
+    }
 }
 
 private class DebugRuleWithDefaultRepeatResult<T : Any>(
@@ -86,6 +90,10 @@ open class CharPredicateResultRule(
 
     override fun debug(name: String?): CharPredicateResultRule {
         return DebugCharPredicateResultRule(rule.debug(name) as CharPredicateRule, callback)
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return rule.isThreadSafe()
     }
 }
 

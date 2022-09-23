@@ -76,6 +76,10 @@ open class ZeroOrMoreRule<T : Any>(
             rule = debug
         )
     }
+
+    override fun isThreadSafe(): Boolean {
+        return rule.isThreadSafe()
+    }
 }
 
 private class DebugZeroOrMoreRule<T : Any>(

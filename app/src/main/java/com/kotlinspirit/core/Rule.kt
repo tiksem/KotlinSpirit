@@ -168,8 +168,14 @@ abstract class Rule<T : Any> {
         get() = false
 
     fun compile(): Parser<T> {
-        return Parser(originRule = this)
+        return if (isThreadSafe()) {
+            RegularParser(originalRule = this)
+        } else {
+            ThreadSafeParser(originRule = this)
+        }
     }
+
+    internal abstract fun isThreadSafe(): Boolean
 
     abstract fun debug(name: String? = null): Rule<T>
     internal fun internalDebug(name: String? = null): Rule<T> {

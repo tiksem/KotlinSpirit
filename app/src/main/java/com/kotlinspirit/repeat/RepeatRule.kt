@@ -112,6 +112,10 @@ open class RepeatRule<T : Any>(
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
+
+    override fun isThreadSafe(): Boolean {
+        return rule.isThreadSafe()
+    }
 }
 
 private class DebugRepeatRule<T : Any>(

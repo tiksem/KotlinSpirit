@@ -97,6 +97,10 @@ open class FailIfRule<T : Any>(
     override fun debug(name: String?): FailIfRule<T> {
         return DebugFailIfRule(name ?: "failIf", rule.internalDebug(), failPredicate)
     }
+
+    override fun isThreadSafe(): Boolean {
+        return rule.isThreadSafe()
+    }
 }
 
 private class DebugFailIfRule<T : Any>(

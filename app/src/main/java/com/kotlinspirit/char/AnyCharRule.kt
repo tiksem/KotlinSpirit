@@ -44,6 +44,10 @@ open class CharResultRule(
 
     override val debugNameShouldBeWrapped: Boolean
         get() = rule.debugNameShouldBeWrapped
+
+    override fun isThreadSafe(): Boolean {
+        return rule.isThreadSafe()
+    }
 }
 
 abstract class CharRule : Rule<Char>() {
@@ -164,6 +168,10 @@ open class AnyCharRule : CharRule() {
         return CharPredicateRule(predicate = {
             !predicate(it)
         })
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return true
     }
 }
 

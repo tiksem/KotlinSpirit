@@ -612,6 +612,10 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
     override fun debug(name: String?): FloatRule {
         return DebugFloatRule(name ?: "float")
     }
+
+    override fun isThreadSafe(): Boolean {
+        return true
+    }
 }
 
 private class DebugFloatRule(override val name: String) : FloatRule(), DebugRule {

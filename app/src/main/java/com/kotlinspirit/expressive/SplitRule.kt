@@ -158,6 +158,10 @@ open class SplitRule<T : Any>(
             r, divider, range
         )
     }
+
+    override fun isThreadSafe(): Boolean {
+        return r.isThreadSafe() && divider.isThreadSafe()
+    }
 }
 
 private class DebugSplitRule<T : Any>(

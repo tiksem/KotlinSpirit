@@ -109,6 +109,10 @@ open class StringOneOrMoreCharPredicateRule(
     override fun debug(name: String?): StringOneOrMoreCharPredicateRule {
         return DebugStringOneOrMoreCharPredicateRule(name ?: "stringPredicate[1..<]", predicate)
     }
+
+    override fun isThreadSafe(): Boolean {
+        return true
+    }
 }
 
 private class DebugStringOneOrMoreCharPredicateRule(
