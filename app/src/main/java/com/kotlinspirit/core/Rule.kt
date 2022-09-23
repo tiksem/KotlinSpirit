@@ -168,10 +168,15 @@ abstract class Rule<T : Any> {
         get() = false
 
     fun compile(): Parser<T> {
-        return if (isThreadSafe()) {
+        val parser = if (isThreadSafe()) {
             RegularParser(originalRule = this)
         } else {
             ThreadSafeParser(originRule = this)
+        }
+        return if (this is DebugRule) {
+            DebugParser(parser)
+        } else {
+            parser
         }
     }
 
