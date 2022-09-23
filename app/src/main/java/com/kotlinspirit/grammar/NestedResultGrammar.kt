@@ -14,6 +14,10 @@ abstract class NestedResultGrammar<T : Any> : Grammar<T>() {
         })
     }
 
+    override fun resetResult() {
+        r = null
+    }
+
     protected abstract fun entire(nested: Rule<T>): Rule<*>
     protected abstract fun nested(): Rule<T>
 }
