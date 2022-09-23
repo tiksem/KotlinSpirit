@@ -44,7 +44,6 @@ private val expression: Rule<Double> = object : Grammar<Double>() {
         }
 
     override fun defineRule(): Rule<*> {
-        val code = hashCode()
         val sign = char('+', '-', '*', '/').invoke {
             this.sign = it
         }
