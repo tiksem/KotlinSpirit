@@ -58,6 +58,10 @@ open class OptionalRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): OptionalRule<T> {
+        return OptionalRule(rule.ignoreCallbacks())
+    }
 }
 
 private class DebugOptionalRule<T : Any>(

@@ -116,6 +116,10 @@ open class RepeatRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): RepeatRule<T> {
+        return RepeatRule(rule.ignoreCallbacks(), range)
+    }
 }
 
 private class DebugRepeatRule<T : Any>(

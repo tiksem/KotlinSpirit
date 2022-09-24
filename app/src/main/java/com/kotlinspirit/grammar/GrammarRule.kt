@@ -1,6 +1,7 @@
 package com.kotlinspirit.grammar
 
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.core.isNotError
 import com.kotlinspirit.debug.DebugEngine
@@ -8,6 +9,7 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaultRepeat<T>() {
+    private var ruleForParse: Rule<*>? = null
     private val stack = arrayListOf(grammar)
     private var stackSeek = 0
 
@@ -27,11 +29,18 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
         stackSeek--
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
-        val grammar = pullGrammar()
-        return grammar.initRule().parse(seek, string).also {
-            returnGrammar(grammar)
+    private fun initRuleForParse(): Rule<*> {
+        var r = ruleForParse
+        if (r == null) {
+            r = grammar.initRule().ignoreCallbacks()
+            ruleForParse = r
         }
+
+        return r
+    }
+
+    override fun parse(seek: Int, string: CharSequence): Long {
+        return initRuleForParse().parse(seek, string)
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
@@ -65,6 +74,10 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
 
     override fun isThreadSafe(): Boolean {
         return false
+    }
+
+    override fun ignoreCallbacks(): GrammarRule<T> {
+        return this
     }
 }
 

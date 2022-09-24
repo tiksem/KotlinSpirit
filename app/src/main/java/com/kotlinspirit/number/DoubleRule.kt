@@ -1,7 +1,6 @@
 package com.kotlinspirit.number
 
-import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
@@ -612,6 +611,10 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
     }
 
     override fun clone(): DoubleRule {
+        return this
+    }
+
+    override fun ignoreCallbacks(): DoubleRule {
         return this
     }
 

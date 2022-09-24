@@ -161,11 +161,11 @@ abstract class Rule<T : Any> {
         return FailIfRule(this, predicate)
     }
 
+    abstract fun ignoreCallbacks(): Rule<T>
+
     abstract fun clone(): Rule<T>
 
     abstract val debugNameShouldBeWrapped: Boolean
-    open val isGrammar: Boolean
-        get() = false
 
     fun compile(): Parser<T> {
         val parser = if (isThreadSafe()) {

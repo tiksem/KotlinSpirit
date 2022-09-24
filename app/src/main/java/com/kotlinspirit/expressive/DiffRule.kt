@@ -120,6 +120,10 @@ open class DiffRuleWithDefaultRepeat<T : Any>(
     override fun isThreadSafe(): Boolean {
         return main.isThreadSafe() && diff.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): DiffRuleWithDefaultRepeat<T> {
+        return DiffRuleWithDefaultRepeat(main.ignoreCallbacks(), diff.ignoreCallbacks())
+    }
 }
 
 private class DebugDiffRuleWithDefaultRepeat<T : Any>(
@@ -185,6 +189,10 @@ open class CharDiffRule(
 
     override fun isThreadSafe(): Boolean {
         return main.isThreadSafe() && diff.isThreadSafe()
+    }
+
+    override fun ignoreCallbacks(): CharDiffRule {
+        return CharDiffRule(main.ignoreCallbacks(), diff.ignoreCallbacks())
     }
 }
 

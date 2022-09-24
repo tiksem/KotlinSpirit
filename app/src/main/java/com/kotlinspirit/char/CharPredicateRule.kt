@@ -1,10 +1,9 @@
 package com.kotlinspirit.char
 
-import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.CharPredicateResultRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
@@ -191,6 +190,10 @@ open class CharPredicateRule : CharRule {
 
     override fun isThreadSafe(): Boolean {
         return true
+    }
+
+    override fun ignoreCallbacks(): CharPredicateRule {
+        return this
     }
 }
 

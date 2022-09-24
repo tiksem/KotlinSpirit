@@ -1,6 +1,5 @@
 package com.kotlinspirit.core
 
-import com.kotlinspirit.*
 import com.kotlinspirit.char.*
 import com.kotlinspirit.char.CharPredicateData
 import com.kotlinspirit.char.CharPredicates

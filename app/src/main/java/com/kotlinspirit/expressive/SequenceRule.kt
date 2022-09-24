@@ -72,6 +72,10 @@ open class SequenceRule(
     override fun isThreadSafe(): Boolean {
         return a.isThreadSafe() && b.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): Rule<CharSequence> {
+        return SequenceRule(a.ignoreCallbacks(), b.ignoreCallbacks())
+    }
 }
 
 private class DebugSequenceRule(

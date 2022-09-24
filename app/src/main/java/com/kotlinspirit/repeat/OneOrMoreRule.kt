@@ -97,6 +97,10 @@ open class OneOrMoreRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): OneOrMoreRule<T> {
+        return OneOrMoreRule(rule.ignoreCallbacks())
+    }
 }
 
 private class DebugOneOrMoreRule<T : Any>(

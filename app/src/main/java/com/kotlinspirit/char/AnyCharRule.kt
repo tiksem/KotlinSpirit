@@ -48,6 +48,10 @@ open class CharResultRule(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): CharRule {
+        return rule.ignoreCallbacks() as CharRule
+    }
 }
 
 abstract class CharRule : Rule<Char>() {
@@ -172,6 +176,10 @@ open class AnyCharRule : CharRule() {
 
     override fun isThreadSafe(): Boolean {
         return true
+    }
+
+    override fun ignoreCallbacks(): AnyCharRule {
+        return this
     }
 }
 

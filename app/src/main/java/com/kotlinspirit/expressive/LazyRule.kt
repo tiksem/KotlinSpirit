@@ -70,6 +70,12 @@ class LazyCharPredicateRule(
         return this
     }
 
+    override fun ignoreCallbacks(): LazyCharPredicateRule {
+        return LazyCharPredicateRule {
+            ruleProvider().ignoreCallbacks() as CharPredicateRule
+        }
+    }
+
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
@@ -105,6 +111,12 @@ open class LazyRule<T : Any>(
 
     override fun clone(): LazyRule<T> {
         return this
+    }
+
+    override fun ignoreCallbacks(): LazyRule<T> {
+        return LazyRule {
+            ruleProvider().ignoreCallbacks() as RuleWithDefaultRepeat<T>
+        }
     }
 
     override val debugNameShouldBeWrapped: Boolean

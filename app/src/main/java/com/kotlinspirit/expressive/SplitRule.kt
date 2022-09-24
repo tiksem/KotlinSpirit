@@ -143,6 +143,10 @@ open class SplitRule<T : Any>(
         }
     }
 
+    override fun ignoreCallbacks(): SplitRule<T> {
+        return SplitRule(r.ignoreCallbacks(), divider.ignoreCallbacks(), range)
+    }
+
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 

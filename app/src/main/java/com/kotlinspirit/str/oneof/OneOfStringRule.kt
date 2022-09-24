@@ -3,6 +3,7 @@ package com.kotlinspirit.str.oneof
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
@@ -109,6 +110,10 @@ open class OneOfStringRule internal constructor(private val strings: List<CharSe
 
     override fun isThreadSafe(): Boolean {
         return false
+    }
+
+    override fun ignoreCallbacks(): OneOfStringRule {
+        return this
     }
 }
 

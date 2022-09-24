@@ -1,7 +1,6 @@
 package com.kotlinspirit.number
 
-import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
@@ -603,6 +602,10 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
     }
 
     override fun clone(): FloatRule {
+        return this
+    }
+
+    override fun ignoreCallbacks(): FloatRule {
         return this
     }
 

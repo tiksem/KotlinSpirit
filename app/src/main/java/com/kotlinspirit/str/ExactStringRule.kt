@@ -1,10 +1,9 @@
 package com.kotlinspirit.str
 
-import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
@@ -81,6 +80,10 @@ open class ExactStringRule(
 
     override fun isThreadSafe(): Boolean {
         return true
+    }
+
+    override fun ignoreCallbacks(): ExactStringRule {
+        return this
     }
 }
 

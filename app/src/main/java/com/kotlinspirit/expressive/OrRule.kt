@@ -74,6 +74,10 @@ open class OrRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return a.isThreadSafe() && b.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): OrRule<T> {
+        return OrRule(a.ignoreCallbacks(), b.ignoreCallbacks())
+    }
 }
 
 private class DebugOrRule<T : Any>(

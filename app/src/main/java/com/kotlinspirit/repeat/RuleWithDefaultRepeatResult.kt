@@ -42,6 +42,10 @@ open class RuleWithDefaultRepeatResult<T : Any>(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): RuleWithDefaultRepeat<T> {
+        return rule.ignoreCallbacks() as RuleWithDefaultRepeat<T>
+    }
 }
 
 private class DebugRuleWithDefaultRepeatResult<T : Any>(
@@ -94,6 +98,10 @@ open class CharPredicateResultRule(
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
+    }
+
+    override fun ignoreCallbacks(): CharPredicateRule {
+        return rule.ignoreCallbacks() as CharPredicateRule
     }
 }
 

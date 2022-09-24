@@ -92,6 +92,10 @@ open class ExpectationRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return a.isThreadSafe() && b.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): ExpectationRule<T> {
+        return ExpectationRule(a.ignoreCallbacks(), b.ignoreCallbacks())
+    }
 }
 
 private class DebugExpectationRule<T : Any>(

@@ -80,6 +80,10 @@ open class ZeroOrMoreRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
+
+    override fun ignoreCallbacks(): ZeroOrMoreRule<T> {
+        return ZeroOrMoreRule(rule.ignoreCallbacks())
+    }
 }
 
 private class DebugZeroOrMoreRule<T : Any>(
