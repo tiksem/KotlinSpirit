@@ -44,7 +44,7 @@ open class OneOrMoreRule<T : Any>(
         val itemResult = ParseResult<T>()
         while (i < string.length) {
             val seekBefore = i
-            rule.parseWithResult(seek, string, itemResult)
+            rule.parseWithResult(i, string, itemResult)
             val stepResult = itemResult.parseResult
             if (stepResult.getParseCode().isError()) {
                 if (list.isNotEmpty()) {

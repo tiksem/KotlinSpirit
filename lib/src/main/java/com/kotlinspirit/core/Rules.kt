@@ -116,7 +116,7 @@ object Rules {
     val double get() = DoubleRule()
     val float get() = FloatRule()
 
-    fun oneOf(vararg strings: CharSequence): Rule<CharSequence> {
+    fun oneOf(vararg strings: CharSequence): RuleWithDefaultRepeat<CharSequence> {
         val withoutEmptyStrings = strings.filter {
             it.isNotEmpty()
         }
