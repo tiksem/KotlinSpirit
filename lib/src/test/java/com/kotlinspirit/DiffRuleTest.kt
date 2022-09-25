@@ -71,4 +71,19 @@ class DiffRuleTest {
         Assert.assertEquals(r.compile().tryParse("345634Hello"), "345634Hello".length)
         Assert.assertEquals(r.compile().tryParse(" Hello 3445 Hi"), " Hello 3445 ".length)
     }
+
+    @Test
+    fun isNotComment() {
+        val comment = str("/*") + (char - "*/").repeat() + str("*/")
+        val notComment = +(char - comment)
+        val p = notComment.compile()
+        Assert.assertEquals(p.tryParse("12345"), "12345".length)
+        Assert.assertEquals(p.tryParse("12345/*"), "12345/*".length)
+        Assert.assertEquals(p.tryParse("/*"), "/*".length)
+        Assert.assertEquals(p.tryParse("/*edssdds*"), "/*edssdds*".length)
+        Assert.assertEquals(p.tryParse("abcd/*edssdds*/**/"), "abcd".length)
+        Assert.assertEquals(p.tryParse("abcd/edssdds**4/**/"), "abcd*edssdds**4".length)
+        Assert.assertEquals(p.tryParse("/*3434*/"), null)
+        Assert.assertEquals(p.tryParse("/**/"), null)
+    }
 }

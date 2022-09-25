@@ -15,7 +15,7 @@ open class OneOrMoreRule<T : Any>(
         var success = false
         while (i < string.length) {
             val seekBefore = i
-            val ruleRes = rule.parse(seek, string)
+            val ruleRes = rule.parse(i, string)
             if (ruleRes.getParseCode().isError()) {
                 return if (success) {
                     createComplete(seekBefore)
