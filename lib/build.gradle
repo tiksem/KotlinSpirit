@@ -1,0 +1,16 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+
+dependencies {
+    implementation files('libs/fastutil-core-8.5.8.jar')
+    implementation 'com.beust:klaxon:5.5'
+    implementation 'org.json:json:20211205'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20180813'
+    testImplementation 'org.skyscreamer:jsonassert:1.2.3'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

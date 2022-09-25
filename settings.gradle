@@ -15,5 +15,15 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+buildscript {
+    ext.kotlin_version = '1.7.10'
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
 rootProject.name = "KotlinSpirit"
-include ':app'
+include ':lib'

@@ -12,6 +12,7 @@ internal abstract class BaseParser<T : Any>(protected val originRule: Rule<T>) :
         rule.parseWithResult(0, string, result)
         val stepResult = result.parseResult
         if (stepResult.getParseCode().isError()) {
+            DebugEngine.root?.toString()
             throw ParseException(
                 stepResult, string,
                 if (rule is DebugRule) DebugEngine.root else null
