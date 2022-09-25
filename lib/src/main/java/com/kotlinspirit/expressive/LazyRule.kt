@@ -38,10 +38,6 @@ abstract class BaseLazyRule<T : Any>(
         return initRule().hasMatch(seek, string)
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return initRule().noParse(seek, string)
-    }
-
     override fun isThreadSafe(): Boolean {
         return false
     }

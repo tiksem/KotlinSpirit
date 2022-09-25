@@ -120,29 +120,6 @@ open class SplitRule<T : Any>(
         return parse(seek, string).getParseCode().isNotError()
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        if (range.first == 0) {
-            return -seek-1
-        }
-
-        val noParse = r.noParse(seek, string)
-        if (noParse < 0) {
-            return noParse
-        }
-
-        val res = parseSaveSeekOnError(seek, string)
-        if (res.getParseCode().isError()) {
-            val noRes = noParse(res.getSeek(), string)
-            return if (noRes < 0) {
-                res.getSeek()
-            } else {
-                noRes
-            }
-        } else {
-            return noParse
-        }
-    }
-
     override fun ignoreCallbacks(): SplitRule<T> {
         return SplitRule(r.ignoreCallbacks(), divider.ignoreCallbacks(), range)
     }

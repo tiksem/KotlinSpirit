@@ -8,6 +8,8 @@ import com.kotlinspirit.core.getParseCode
 import org.junit.Assert
 import org.junit.Test
 
+private val noDouble = (!double).compile()
+
 class DoubleTest {
     @Test
     fun testInteger() {
@@ -361,44 +363,32 @@ class DoubleTest {
 
     @Test
     fun noParseTest() {
-        val str = "......."
-        Assert.assertEquals(double.noParse(0, str), str.length)
-    }
-
-    @Test
-    fun noParseTest2() {
-        val str = ".......9.0"
-        Assert.assertEquals(double.noParse(0, str), str.length - 4)
+        Assert.assertEquals(noDouble.tryParse("......."), 1)
     }
 
     @Test
     fun noParseTest3() {
-        val str = "abcdegfrt9.0"
-        Assert.assertEquals(double.noParse(0, str), str.length - 3)
+        Assert.assertEquals(noDouble.tryParse("abcdegfrt9.0"), 1)
     }
 
     @Test
     fun noParseTest4() {
-        val str = "+__fff"
-        Assert.assertEquals(double.noParse(0, str), str.length)
+        Assert.assertEquals(noDouble.tryParse("+__fff.0"), 1)
     }
 
 
     @Test
     fun noParseTest5() {
-        val str = "-__fff"
-        Assert.assertEquals(double.noParse(0, str), str.length)
+        Assert.assertEquals(noDouble.tryParse("-__fff"), 1)
     }
 
     @Test
     fun noParseTest6() {
-        val str = "+.er4"
-        Assert.assertEquals(double.noParse(0, str), str.length - 1)
+        Assert.assertEquals(noDouble.tryParse("+.er4"), 1)
     }
 
     @Test
     fun noParseTest7() {
-        val str = "-.er4"
-        Assert.assertEquals(double.noParse(0, str), str.length - 1)
+        Assert.assertEquals(noDouble.tryParse("-.er4"), 1)
     }
 }

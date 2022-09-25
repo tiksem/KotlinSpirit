@@ -10,6 +10,7 @@ import com.kotlinspirit.number.FloatRule
 import com.kotlinspirit.number.IntRule
 import com.kotlinspirit.number.LongRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
+import com.kotlinspirit.str.EmptyStringRule
 import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.str.StringCharPredicateRule
 import com.kotlinspirit.str.StringOneOrMoreCharPredicateRule
@@ -103,7 +104,11 @@ object Rules {
     }
 
     fun str(string: String): ExactStringRule {
-        return ExactStringRule(string)
+        return if (string.isEmpty()) {
+            EmptyStringRule()
+        } else {
+            ExactStringRule(string)
+        }
     }
 
     fun str(predicate: (Char) -> Boolean): StringCharPredicateRule {

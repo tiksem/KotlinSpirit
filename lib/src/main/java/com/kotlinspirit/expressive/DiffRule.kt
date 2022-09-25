@@ -47,32 +47,6 @@ private fun internalHasMatch(
     return main.hasMatch(seek, string) && !diff.hasMatch(seek, string)
 }
 
-private fun internalNoParse(seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>): Int {
-    var i = seek
-    val length = string.length
-    while (true) {
-        val diffRes = diff.parse(i, string)
-        if (diffRes.getParseCode().isNotError()) {
-            i = diffRes.getSeek()
-        } else {
-            val mainRes = main.noParse(i, string)
-            if (mainRes >= 0) {
-                i = mainRes
-            } else {
-                return if (i == seek) {
-                    mainRes
-                } else {
-                    i
-                }
-            }
-        }
-
-        if (i >= length) {
-            return i
-        }
-    }
-}
-
 private fun generateDebugName(main: Rule<*>, diff: Rule<*>): String {
     val mainName = main.debugNameWrapIfNeed
     val diffName = diff.debugNameWrapIfNeed
@@ -93,10 +67,6 @@ open class DiffRuleWithDefaultRepeat<T : Any>(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return internalHasMatch(seek, string, main, diff)
-    }
-
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return internalNoParse(seek, string, main, diff)
     }
 
     override fun clone(): DiffRuleWithDefaultRepeat<T> {
@@ -163,10 +133,6 @@ open class CharDiffRule(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return internalHasMatch(seek, string, main, diff)
-    }
-
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return internalNoParse(seek, string, main, diff)
     }
 
     override val debugNameShouldBeWrapped: Boolean

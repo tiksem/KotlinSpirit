@@ -40,10 +40,6 @@ open class OptionalRule<T : Any>(
         return true
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return -seek - 1
-    }
-
     override fun clone(): OptionalRule<T> {
         return OptionalRule(rule)
     }

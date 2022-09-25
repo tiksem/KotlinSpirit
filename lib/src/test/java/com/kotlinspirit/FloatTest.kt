@@ -6,6 +6,8 @@ import com.kotlinspirit.core.createStepResult
 import org.junit.Assert
 import org.junit.Test
 
+private val noFloat = (!float).compile()
+
 class FloatTest {
     @Test
     fun testInteger() {
@@ -347,47 +349,35 @@ class FloatTest {
             )
         )
     }
-
+    
     @Test
     fun noParseTest() {
-        val str = "......."
-        Assert.assertEquals(float.noParse(0, str), str.length)
-    }
-
-    @Test
-    fun noParseTest2() {
-        val str = ".......9.0"
-        Assert.assertEquals(float.noParse(0, str), str.length - 4)
+        Assert.assertEquals(noFloat.tryParse("......."), 1)
     }
 
     @Test
     fun noParseTest3() {
-        val str = "abcdegfrt9.0"
-        Assert.assertEquals(float.noParse(0, str), str.length - 3)
+        Assert.assertEquals(noFloat.tryParse("abcdegfrt9.0"), 1)
     }
 
     @Test
     fun noParseTest4() {
-        val str = "+__fff"
-        Assert.assertEquals(float.noParse(0, str), str.length)
+        Assert.assertEquals(noFloat.tryParse("+__fff.0"), 1)
     }
 
 
     @Test
     fun noParseTest5() {
-        val str = "-__fff"
-        Assert.assertEquals(float.noParse(0, str), str.length)
+        Assert.assertEquals(noFloat.tryParse("-__fff"), 1)
     }
 
     @Test
     fun noParseTest6() {
-        val str = "+.er4"
-        Assert.assertEquals(float.noParse(0, str), str.length - 1)
+        Assert.assertEquals(noFloat.tryParse("+.er4"), 1)
     }
 
     @Test
     fun noParseTest7() {
-        val str = "-.er4"
-        Assert.assertEquals(float.noParse(0, str), str.length - 1)
+        Assert.assertEquals(noFloat.tryParse("-.er4"), 1)
     }
 }

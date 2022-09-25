@@ -36,10 +36,6 @@ open class StringRuleWrapper(
         return rule.hasMatch(seek, string)
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return rule.noParse(seek, string)
-    }
-
     override fun clone(): StringRuleWrapper {
         return StringRuleWrapper(rule = rule.clone())
     }

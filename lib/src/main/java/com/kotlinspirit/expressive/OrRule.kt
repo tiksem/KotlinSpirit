@@ -37,20 +37,6 @@ open class OrRule<T : Any>(
         return a.hasMatch(seek, string) || b.hasMatch(seek, string)
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        val aResult = a.noParse(seek, string)
-        if (aResult < 0) {
-            return aResult
-        }
-
-        val bResult = b.noParse(seek, string)
-        if (bResult < 0) {
-            return bResult
-        }
-
-        return min(aResult, bResult)
-    }
-
     override fun repeat(): Rule<List<T>> {
         return ZeroOrMoreRule(this)
     }

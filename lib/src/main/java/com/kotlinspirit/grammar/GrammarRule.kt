@@ -45,20 +45,19 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         val grammar = pullGrammar()
-        val parseResult = grammar.initRule().parse(seek, string)
-        result.parseResult = parseResult
-        if (parseResult.getParseCode().isNotError()) {
-            result.data = grammar.result
+        try {
+            val parseResult = grammar.initRule().parse(seek, string)
+            result.parseResult = parseResult
+            if (parseResult.getParseCode().isNotError()) {
+                result.data = grammar.result
+            }
+        } finally {
+            returnGrammar(grammar)
         }
-        returnGrammar(grammar)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return grammar.initRule().hasMatch(seek, string)
-    }
-
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return grammar.initRule().noParse(seek, string)
     }
 
     override val debugNameShouldBeWrapped: Boolean

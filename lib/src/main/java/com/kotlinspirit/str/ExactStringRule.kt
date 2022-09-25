@@ -12,51 +12,89 @@ open class ExactStringRule(
     internal val string: String
 ) : RuleWithDefaultRepeat<CharSequence>() {
     override fun parse(seek: Int, string: CharSequence): Long {
-        val str = string.subSequence(seek, string.length)
-        return if (str.startsWith(this.string)) {
-            createComplete(
-                seek = seek + this.string.length
-            )
-        } else {
-            createStepResult(
+        if (seek >= string.length) {
+            return createStepResult(
                 seek = seek,
-                parseCode = ParseCode.STRING_DOES_NOT_MATCH
+                ParseCode.EOF
             )
         }
+
+        val self = this.string
+        if (seek + self.length > string.length) {
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
+            )
+        }
+
+        var i = seek
+        val end = self.length + seek
+        do {
+            if (self[i - seek] != string[i]) {
+                return createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.STRING_DOES_NOT_MATCH
+                )
+            }
+            i++
+        } while (i < end)
+
+        return createComplete(end)
     }
 
     override fun parseWithResult(
         seek: Int, string: CharSequence, result: ParseResult<CharSequence>
     ) {
-        val str = string.subSequence(seek, string.length)
-        if (str.startsWith(this.string)) {
-            result.parseResult = createComplete(
-                seek = seek + this.string.length
-            )
-            result.data = string.subSequence(seek, this.string.length + seek)
-        } else {
+        if (seek >= string.length) {
             result.parseResult = createStepResult(
                 seek = seek,
-                parseCode = ParseCode.STRING_DOES_NOT_MATCH
+                ParseCode.EOF
             )
+            return
         }
+
+        val self = this.string
+        if (seek + self.length > string.length) {
+            result.parseResult = createStepResult(
+                seek = seek,
+                parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
+            )
+            return
+        }
+
+        var i = seek
+        val end = self.length + seek
+        do {
+            if (self[i - seek] != string[i]) {
+                result.parseResult = createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.STRING_DOES_NOT_MATCH
+                )
+                return
+            }
+            i++
+        } while (i < end)
+
+        result.parseResult = createComplete(end)
+        result.data = this.string
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return string.subSequence(seek, string.length).startsWith(this.string)
-    }
-
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        val findIndex = string.indexOf(this.string, seek)
-        return if (findIndex == seek) {
-            -seek - 1
-        } else {
-            if (findIndex < 0) {
-                string.length
-            } else {
-                findIndex
-            }
+        val self = this.string
+        if (seek + self.length > string.length) {
+            return false
         }
+
+        var i = seek
+        val end = string.length + seek
+        do {
+            if (self[i] != string[i]) {
+                return false
+            }
+            i++
+        } while (i < end)
+
+        return true
     }
 
     infix fun or(anotherRule: ExactStringRule): OneOfStringRule {
@@ -87,10 +125,48 @@ open class ExactStringRule(
     }
 }
 
+open class EmptyStringRule: ExactStringRule("") {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        return createComplete(seek)
+    }
+
+    override fun parseWithResult(
+        seek: Int,
+        string: CharSequence,
+        result: ParseResult<CharSequence>
+    ) {
+        result.parseResult = createComplete(seek)
+        result.data = ""
+    }
+
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        return true
+    }
+
+    override fun debug(name: String?): ExactStringRule {
+        return DebugEmptyStringRule(name ?: "str()")
+    }
+}
+
 private class DebugExactStringRule(override val name: String, string: String) :
     ExactStringRule(string),
     DebugRule
 {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+}
+
+private class DebugEmptyStringRule(override val name: String) : EmptyStringRule(), DebugRule {
     override fun parse(seek: Int, string: CharSequence): Long {
         DebugEngine.ruleParseStarted(this, seek)
         return super.parse(seek, string).also {

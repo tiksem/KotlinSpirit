@@ -45,25 +45,6 @@ open class StringCharPredicateRule(
         return true
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        var i = seek
-        val length = string.length
-        while (i < length) {
-            val c = string[i]
-            if (predicate(c)) {
-                break
-            }
-
-            i++
-        }
-
-        return if (i == seek) {
-            -seek - 1
-        } else {
-            i
-        }
-    }
-
     override fun clone(): StringCharPredicateRule {
         return this
     }

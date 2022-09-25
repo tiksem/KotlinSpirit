@@ -60,9 +60,7 @@ class ParseResult<T> {
 abstract class Rule<T : Any> {
     internal abstract fun parse(seek: Int, string: CharSequence): Long
     internal abstract fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
-
     internal abstract fun hasMatch(seek: Int, string: CharSequence): Boolean
-    internal abstract fun noParse(seek: Int, string: CharSequence): Int
 
     open operator fun not(): Rule<*> {
         return NoRule(this)

@@ -6,6 +6,7 @@ import com.kotlinspirit.core.isError
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
+import java.lang.IllegalStateException
 
 open class SequenceRule(
     protected val a: Rule<*>,
@@ -38,16 +39,6 @@ open class SequenceRule(
             false
         } else {
             b.hasMatch(aResult.getSeek(), string)
-        }
-    }
-
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        val aNoParseResult = a.noParse(seek, string)
-        return if (aNoParseResult < 0) {
-            val aParseResult = a.parse(seek, string)
-            b.noParse(aParseResult.getSeek(), string)
-        } else {
-            aNoParseResult
         }
     }
 

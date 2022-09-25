@@ -26,7 +26,7 @@ class FailIfTest {
         Assert.assertEquals(r.parse("1235").isError, false)
         Assert.assertEquals(r.parse("123").errorCode, ParseCode.NO_FAILED)
         Assert.assertEquals(r.parse("").isError, false)
-        Assert.assertEquals(r.tryParse("1235dsdds1235"), "1235dsdds1235".length)
-        Assert.assertEquals(r.tryParse("1235dsdds1235s4"), "1235dsdds1235s".length)
+        Assert.assertEquals(r.tryParse("1235dsdds1235"), 1)
+        Assert.assertEquals(r.tryParse("1235dsdds1235s4"), 1)
     }
 }

@@ -75,29 +75,6 @@ open class StringOneOrMoreCharPredicateRule(
         return seek < string.length && predicate(string[seek])
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        val length = string.length
-        if (seek >= length) {
-            return seek
-        }
-
-        var i = seek
-        do {
-            val c = string[i]
-            if (predicate(c)) {
-                return if (i == seek) {
-                    -i - 1
-                } else {
-                    i
-                }
-            }
-
-            i++
-        } while (i < length)
-
-        return i
-    }
-
     override fun clone(): StringOneOrMoreCharPredicateRule {
         return this
     }

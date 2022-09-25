@@ -80,10 +80,6 @@ open class RepeatRule<T : Any>(
         return true
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        throw UnsupportedOperationException()
-    }
-
     override fun not(): Rule<*> {
         return when {
             range.first <= 0 -> {

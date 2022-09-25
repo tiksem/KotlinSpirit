@@ -22,10 +22,6 @@ abstract class BaseRuleWithResult<T : Any>(
         }
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return noParse(seek, string)
-    }
-
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return rule.hasMatch(seek, string)
     }

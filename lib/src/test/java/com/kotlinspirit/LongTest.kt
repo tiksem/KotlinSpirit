@@ -56,10 +56,16 @@ class LongTest {
     @Test
     fun noLong() {
         val r = (!long).compile()
-        r.matchOrThrow("+dsds")
-        r.matchOrThrow("-dsdsds")
-        r.matchOrThrow("dsdsds")
-        r.matchOrThrow("-")
-        r.matchOrThrow("+")
+        Assert.assertEquals(r.matchesAtBeginning("+dsds"), true)
+        Assert.assertEquals(r.matchesAtBeginning("-dsdsds"), true)
+        Assert.assertEquals(r.matchesAtBeginning("dsdsds"), true)
+        Assert.assertEquals(r.matchesAtBeginning("-"), true)
+        Assert.assertEquals(r.matchesAtBeginning("+"), true)
+        Assert.assertEquals(r.matchesAtBeginning("+4"), false)
+        Assert.assertEquals(r.matchesAtBeginning("-0"), false)
+        Assert.assertEquals(r.matchesAtBeginning("0"), false)
+        Assert.assertEquals(r.matchesAtBeginning("0345"), true)
+        Assert.assertEquals(r.matchesAtBeginning("456"), false)
+        Assert.assertEquals(r.matchesAtBeginning(""), true)
     }
 }

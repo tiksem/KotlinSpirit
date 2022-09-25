@@ -1,6 +1,5 @@
 package com.kotlinspirit.char
 
-import com.kotlinspirit.*
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.core.ParseResult
@@ -56,14 +55,6 @@ open class ExactCharRule(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return string.length < seek && string[seek] == char
-    }
-
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return if (string[seek] != char) {
-            seek + 1
-        } else {
-            -seek - 1
-        }
     }
 
     override fun clone(): ExactCharRule {

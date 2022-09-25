@@ -126,14 +126,6 @@ open class AnyCharRule : CharRule() {
         return seek < string.length
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return if (seek < string.length) {
-            -seek - 1
-        } else {
-            seek
-        }
-    }
-
     override fun clone(): AnyCharRule {
         return this
     }

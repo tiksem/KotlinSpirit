@@ -48,39 +48,6 @@ open class FailIfRule<T : Any>(
         return parse(seek, string).getParseCode().isNotError()
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        val noParseResult = rule.noParse(seek, string)
-        if (noParseResult < 0) {
-            val result = ParseResult<T>()
-            rule.parseWithResult(seek, string, result)
-            if (result.isError) {
-                throw IllegalStateException("FailIfRule undefined behaviour")
-            }
-            val data = result.data ?: throw IllegalStateException("rule produces null, without error")
-            return if (failPredicate(data)) {
-                val r = noParse(result.seek, string)
-                if (r < 0) {
-                    result.seek
-                } else {
-                    r
-                }
-            } else {
-                noParseResult
-            }
-        } else {
-            return if (noParseResult == seek) {
-                seek
-            } else {
-                val r = noParse(noParseResult, string)
-                if (r < 0) {
-                    noParseResult
-                } else {
-                    r
-                }
-            }
-        }
-    }
-
     override fun failIf(predicate: (T) -> Boolean): FailIfRule<T> {
         return FailIfRule(rule = rule, failPredicate = {
             failPredicate(it) || predicate(it)

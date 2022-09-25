@@ -70,7 +70,14 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
             }
         } while (i < length)
 
-        return createComplete(i)
+        return if (successFlag) {
+            createComplete(i)
+        } else {
+            createStepResult(
+                seek = seek,
+                parseCode = ParseCode.INVALID_LONG
+            )
+        }
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Long>) {
@@ -146,8 +153,15 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
             }
         } while (i < length)
 
-        r.data = result * sign
-        r.parseResult = createComplete(i)
+        if (successFlag) {
+            r.data = result * sign
+            r.parseResult = createComplete(i)
+        } else {
+            r.parseResult = createStepResult(
+                seek = seek,
+                parseCode = ParseCode.INVALID_INT
+            )
+        }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -162,46 +176,6 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
         } else {
             char in '0'..'9'
         }
-    }
-
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        val length = string.length
-        if (seek >= length) {
-            return seek
-        }
-
-        var noSuccess = false
-        var i = seek
-        do {
-            val char = string[i]
-            when {
-                (char == '-' || char == '+') && !noSuccess -> {
-                    if (i < length - 1) {
-                        if (string[i + 1] in '0'..'9') {
-                            return -seek - 1
-                        } else {
-                            noSuccess = true
-                            i+=2
-                        }
-                    } else {
-                        return i + 1
-                    }
-                }
-                char in '0'..'9' -> {
-                    return if (noSuccess) {
-                        i
-                    } else {
-                        -i - 1
-                    }
-                }
-                else -> {
-                    noSuccess = true
-                    i++
-                }
-            }
-        } while (i < length)
-
-        return i
     }
 
     override fun clone(): LongRule {

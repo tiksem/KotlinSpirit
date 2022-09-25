@@ -57,25 +57,6 @@ open class ExpectationRule<T : Any>(
         return b.hasMatch(aResult.getSeek(), string)
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        val aResult = a.noParse(seek, string)
-        if (aResult < 0 || aResult >= string.length) {
-            return aResult
-        }
-
-        val aParseResult = a.parse(aResult, string)
-        if (aParseResult.getParseCode().isError()) {
-            throw IllegalStateException("Undefined behaviour, internal error")
-        }
-
-        val bParse = b.noParse(aParseResult.getSeek(), string)
-        return if (bParse > aResult) {
-            noParse(bParse, string)
-        } else {
-            aResult
-        }
-    }
-
     override fun clone(): ExpectationRule<T> {
         return ExpectationRule(a.clone(), b.clone())
     }

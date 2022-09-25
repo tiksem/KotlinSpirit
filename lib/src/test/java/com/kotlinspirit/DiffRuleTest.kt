@@ -65,11 +65,11 @@ class DiffRuleTest {
         val word = char('A'..'Z') + +char('a'..'z')
         val r = !(word - "Hello")
         Assert.assertEquals(r.compile().tryParse("Hi Yo Hello"), null)
-        Assert.assertEquals(r.compile().tryParse("Hello world!"), "Hello world!".length)
-        Assert.assertEquals(r.compile().tryParse("Hello World!"), "Hello ".length)
+        Assert.assertEquals(r.compile().tryParse("Hello world!"), 1)
+        Assert.assertEquals(r.compile().tryParse("Hello World!"), 1)
         Assert.assertEquals(r.compile().tryParse("Hi"), null)
-        Assert.assertEquals(r.compile().tryParse("345634Hello"), "345634Hello".length)
-        Assert.assertEquals(r.compile().tryParse(" Hello 3445 Hi"), " Hello 3445 ".length)
+        Assert.assertEquals(r.compile().tryParse("345634Hello"), 1)
+        Assert.assertEquals(r.compile().tryParse(" Hello 3445 Hi"), 1)
     }
 
     @Test

@@ -526,49 +526,6 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
         }
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        val length = string.length
-        if (seek >= length) {
-            return seek
-        }
-
-        var i = seek
-        do {
-            val c = string[i]
-            if (c.isDigit()) {
-                return if (i == seek) {
-                    -seek - 1
-                } else {
-                    i
-                }
-            } else if(c == '-' || c == '+') {
-                if (i + 1 < length) {
-                    if (string[i + 1].isDigit()) {
-                        return i
-                    } else {
-                        i++
-                    }
-                } else {
-                    return i + 1
-                }
-            } else if (c == '.') {
-                if (i + 1 < length) {
-                    if (string[i + 1].isDigit()) {
-                        return i
-                    } else {
-                        i++
-                    }
-                } else {
-                    return i + 1
-                }
-            } else {
-                i++
-            }
-        } while (i < length)
-
-        return i
-    }
-
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         val length = string.length
         if (seek >= length) {

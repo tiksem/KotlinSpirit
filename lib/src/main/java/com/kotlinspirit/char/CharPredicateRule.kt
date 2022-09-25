@@ -137,18 +137,6 @@ open class CharPredicateRule : CharRule {
         return StringOneOrMoreCharPredicateRule(predicate)
     }
 
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        if (seek >= string.length) {
-            return -seek - 1
-        }
-
-        return if (!predicate(string[seek])) {
-            seek + 1
-        } else {
-            -seek - 1
-        }
-    }
-
     override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {
         return CharPredicateResultRule(rule = this, callback)
     }

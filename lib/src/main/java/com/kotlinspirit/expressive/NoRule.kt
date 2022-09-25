@@ -1,5 +1,6 @@
 package com.kotlinspirit.expressive
 
+import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
@@ -9,48 +10,43 @@ import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 open class NoRule(
     protected val rule: Rule<*>
-) : RuleWithDefaultRepeat<CharSequence>() {
+) : CharRule() {
     override fun parse(seek: Int, string: CharSequence): Long {
-        return rule.noParse(seek, string).let {
-            if (it < 0) {
-                return createStepResult(
-                    seek = -it - 1,
-                    parseCode = ParseCode.NO_FAILED
-                )
-            } else {
-                createComplete(it)
-            }
+        val rResult = rule.parse(seek, string)
+        val parseCode = rResult.getParseCode()
+        return when (parseCode) {
+            ParseCode.COMPLETE -> createStepResult(
+                seek = seek,
+                parseCode = ParseCode.NO_FAILED
+            )
+            ParseCode.EOF -> createComplete(string.length)
+            else -> createComplete(seek + 1)
         }
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
-        val parseResult = rule.noParse(seek, string)
-        if (parseResult >= 0) {
-            result.data = string.subSequence(seek, parseResult)
-            result.parseResult = createStepResult(
-                seek = parseResult,
-                parseCode = ParseCode.COMPLETE
-            )
-        } else {
-            result.parseResult = createStepResult(
-                seek = -parseResult - 1,
-                parseCode = ParseCode.NO_FAILED
-            )
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        val rResult = rule.parse(seek, string)
+        val parseCode = rResult.getParseCode()
+        when (parseCode) {
+            ParseCode.COMPLETE -> {
+                result.parseResult = createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.NO_FAILED
+                )
+            }
+            ParseCode.EOF -> {
+                result.parseResult = createComplete(seek)
+                result.data = 0.toChar()
+            }
+            else -> {
+                result.parseResult = createComplete(seek + 1)
+                result.data = string[seek]
+            }
         }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return !rule.hasMatch(seek, string)
-    }
-
-    override fun noParse(seek: Int, string: CharSequence): Int {
-        return rule.parse(seek, string).let {
-            if (it.getParseCode().isNotError()) {
-                it.getSeek()
-            } else {
-                -it.getSeek() - 1
-            }
-        }
+        return rule.parse(seek, string).getParseCode().isError()
     }
 
     override fun clone(): NoRule {
@@ -89,7 +85,7 @@ private class DebugNoRule(
     }
 
     override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<CharSequence>
+        seek: Int, string: CharSequence, result: ParseResult<Char>
     ) {
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, result)
