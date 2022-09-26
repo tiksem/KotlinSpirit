@@ -47,10 +47,13 @@ class QuotedRuleTest {
     @Test
     fun quotedIntSplit() {
         val r = (int % ',').quoted('[', ']').compile()
+        val str = "[123,45,1234,-23]"
+        val res = r.parseWithResult(str)
         Assert.assertArrayEquals(
-            r.parseGetResultOrThrow("[123,45,1234,-23]").toTypedArray(),
+            res.data!!.toTypedArray(),
             arrayOf(123,45,1234,-23)
         )
+        Assert.assertEquals(res.seek, str.length)
     }
 
     @Test
@@ -58,10 +61,13 @@ class QuotedRuleTest {
         val skipper = space.repeat()
         val divider = char(',').quoted(skipper)
         val r = (int % divider).quoted(skipper + '[' + skipper, skipper + ']' + skipper).compile()
+        val str = "  [  123, 45,   1234,  -23   ] "
+        val res = r.parseWithResult(str)
         Assert.assertArrayEquals(
-            r.parseGetResultOrThrow("  [  123, 45,   1234,  -23   ] ").toTypedArray(),
+            res.data!!.toTypedArray(),
             arrayOf(123,45,1234,-23)
         )
+        Assert.assertEquals(res.seek, str.length)
     }
 
     @Test
@@ -69,18 +75,24 @@ class QuotedRuleTest {
         val skipper = space.repeat()
         val divider = char(',').quoted(skipper)
         val r = ((int or word).asString() % divider).quoted(skipper + '[' + skipper, skipper + ']' + skipper).compile()
+        val str = "  [  123, Julia,   1234,  Mordor   ] "
+        val res = r.parseWithResult(str)
         Assert.assertArrayEquals(
-            r.parseGetResultOrThrow("  [  123, Julia,   1234,  Mordor   ] ").toTypedArray(),
+            res.data!!.toTypedArray(),
             arrayOf("123","Julia","1234","Mordor")
         )
+        Assert.assertEquals(res.seek, str.length)
     }
 
     @Test
     fun quotedInsideQuotedSplit() {
         val r = (int.quoted(word).asString() % word.quoted(int)).compile()
+        val str = "Julia123Radon12Abdul-456Anton234Simon"
+        val res = r.parseWithResult(str)
         Assert.assertArrayEquals(
-            r.parseGetResultOrThrow("Julia123Radon12Abdul-456Anton234Simon").toTypedArray(),
+            res.data!!.toTypedArray(),
             arrayOf("Julia123Radon", "Anton234Simon")
         )
+        Assert.assertEquals(res.seek, str.length)
     }
 }
