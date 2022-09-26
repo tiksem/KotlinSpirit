@@ -3,12 +3,14 @@ package com.kotlinspirit.quoted
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.core.isError
+import com.kotlinspirit.debug.DebugEngine
+import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class QuotedRule<T : Any>(
-    private val main: Rule<T>,
-    private val left: Rule<*>,
-    private val right: Rule<*>
+open class QuotedRule<T : Any>(
+    protected val main: Rule<T>,
+    protected val left: Rule<*>,
+    protected val right: Rule<*>
 ) : RuleWithDefaultRepeat<T>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val l = left.parse(seek, string)
@@ -33,9 +35,11 @@ class QuotedRule<T : Any>(
             return
         }
         val r = right.parse(result.seek, string)
+        result.parseResult = r
         if (r.getParseCode().isError()) {
-            result.parseResult = r
             result.data = null
+        } else {
+            result.parseResult
         }
     }
 
@@ -56,17 +60,50 @@ class QuotedRule<T : Any>(
     }
 
     override val debugNameShouldBeWrapped: Boolean
-        get() = TODO("Not yet implemented")
+        get() = true
 
     override fun isThreadSafe(): Boolean {
-        TODO("Not yet implemented")
+        return main.isThreadSafe() && left.isThreadSafe() && right.isThreadSafe()
     }
 
-    override fun clone(): RuleWithDefaultRepeat<T> {
-        TODO("Not yet implemented")
+    override fun clone(): QuotedRule<T> {
+        return QuotedRule(main.clone(), left.clone(), right.clone())
     }
 
     override fun debug(name: String?): RuleWithDefaultRepeat<T> {
-        TODO("Not yet implemented")
+        val main = main.internalDebug()
+        val left = left.internalDebug()
+        val right = right.internalDebug()
+
+        val n = name ?: arrayOf(
+            left.debugNameWrapIfNeed,
+            main.debugNameWrapIfNeed,
+            right.debugNameWrapIfNeed
+        ).joinToString(" + ")
+        return DebugQuotedRule(n, main, left, right)
+    }
+}
+
+private class DebugQuotedRule<T : Any>(
+    override val name: String,
+    main: Rule<T>,
+    left: Rule<*>,
+    right: Rule<*>
+): QuotedRule<T>(main, left, right), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
+    }
+
+    override fun clone(): QuotedRule<T> {
+        return DebugQuotedRule(name, main.clone(), left.clone(), right.clone())
     }
 }

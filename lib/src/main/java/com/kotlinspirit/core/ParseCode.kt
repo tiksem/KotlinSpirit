@@ -20,6 +20,7 @@ object ParseCode {
     const val FAIL_PREDICATE = 16
     const val EXPECTATION_FAILED = 17
     const val SPLIT_NOT_ENOUGH_DATA = 18
+    const val AFTER_FAILED = 19
 }
 
 internal inline fun Int.isError(): Boolean {

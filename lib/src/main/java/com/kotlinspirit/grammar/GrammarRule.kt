@@ -68,7 +68,14 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
     }
 
     override fun debug(name: String?): GrammarRule<T> {
-        return DebugGrammarRule(name ?: grammar.name, grammar)
+        return DebugGrammarRule(name ?: grammar.name, object : Grammar<T>() {
+            override val result: T
+                get() = grammar.result
+
+            override fun defineRule(): Rule<*> {
+                return grammar.defineRule().internalDebug()
+            }
+        })
     }
 
     override fun isThreadSafe(): Boolean {

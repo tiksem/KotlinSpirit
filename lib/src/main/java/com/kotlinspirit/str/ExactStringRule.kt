@@ -101,7 +101,7 @@ open class ExactStringRule(
         return OneOfStringRule(listOf(string, anotherRule.string))
     }
 
-    infix fun or(string: String): OneOfStringRule {
+    override infix fun or(string: String): OneOfStringRule {
         return OneOfStringRule(listOf(this.string, string))
     }
 

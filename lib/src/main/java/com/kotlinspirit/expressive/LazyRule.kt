@@ -4,6 +4,8 @@ import com.kotlinspirit.char.CharPredicateRule
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.BaseRuleWithResult
+import com.kotlinspirit.debug.DebugEngine
+import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.repeat.RuleWithDefaultRepeatResult
 import com.kotlinspirit.str.StringCharPredicateRangeRule
@@ -119,10 +121,29 @@ open class LazyRule<T : Any>(
         get() = true
 
     override fun debug(name: String?): LazyRule<T> {
-        return LazyRule(
+        return DebugLazyRule(
+            name = name ?: "lazy",
             ruleProvider = {
-                ruleProvider().debug(name ?: "lazy") as RuleWithDefaultRepeat<T>
+                ruleProvider().internalDebug() as RuleWithDefaultRepeat<T>
             }
         )
+    }
+}
+
+private class DebugLazyRule<T : Any>(
+    override val name: String,
+    ruleProvider: () -> RuleWithDefaultRepeat<T>
+): LazyRule<T>(ruleProvider), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, result)
+        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

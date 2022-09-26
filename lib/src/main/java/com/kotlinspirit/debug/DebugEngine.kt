@@ -7,6 +7,7 @@ import com.kotlinspirit.core.parseCodeToString
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.IllegalStateException
+import java.lang.RuntimeException
 import java.util.concurrent.ConcurrentHashMap
 
 private const val DEBUG_MAX_TOKEN_LENGTH = 20
@@ -16,7 +17,7 @@ class RuleDebugTreeNode(
     val string: CharSequence
 ) {
     val name: String
-        get() = (rule as? DebugRule)?.name ?: "error"
+        get() = (rule as? DebugRule)?.name ?: throw RuntimeException()
     var startSeek = -1
         internal set
     var endSeek = -1

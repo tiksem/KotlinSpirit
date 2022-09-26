@@ -8,7 +8,9 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.ext.containsAny
 import com.kotlinspirit.ext.quoteIf
 import com.kotlinspirit.expressive.*
+import com.kotlinspirit.quoted.QuotedRule
 import com.kotlinspirit.str.ExactStringRule
+import java.lang.RuntimeException
 
 private val DEFAULT_STEP_RESULT = createStepResult(
     seek = 0,
@@ -73,6 +75,10 @@ abstract class Rule<T : Any> {
     infix fun or(anotherRule: Rule<T>): OrRule<T> {
         val c = this
         return OrRule(c, anotherRule)
+    }
+
+    open infix fun or(string: String): Rule<*> {
+        return AnyOrRule(this as Rule<Any>, str(string) as Rule<Any>)
     }
 
     operator fun plus(rule: Rule<*>): SequenceRule {
@@ -159,6 +165,30 @@ abstract class Rule<T : Any> {
         return FailIfRule(this, predicate)
     }
 
+    open fun quoted(left: Rule<*>, right: Rule<*>): QuotedRule<T> {
+        return QuotedRule(this, left, right)
+    }
+
+    open fun quoted(rule: Rule<*>): QuotedRule<T> {
+        return QuotedRule(this, rule, rule)
+    }
+
+    fun quoted(ch: Char): QuotedRule<T> {
+        return quoted(char(ch))
+    }
+
+    fun quoted(left: Char, right: Char): QuotedRule<T> {
+        return quoted(char(left), char(right))
+    }
+
+    fun quoted(string: String): QuotedRule<T> {
+        return quoted(str(string))
+    }
+
+    fun quoted(left: String, right: String): QuotedRule<T> {
+        return quoted(str(left), str(right))
+    }
+
     abstract fun ignoreCallbacks(): Rule<T>
 
     abstract fun clone(): Rule<T>
@@ -194,10 +224,10 @@ abstract class Rule<T : Any> {
     }
 
     internal val debugName: String
-        get() = (this as? DebugRule)?.name ?: "error"
+        get() = (this as? DebugRule)?.name ?: throw RuntimeException()
 
     internal val debugNameWrapIfNeed: String
         get() = (this as? DebugRule)?.name?.quoteIf('(', ')',
             debugNameShouldBeWrapped && debugName.containsAny("() \n\t")
-        ) ?: "error"
+        ) ?: throw RuntimeException()
 }

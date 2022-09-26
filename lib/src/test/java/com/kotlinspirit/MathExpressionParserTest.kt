@@ -4,26 +4,12 @@ import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.double
 import com.kotlinspirit.core.Rules.space
-import com.kotlinspirit.core.plus
 import com.kotlinspirit.grammar.Grammar
-import com.kotlinspirit.grammar.nestedResult
-import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import org.junit.Assert
 import org.junit.Test
 import java.lang.IllegalStateException
-import java.util.*
-import kotlin.math.exp
 
 private val skipper = space.repeat().debug("skipper")
-
-private val expressionInBrackets = nestedResult(
-    nested = {
-        expression
-    },
-    entire = {
-        '(' + it + ')'
-    }
-)
 
 private val expression: Rule<Double> = object : Grammar<Double>() {
     private var sign = 'x'
@@ -64,6 +50,8 @@ private val expression: Rule<Double> = object : Grammar<Double>() {
         get() = "expression"
 
 }.toRule()
+
+private val expressionInBrackets = expression.quoted('(', ')')
 
 class MathExpressionParserTest {
     @Test

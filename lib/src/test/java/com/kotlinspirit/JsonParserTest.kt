@@ -17,15 +17,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 
-private val jsonString = nestedResult(
-    nested = {
-        val ch = !char('"') or str("\\\"")
-        ch.repeat().asString()
-    },
-    entire = {
-        '"' + it + '"'
-    }
-)
+private val jsonString = (str("\\\"") or (char - '"')).repeat().asString().quoted('"')
 
 private val skipper = str {
     it.isWhitespace()
@@ -36,7 +28,7 @@ private val value: LazyRule<Any> = lazy {
 }
 
 private val jsonObject = object : Grammar<Map<String, Any>>() {
-    private var key: CharSequence = ""
+    private var key: String = ""
     override var result = LinkedHashMap<String, Any>()
         private set
 
@@ -46,9 +38,9 @@ private val jsonObject = object : Grammar<Map<String, Any>>() {
 
     override fun defineRule(): Rule<*> {
         val jsonPair = skipper + jsonString {
-            key = it
+            key = it.toString().replace("\\\"", "\"")
         } + skipper + ':' + skipper + value {
-            result[key.toString()] = it
+            result[key] = it
         } + skipper
         return char('{') + skipper + jsonPair.split(
             divider = ',',
@@ -57,20 +49,8 @@ private val jsonObject = object : Grammar<Map<String, Any>>() {
     }
 }.toRule()
 
-private val jsonArray = object : Grammar<List<Any>>() {
-    override var result = ArrayList<Any>()
-        private set
-
-    override fun resetResult() {
-        result = ArrayList()
-    }
-
-    override fun defineRule(): Rule<*> {
-        return char('[') + (skipper + value {
-            result.add(it)
-        } + skipper).split(',', 0..Int.MAX_VALUE) + ']'
-    }
-}.toRule()
+private val jsonArray = value.split(char(',').quoted(skipper), 0..Int.MAX_VALUE)
+    .quoted('[' + skipper, skipper + ']')
 
 private fun Map<out Any, Any>.contentEquals(other: Map<out Any, Any>): Boolean {
     if (size != other.size) {
@@ -128,6 +108,11 @@ class JsonParserTest {
             "some str",
             jsonString.compile().parseGetResultOrThrow("\"some str\"")
         )
+
+        Assert.assertEquals(
+            "some \\\" str",
+            jsonString.compile().parseGetResultOrThrow("\"some \\\" str\"  ")
+        )
     }
 
     @Test
@@ -148,7 +133,6 @@ class JsonParserTest {
 
     @Test
     fun emptyArrayTest() {
-        val scanner = Scanner("")
         Assert.assertArrayEquals(
             arrayOf(),
             jsonArray.compile().parseGetResultOrThrow("[]").toTypedArray()

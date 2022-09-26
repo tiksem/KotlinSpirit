@@ -61,7 +61,7 @@ open class OneOfStringRule internal constructor(private val strings: List<CharSe
         return tree.hasMatch(seek, string)
     }
 
-    infix fun or(string: String): OneOfStringRule {
+    override infix fun or(string: String): OneOfStringRule {
         return OneOfStringRule(listOf(string) + strings)
     }
 
