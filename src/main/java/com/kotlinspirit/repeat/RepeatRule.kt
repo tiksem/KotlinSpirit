@@ -5,7 +5,6 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
-import java.lang.UnsupportedOperationException
 
 open class RepeatRule<T : Any>(
     protected val rule: Rule<T>,

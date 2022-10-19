@@ -6,7 +6,6 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
-import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 open class NoRule(
     protected val rule: Rule<*>

@@ -6,7 +6,6 @@ import com.kotlinspirit.core.isError
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import java.lang.IllegalStateException
 
 open class SequenceRule(
     protected val a: Rule<*>,

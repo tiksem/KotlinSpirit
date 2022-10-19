@@ -5,7 +5,6 @@ import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import java.lang.IllegalStateException
 
 open class ExpectationRule<T : Any>(
     protected val a: Rule<T>,

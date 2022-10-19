@@ -8,7 +8,6 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.repeat.ZeroOrMoreRule
-import kotlin.math.min
 
 open class OrRule<T : Any>(
     protected val a: Rule<T>,

@@ -7,15 +7,12 @@ import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.core.Rules.lazy
 import com.kotlinspirit.expressive.LazyRule
 import com.kotlinspirit.grammar.Grammar
-import com.kotlinspirit.grammar.nestedResult
 import com.kotlinspirit.core.*
 import org.json.JSONObject
 import org.junit.Assert
 import org.junit.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
 
 private val jsonString = (str("\\\"") or (char - '"')).repeat().asString().quoted('"')
 

@@ -4,7 +4,6 @@ import com.kotlinspirit.ext.*
 import com.kotlinspirit.ext.excludeRanges
 import com.kotlinspirit.ext.includeRanges
 import java.util.*
-import kotlin.collections.ArrayList
 
 internal class CharPredicateData(
     chars: SortedSet<Char>,
