@@ -145,7 +145,7 @@ Warning: If your root parser rule is OptionalRule `parseGetResultOrThrow` will a
 ## Quoted rule
 Quoted rule represents rule `a` quoted by `left` and `right` rules. If you specify only a single rule as an argument of `quoted` `left` and `right` will be the same. You may ask what is the difference between sequence rule `left + a + right` and `a.quoted(left, right)`. The difference is the result. The resultType of sequence rule is always CharSequence from the beginning to the end of the rule, so quotes are included into the result as well. However the quouted rule result is the same as `a` result.
 
-Let's consider we want to implement a quoted string:
+Let's consider we want to implement quoted string parser:
 ```
 val quotedStr = (char - '"').quoted('"').compile()
 val result = quotedStr.parseGetResultOrThrow("\"Hello, world!\"")
