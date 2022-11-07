@@ -109,7 +109,7 @@ The resultType of the rule is Char
 `val exp = !a` Matches one character, if it doesn't match rule a. If we are at the end of input, and `a` doesn't match EOF, it outputs '\0' as a result
 
 This rule is similar to some cases of the difference rule. For example `char - 'a'` is similar to `!char('a')`. The difference is only at the end of input.
-`!char('a')` matches the end of input, cause eof is catually not 'a', but `char - 'a'` doesn't match eof.
+`!char('a')` matches EOF, but `char - 'a'` doesn't match EOF.
 
 ## Repeat rules
 The resultType of repeat rules might be different, depending on the repeated rule kind. If the repeated rule is `Char` rule the result is `CharSequence` in all other cases it is `List<T>`, where `T` is the resultType of repeared rule.
