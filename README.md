@@ -88,7 +88,7 @@ The resultType of the rule depends on the resultTypes of `a` and `b`. If the res
 
 `val exp = a + b` matches `a` or `b`
 
-As an example let's consider we want to create a parser which parsers an input, where a user can specify his username or an identification number.
+As an example let's consider we want to create a parser, which parses an input, where a user can specify his username or an identification number.
 ```
 val id = long or (char('a'..'z') + +char('a'..'z', '0'..'9'))
 ```
