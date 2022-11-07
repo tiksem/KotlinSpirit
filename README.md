@@ -137,7 +137,7 @@ matches a list of names, at least one name should be specified.
 For example: `names.compile().parseGetResultOrThrow("HelloWorldYo")` will return list `["Hello", "World", "Yo"]`
 
 ## Split rule
-The resultType of split rule is List<T>
+The resultType of split rule is `List<T>`
 
 `val exp = a % divider` Matches a list of `a` items splitted by a `divider` rule.
 
