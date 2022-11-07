@@ -189,3 +189,70 @@ Each rule contains its result after parsing, when you parse without a result, ju
 `fun matchOrThrow(string: CharSequence)` Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
 
 `fun matchesAtBeginning(string: CharSequence): Boolean` Returns true if the string metches the rule from the beginning only.
+
+# Recursive expressions
+Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recurssion here.
+
+Let's discuss a real-time example. We want to parse mathematic expression like 5 + (34 + 48).
+```
+val operator = char('+', '-', '*', '/')
+val value = expressionInBrackets or double
+val expression = value + operator + value
+val expressionInBrackets = expression.quoted('(', ')')
+```
+Looks clear. However if you try to run it you will get StackOverflow error. Let's see how we can solve it.
+
+## Lazy rules
+Let's rewrite our above example using lazy rules. Lazy rules are rules, computed at runtime.
+```
+val operator = char('+', '-', '*', '/')
+val value = lazy { expressionInBrackets or double }
+val expression = value + operator + value
+val expressionInBrackets = expression.quoted('(', ')')
+```
+Ok we fixed StackOverflow error here. But let's move further and figure out how we can create rules with custom results and resolve recursive issues as well.
+
+# Capturing custom results
+You may be wondering how do we get results from nested rules during parsing. `parseWithResult` function of Parser is kind of limited.
+
+## Rule callbacks
+Each rule can have a custom callback specified, this callback is called when the rule is succesful. Let's come back to our first example where we parsed a key-value pair of name and age. And specify callbacks to retrieve the results.
+```
+var name = ""
+var age = -1
+val nameRule = char('A'..'Z') + +char('a'..'z')
+val rule = nameRule { name = it } + '=' + int { age = it }
+```
+
+## Grammars
+Grammars are used to create rules with custom results. They are computed at rumtime, so can be used instead of lazy rules.
+
+To create a grammar we need to override
+```
+abstract val result: T
+abstract fun defineRule(): Rule<*>
+open fun resetResult() {}
+```
+resetResult is optional and it's needed to reinitialize the result, cause we might receive the result from the previous parsing process.
+
+Let's rewrite our above example with callbacks using Grammar
+```
+data class Person(
+    val name: String,
+    val age: Int
+)
+
+val personRule = object : Grammar<Person>() {
+    private var personName: CharSequence = ""
+    private var age: Int = -1
+
+    override val result: Person
+        get() = Person(name, age)
+
+    override fun defineRule(): Rule<*> {
+        val nameRule = char('A'..'Z') + +char('a'..'z')
+        return nameRule { personName = it } + '=' + int { age = it }
+    }
+}.toRule()
+```
+Please not, that `toRule` is used to convert the grammar to a rule.
