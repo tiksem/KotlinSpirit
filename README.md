@@ -213,7 +213,7 @@ val expressionInBrackets = expression.quoted('(', ')')
 Ok we fixed StackOverflow error here. But let's move further and figure out how we can create rules with custom results and resolve recursive issues as well.
 
 # Capturing custom results
-You may be wondering how do we get results from nested rules during parsing. `parseWithResult` function of Parser is kind of limited.
+You may be wondering how do we get results from nested rules during parsing. `parseWithResult` function of Parser is quite limited.
 
 ## Rule callbacks
 Each rule can have a custom callback specified, this callback is called when the rule is succesful. Let's come back to our first example where we parsed a key-value pair of name and age. And specify callbacks to retrieve the results.
