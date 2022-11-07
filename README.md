@@ -193,7 +193,7 @@ Each rule contains its result after parsing, when you parse without a result, ju
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recurssion here.
 
-Let's discuss a real-time example. We want to parse mathematic expression like 5 + (34 + 48).
+Let's discuss a real-time example. We want to parse a mathematic expression like 5 + (34 + 48).
 ```
 val operator = char('+', '-', '*', '/')
 val value = expressionInBrackets or double
