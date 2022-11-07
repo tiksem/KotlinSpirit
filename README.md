@@ -150,7 +150,7 @@ Let's consider we want to implement a quoted string:
 val quotedStr = (char - '"').quoted('"').compile()
 val result = quotedStr.parseGetResultOrThrow("\"Hello, world!\"")
 ```
-In the example `result` will be `Hello, world!`. But not `\"Hello world!\"`
+In the example `result` will be `Hello, world!`. But not `"Hello world!"`
 
 # Parser functions, and getting a result
 Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticable.
