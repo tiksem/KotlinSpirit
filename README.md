@@ -141,11 +141,11 @@ Each rule contains its result after parsing, when you parse without a result, ju
 
 `fun parseGetResultOrThrow(string: CharSequence): T` Parses and gets the result, if rule doesn't match throws ParseException
 
-`fun parseOrThrow(string: CharSequence): Int` Parses without any result, if rule doesn't match throws ParseException
+`fun parseOrThrow(string: CharSequence): Int` Parses without any result returning the ending seek, if rule doesn't match throws ParseException.
 
 `fun tryParse(string: CharSequence): Int?` Parses without any result, returns ending seek if rule matches and null otherwise.
 
-`fun parseWithResult(string: CharSequence): ParseResult<T>` Parses with returning ParseResult. it contains a result or errorCode if rule doesn't match
+`fun parseWithResult(string: CharSequence): ParseResult<T>` Parses with returning ParseResult. it contains the result or errorCode if rule doesn't match
 
 `fun parse(string: CharSequence): ParseSeekResult` Parses without a result returning ParseSeekResult. ParseSeekResult contains ending seek and errorCode.
 
