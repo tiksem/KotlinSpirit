@@ -255,4 +255,4 @@ val personRule = object : Grammar<Person>() {
     }
 }.toRule()
 ```
-Please not, that `toRule` is used to convert the grammar to a rule.
+Note: `toRule` is used to convert the grammar to a rule.
