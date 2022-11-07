@@ -3,7 +3,7 @@
 Lighweight library for creating parsers, inspired by C++ boost spirit library.
 
 # Introduction
-There are no good libraries or frameworks to parse a text easily in Kotlin. Yeah, we have regular expressions. But they are hard to debug, hard to read, don't support 
+There are no good libraries or frameworks to parse text easily in Kotlin. Yeah, we have regular expressions. But they are hard to debug, hard to read, don't support 
 recursive expressions and they perform poor. One time I got StackOverflow error easily while parsing a large text. So the idea was to create a simple library with compile-time 
 expressions checking. KotlinSpirit does the job. It outperforms regular expressions in many cases.
 
