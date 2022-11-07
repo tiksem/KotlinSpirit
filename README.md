@@ -136,6 +136,25 @@ matches a list of names, at least one name should be specified.
 
 For example: `names.compile().parseGetResultOrThrow("HelloWorldYo")` will return list `["Hello", "World", "Yo"]`
 
+## Split rule
+The resultType of split rule is List<T>
+
+`val exp = a % divider` Matches a list of `a` items splitted by a `divider` rule.
+
+`a.split(divider: Rule<*>, n: Int)` Matches `a` splitted by `divider` exactly `n` times
+  
+`a.split(divider: Rule<*>, range: IntRange)` Matches `a` splitted by `divider` i times, where i in range.
+
+`a % divider` Matches `a` splitted by `divider` i times, where i in [1, MAX_INT].
+
+Let's consider we want to implement a parser of numbers divided by ',':
+```
+val numbers = int % ','
+val parser = numbers.compile()
+val result = numbers.parseGetResultOrThrow("12,16,76,1233,-5")
+```
+The result will be [12,16,76,1233,-5]
+  
 ## Optional rule
 The resultType of optional rule is T?, where T is is the result of `a`
 `val optional = -a` This rule is always succesful. It matches `a` if possible, if not it just outputs null.
