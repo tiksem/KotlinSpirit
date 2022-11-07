@@ -10,7 +10,7 @@ expressions checking. KotlinSpirit does the job. It outperforms regular expressi
 # Creating a simple parser
 KotlinSpirit consists of basic rules and operators. All the rules are defined in Rules object namespace. In all the examples below we consider, that the rules are already imported from Rules object.
 
-Let's create a simple parser for key-value pairs, where key is name and value is age as our first example
+Let's create a simple parser for key-value pairs, where key is name and value is age, as our first example
 
 ```
 val name = char('A'..'Z') + +char('a'..'z')
@@ -21,7 +21,7 @@ parser.matches("Ivan=43") // true
 parser.matches("ivan=43") // false
 ```
 
-This simple example demonstrate usages of char and int basic rules, sequence operator +, and oneOrMore operator +. In this example we used `matches` parser function, which checks if a string matches from the beginning to the end. We will discuss how to get parsing results and use other parser functions later.
+This simple example demonstrates usages of char and int basic rules, sequence operator +, and oneOrMore operator +. In this example we used `matches` parser function, which checks if a string matches from the beginning to the end. We will discuss how to get parsing results and use other parser functions later.
 
 # Basic rules
 Let's describe basic rules used as simple units for creating complex rules. Don't forget to import them from Rules object namespace.
