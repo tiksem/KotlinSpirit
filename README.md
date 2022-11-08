@@ -247,7 +247,7 @@ val personRule = object : Grammar<Person>() {
     private var age: Int = -1
 
     override val result: Person
-        get() = Person(name, age)
+        get() = Person(personName, age)
 
     override fun defineRule(): Rule<*> {
         val nameRule = char('A'..'Z') + +char('a'..'z')
