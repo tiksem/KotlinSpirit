@@ -8,6 +8,7 @@ import com.kotlinspirit.core.Rules.lazy
 import com.kotlinspirit.expressive.LazyRule
 import com.kotlinspirit.grammar.Grammar
 import com.kotlinspirit.core.*
+import com.kotlinspirit.core.Rules.int
 import org.json.JSONObject
 import org.junit.Assert
 import org.junit.Test
@@ -196,3 +197,21 @@ class JsonParserTest {
         JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
     }
 }
+
+data class Person(
+    val name: String,
+    val age: Int
+)
+
+val personRule = object : Grammar<Person>() {
+    private var personName: CharSequence = ""
+    private var age: Int = -1
+
+    override val result: Person
+        get() = Person(name, age)
+
+    override fun defineRule(): Rule<*> {
+        val nameRule = char('A'..'Z') + +char('a'..'z')
+        return nameRule { personName = it } + '=' + int { age = it }
+    }
+}.toRule()

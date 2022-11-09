@@ -5,10 +5,7 @@ import com.kotlinspirit.char.CharPredicateData
 import com.kotlinspirit.char.CharPredicates
 import com.kotlinspirit.expressive.LazyRule
 import com.kotlinspirit.expressive.OptionalRule
-import com.kotlinspirit.number.DoubleRule
-import com.kotlinspirit.number.FloatRule
-import com.kotlinspirit.number.IntRule
-import com.kotlinspirit.number.LongRule
+import com.kotlinspirit.number.*
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.str.EmptyStringRule
 import com.kotlinspirit.str.ExactStringRule
@@ -23,6 +20,7 @@ object Rules {
     }
 
     val int get() = IntRule()
+    val uint get() = UIntRule()
     val long get() = LongRule()
     val char get() = AnyCharRule()
     val digit = char('0'..'9')

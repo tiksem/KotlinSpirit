@@ -4,23 +4,25 @@ object ParseCode {
     const val COMPLETE = 0
     const val EOF = 1
     const val INVALID_INT = 2
-    const val INVALID_LONG = 3
-    const val INT_STARTED_FROM_ZERO = 4
-    const val INT_OUT_OF_BOUNDS = 5
-    const val LONG_OUT_OF_BOUNDS = 6
-    const val DIFF_FAILED = 7
-    const val CHAR_PREDICATE_FAILED = 8
-    const val STRING_NOT_ENOUGH_DATA = 9
-    const val STRING_DOES_NOT_MATCH = 10
-    const val NO_FAILED = 11
-    const val INVALID_DOUBLE = 12
-    const val INVALID_FLOAT = 13
-    const val WHOLE_STRING_DOES_NOT_MATCH = 14
-    const val ONE_OF_STRING_NOT_FOUND = 15
-    const val FAIL_PREDICATE = 16
-    const val EXPECTATION_FAILED = 17
-    const val SPLIT_NOT_ENOUGH_DATA = 18
-    const val AFTER_FAILED = 19
+    const val INVALID_UINT = 3
+    const val INVALID_LONG = 4
+    const val INVALID_ULONG = 5
+    const val INT_STARTED_FROM_ZERO = 6
+    const val INT_OUT_OF_BOUNDS = 7
+    const val LONG_OUT_OF_BOUNDS = 8
+    const val DIFF_FAILED = 9
+    const val CHAR_PREDICATE_FAILED = 10
+    const val STRING_NOT_ENOUGH_DATA = 11
+    const val STRING_DOES_NOT_MATCH = 12
+    const val NO_FAILED = 13
+    const val INVALID_DOUBLE = 14
+    const val INVALID_FLOAT = 15
+    const val WHOLE_STRING_DOES_NOT_MATCH = 16
+    const val ONE_OF_STRING_NOT_FOUND = 17
+    const val FAIL_PREDICATE = 18
+    const val EXPECTATION_FAILED = 19
+    const val SPLIT_NOT_ENOUGH_DATA = 20
+    const val AFTER_FAILED = 21
 }
 
 internal inline fun Int.isError(): Boolean {

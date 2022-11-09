@@ -70,7 +70,7 @@ open class QuotedRule<T : Any>(
         return QuotedRule(main.clone(), left.clone(), right.clone())
     }
 
-    override fun debug(name: String?): RuleWithDefaultRepeat<T> {
+    override fun debug(name: String?): QuotedRule<T> {
         val main = main.internalDebug()
         val left = left.internalDebug()
         val right = right.internalDebug()

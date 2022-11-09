@@ -20,26 +20,27 @@ open class ExactStringRule(
         }
 
         val self = this.string
-        if (seek + self.length > string.length) {
+        val selfLength = self.length
+        if (seek + selfLength > string.length) {
             return createStepResult(
                 seek = seek,
                 parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
             )
         }
 
-        var i = seek
-        val end = self.length + seek
-        do {
-            if (self[i - seek] != string[i]) {
-                return createStepResult(
-                    seek = seek,
-                    parseCode = ParseCode.STRING_DOES_NOT_MATCH
-                )
-            }
-            i++
-        } while (i < end)
-
-        return createComplete(end)
+        return if (string.regionMatches(
+                thisOffset = seek,
+                other = self,
+                otherOffset = 0,
+                length = selfLength
+            )) {
+            createComplete(seek + selfLength)
+        } else {
+            createStepResult(
+                seek = seek,
+                parseCode = ParseCode.STRING_DOES_NOT_MATCH
+            )
+        }
     }
 
     override fun parseWithResult(
