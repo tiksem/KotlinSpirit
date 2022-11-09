@@ -86,7 +86,7 @@ val exp = int + char('+', '-', '/', '*') + int
 ## Or rule
 The resultType of the rule depends on the resultTypes of `a` and `b`. If the resultTypes are the same, the resultType of `or` will be the resultType of `a` and `b`. Otherwise it will be Any or something less generic in some cases.
 
-`val exp = a + b` matches `a` or `b`
+`val exp = a or b` matches `a` or `b`
 
 As an example let's consider we want to create a parser, which parses an input, where a user can specify his username or an identification number.
 ```Kotlin
