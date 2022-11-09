@@ -183,9 +183,6 @@ val result = quotedStr.parseGetResultOrThrow("\"Hello, world!\"")
 ```
 In the example `result` will be `Hello, world!`. But not `"Hello world!"`
 
-# Parser functions, and getting a result
-Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticable.
-
 ## Expectation rule
 The resultType of the rule is the same is the resultType of rule `a`
 
@@ -201,6 +198,9 @@ parser.matches("123abc") // true
 parser.matches("123.bc") // false
 parser.matches("123.34") // false
 ```
+
+# Parser functions, and getting a result
+Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticable.
 
 `fun parseGetResultOrThrow(string: CharSequence): T` Parses and gets the result, if rule doesn't match throws ParseException
 
