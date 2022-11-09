@@ -186,6 +186,22 @@ In the example `result` will be `Hello, world!`. But not `"Hello world!"`
 # Parser functions, and getting a result
 Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticable.
 
+## Expectation rule
+The resultType of the rule is the same is the resultType of rule `a`
+
+`val exp = a.expects(b)` Matches rule `a`, only if rule `b` matches after rule `a`
+
+The rule is similar to `a + b`. However it has the resultType of rule `a` and it sets the seek to the end of `a` after parsing is finished.
+
+Let's consider we want to parse `int` followed by a string with 3 characters and this int cannot be decimal
+```Kotlin
+val exp = int.expect(!char('.')) + char.repeat(3..3)
+val parser = exp.compile()
+parser.matches("123abc") // true
+parser.matches("123.bc") // false
+parser.matches("123.34") // false
+```
+
 `fun parseGetResultOrThrow(string: CharSequence): T` Parses and gets the result, if rule doesn't match throws ParseException
 
 `fun parseOrThrow(string: CharSequence): Int` Parses without any result returning the ending seek, if rule doesn't match throws ParseException.
@@ -283,7 +299,7 @@ After parsing is finished you can get a tree of your parsing process using `Debu
 KotlinSpirit assigns readable names for all the rules by default. However if you want to specify your own custom name you can do it applying `debug(name: String)` method to intermidiate rules.
 
 Let's come back to our first example and make it debuggable.
-```
+```Kotlin
 val name = char('A'..'Z') + +char('a'..'z')
 val age = int
 val r = (name.debug("name") + '=' + age.debug("age")).debug()
