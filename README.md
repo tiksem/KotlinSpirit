@@ -29,7 +29,7 @@ Let's describe basic rules used as simple units for creating complex rules. Don'
 ## Number rules
 Those rules represent the corresponding numbers, with bound checks for integers
 ```
-int, long, float, double
+int, long, float, double, uint, ulong
 ```
 ## Char rules
 `char` represents any single chcracter
