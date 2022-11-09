@@ -21,6 +21,7 @@ object Rules {
 
     val int get() = IntRule()
     val uint get() = UIntRule()
+    val ulong get() = ULongRule()
     val long get() = LongRule()
     val char get() = AnyCharRule()
     val digit = char('0'..'9')

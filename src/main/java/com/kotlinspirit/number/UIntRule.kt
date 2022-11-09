@@ -51,7 +51,7 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
                 else -> {
                     return createStepResult(
                         seek = i,
-                        parseCode = ParseCode.INVALID_ULONG
+                        parseCode = ParseCode.INVALID_UINT
                     )
                 }
             }
@@ -109,7 +109,7 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
                 else -> {
                     r.parseResult = createStepResult(
                         seek = i,
-                        parseCode = ParseCode.INVALID_INT
+                        parseCode = ParseCode.INVALID_UINT
                     )
                     return
                 }
@@ -121,17 +121,7 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        val length = string.length
-        if (seek >= length) {
-            return false
-        }
-
-        val char = string[seek]
-        return if (char == '-') {
-            seek < length - 1 && string[seek + 1] in '0'..'9'
-        } else {
-            char in '0'..'9'
-        }
+        return parse(seek, string).getParseCode() == ParseCode.COMPLETE
     }
 
     override fun clone(): UIntRule {

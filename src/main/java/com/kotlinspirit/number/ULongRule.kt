@@ -7,7 +7,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class LongRule : RuleWithDefaultRepeat<Long>() {
+open class ULongRule : RuleWithDefaultRepeat<ULong>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -19,23 +19,10 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
 
         var i = seek
         var result = 0L
-        var sign = 1L
         var successFlag = false
         do {
             val char = string[i++]
             when {
-                char == '-' -> {
-                    if (successFlag) {
-                        return createComplete(i)
-                    } else if (sign == 1L) {
-                        sign = -1L
-                    }
-                }
-                char == '+' -> {
-                    if (successFlag) {
-                        return createComplete(i)
-                    }
-                }
                 !successFlag && char == '0' -> {
                     return if (i >= length || string[i] !in '0'..'9') {
                         createComplete(i)
@@ -64,23 +51,16 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
                 else -> {
                     return createStepResult(
                         seek = i,
-                        parseCode = ParseCode.INVALID_INT
+                        parseCode = ParseCode.INVALID_ULONG
                     )
                 }
             }
         } while (i < length)
 
-        return if (successFlag) {
-            createComplete(i)
-        } else {
-            createStepResult(
-                seek = seek,
-                parseCode = ParseCode.INVALID_LONG
-            )
-        }
+        return createComplete(i)
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Long>) {
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<ULong>) {
         val length = string.length
         if (seek >= length) {
             r.parseResult = createStepResult(
@@ -91,31 +71,14 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
         }
 
         var i = seek
-        var sign = 1L
         var result = 0L
         var successFlag = false
         do {
             val char = string[i++]
             when {
-                (char == '-' || char == '+') && !successFlag -> {
-                    when {
-                        i == seek + 1 -> {
-                            if (char == '-') {
-                                sign = -1
-                            }
-                        }
-                        else -> {
-                            r.parseResult = createStepResult(
-                                seek = i,
-                                parseCode = ParseCode.INVALID_INT
-                            )
-                            return
-                        }
-                    }
-                }
                 !successFlag && char == '0' -> {
                     if (i >= length || string[i] !in '0'..'9') {
-                        r.data = result * sign
+                        r.data = 0u
                         r.parseResult = createComplete(i)
                     } else {
                         r.parseResult = createStepResult(
@@ -133,13 +96,13 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
                     if (result < 0) {
                         r.parseResult = createStepResult(
                             seek = i,
-                            parseCode = ParseCode.INT_OUT_OF_BOUNDS
+                            parseCode = ParseCode.LONG_OUT_OF_BOUNDS
                         )
                         return
                     }
                 }
                 successFlag -> {
-                    r.data = result * sign
+                    r.data = result.toULong()
                     r.parseResult = createComplete(i - 1)
                     return
                 }
@@ -153,42 +116,35 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
             }
         } while (i < length)
 
-        if (successFlag) {
-            r.data = result * sign
-            r.parseResult = createComplete(i)
-        } else {
-            r.parseResult = createStepResult(
-                seek = seek,
-                parseCode = ParseCode.INVALID_INT
-            )
-        }
+        r.parseResult = createComplete(i)
+        r.data = result.toULong()
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return parse(seek, string).getParseCode() == ParseCode.COMPLETE
     }
 
-    override fun clone(): LongRule {
+    override fun clone(): ULongRule {
         return this
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): LongRule {
-        return DebugLongRule(name ?: "long")
+    override fun debug(name: String?): ULongRule {
+        return DebugULongRule(name ?: "ulong")
     }
 
     override fun isThreadSafe(): Boolean {
         return true
     }
 
-    override fun ignoreCallbacks(): LongRule {
+    override fun ignoreCallbacks(): ULongRule {
         return this
     }
 }
 
-private class DebugLongRule(override val name: String): LongRule(), DebugRule {
+private class DebugULongRule(override val name: String): ULongRule(), DebugRule {
     override fun parse(seek: Int, string: CharSequence): Long {
         DebugEngine.ruleParseStarted(this, seek)
         return super.parse(seek, string).also {
@@ -196,7 +152,7 @@ private class DebugLongRule(override val name: String): LongRule(), DebugRule {
         }
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Long>) {
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<ULong>) {
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, r)
         DebugEngine.ruleParseEnded(this, r.parseResult)
