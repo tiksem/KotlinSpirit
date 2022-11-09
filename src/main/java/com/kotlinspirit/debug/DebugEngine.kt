@@ -61,18 +61,18 @@ class RuleDebugTreeNode(
     }
 }
 
-internal class DebugEngine {
+class DebugEngine {
     private var root: RuleDebugTreeNode? = null
     private var seek: RuleDebugTreeNode? = null
     private var string: CharSequence = ""
 
-    fun startDebugSession(string: CharSequence) {
+    internal fun startDebugSession(string: CharSequence) {
         this.string = string
         root = null
         seek = null
     }
 
-    fun ruleParseStarted(rule: Rule<*>, startSeek: Int) {
+    internal fun ruleParseStarted(rule: Rule<*>, startSeek: Int) {
         val node = RuleDebugTreeNode(rule, string).also {
             it.startSeek = startSeek
         }
@@ -86,7 +86,7 @@ internal class DebugEngine {
         }
     }
 
-    fun ruleParseEnded(rule: Rule<*>, result: Long) {
+    internal fun ruleParseEnded(rule: Rule<*>, result: Long) {
         val seek = this.seek
             ?: throw IllegalStateException("Undefined behaviour, " +
                     "ruleParseEnded was called before parsing was started")
@@ -112,15 +112,15 @@ internal class DebugEngine {
         val root: RuleDebugTreeNode?
             get() = getEngine().root
 
-        fun startDebugSession(string: CharSequence) {
+        internal fun startDebugSession(string: CharSequence) {
             getEngine().startDebugSession(string)
         }
 
-        fun ruleParseStarted(rule: Rule<*>, startSeek: Int) {
+        internal fun ruleParseStarted(rule: Rule<*>, startSeek: Int) {
             getEngine().ruleParseStarted(rule, startSeek)
         }
 
-        fun ruleParseEnded(rule: Rule<*>, result: Long) {
+        internal fun ruleParseEnded(rule: Rule<*>, result: Long) {
             getEngine().ruleParseEnded(rule, result)
         }
     }
