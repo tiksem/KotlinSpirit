@@ -164,7 +164,7 @@ Warning: If your root parser rule is OptionalRule `parseGetResultOrThrow` will a
 ## FailIf rule
 The resultType of the rule is the same as the resultType of `a` rule
 
-`a.failIf(predicate: (T) -> Boolean)` Check the result of `a` and fail the passed predicate returns true.
+`a.failIf(predicate: (T) -> Boolean)` Checks the result of `a` and fails if the passed predicate returns true.
 
 Let's consider we want to create a name parser, where name is not Jhon.
 ```Kotlin
