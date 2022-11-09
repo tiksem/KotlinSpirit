@@ -151,7 +151,7 @@ Let's consider we want to implement a parser of numbers divided by ',':
 ```Kotlin
 val numbers = int % ','
 val parser = numbers.compile()
-val result = numbers.parseGetResultOrThrow("12,16,76,1233,-5")
+val result = parser.parseGetResultOrThrow("12,16,76,1233,-5")
 ```
 The result will be [12,16,76,1233,-5]
   
