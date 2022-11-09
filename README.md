@@ -162,7 +162,7 @@ The resultType of optional rule is T?, where T is is the result of `a`
 Warning: If your root parser rule is OptionalRule `parseGetResultOrThrow` will always throw an exception. This issue is going to be fixed in next versions of KotlinSpirit.
 
 ## FailIf rule
-The resultType the rule is the same as the resultType if `a` rule
+The resultType the rule is the same as the resultType of `a` rule
 
 `a.failIf(predicate: (T) -> Boolean)` Check the result of `a` and fail the passed predicate returns true.
 
