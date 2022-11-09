@@ -186,7 +186,7 @@ In the example `result` will be `Hello, world!`. But not `"Hello world!"`
 ## Expectation rule
 The resultType of the rule is the same is the resultType of rule `a`
 
-`val exp = a.expects(b)` Matches rule `a`, only if rule `b` matches after rule `a`
+`val exp = a.expect(b)` Matches rule `a`, only if rule `b` matches after rule `a`
 
 The rule is similar to `a + b`. However it has the resultType of rule `a` and it sets the seek to the end of `a` after parsing is finished.
 
