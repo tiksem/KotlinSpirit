@@ -268,3 +268,27 @@ val personRule = object : Grammar<Person>() {
 }.toRule()
 ```
 Note: `toRule` is used to convert the grammar to a rule.
+
+# Thread safety
+A compiled parser is complitely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However if you use grammars or lazy rules in your rule, Parser creates a copy of your rule for each thread internally. You don't need to worry about it a lot, KotlinSpirit does all the job underhood. However it may affect performance slightly.
+
+# Debugging
+KotlinSpirit has a debugging engine included, which makes it easier to debug errors in your parser. To enable debugging you need to call `debug()` on your root rule.
+
+For example: `val debugIntRule = int.debug()`
+
+After parsing is finished you can get a tree of your parsing process using `DebugEngine.root`. The tree is passed to `ParseException` as well. The tree is also convertible to json string using `toString` method.
+
+### Debug names
+KotlinSpirit assigns readable names for all the rules by default. However if you want to specify your own custom name you can do it applying `debug(name: String)` method to intermidiate rules.
+
+Let's come back to our first example and make it debuggable.
+```
+val name = char('A'..'Z') + +char('a'..'z')
+val age = int
+val r = (name.debug("name") + '=' + age.debug("age")).debug()
+```
+Don't forget to make your root rule debuggable by calling `.debug()`
+
+### Debug performance
+Adding `debug()` to your rules affects performance and after you finish a testing and debugging of your rules you need to remove `debug()` calls.
