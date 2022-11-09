@@ -111,6 +111,14 @@ abstract class Rule<T : Any> {
         return ExpectationRule(this, other)
     }
 
+    fun expect(string: String): ExpectationRule<T> {
+        return ExpectationRule(this, str(string))
+    }
+
+    fun expect(char: Char): ExpectationRule<T> {
+        return ExpectationRule(this, ExactCharRule(char))
+    }
+
     abstract fun repeat(): Rule<*>
     abstract fun repeat(range: IntRange): Rule<*>
     abstract operator fun unaryPlus(): Rule<*>
