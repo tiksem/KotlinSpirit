@@ -54,7 +54,7 @@ str(predicate: (Char) -> Boolean)
 ```
 If you want to match a string with at least one character you can use `nonEmptyStr` instead.
 
-In our example above you may notice, that name contains `+char('a'..'z')`, that is basically the same as `nonEmptyStr('a'..'z')`.
+In our example above you may notice, that the name rule contains `+char('a'..'z')`, that is basically the same as `nonEmptyStr('a'..'z')`.
 
 `+rule` is a repeat operator. We will discuss it later.
 
