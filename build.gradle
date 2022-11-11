@@ -36,6 +36,10 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
 dependencies {
     implementation files('libs/fastutil-core-8.5.8.jar')
     implementation 'com.beust:klaxon:5.6'
