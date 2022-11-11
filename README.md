@@ -7,6 +7,12 @@ There are no good libraries or frameworks to parse text easily in Kotlin. Yeah, 
 recursive expressions and they perform poorly. One time I got StackOverflow error easily while parsing a large text. So the idea was to create a simple library with compile-time 
 expressions checking.
 
+# Installation
+Add the following dependency into your `build.gradle` file dependencies section
+```
+implementation("com.github.tiksem:KotlinSpirit:1.0.0")
+```
+
 # Creating a simple parser
 KotlinSpirit consists of basic rules and operators. All the rules are defined in Rules object namespace. In all the examples below we consider, that the rules are already imported from Rules object.
 
