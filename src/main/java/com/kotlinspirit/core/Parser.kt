@@ -11,6 +11,8 @@ interface Parser<T : Any> {
     fun matches(string: CharSequence): Boolean
     fun matchOrThrow(string: CharSequence)
     fun matchesAtBeginning(string: CharSequence): Boolean
+    fun replaceFirst(source: CharSequence, replacement: CharSequence): CharSequence
+    fun replaceAll(source: CharSequence, replacement: CharSequence): CharSequence
 
     fun getDebugTree(): RuleDebugTreeNode? {
         return null

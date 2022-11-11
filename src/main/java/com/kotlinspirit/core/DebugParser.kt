@@ -47,4 +47,14 @@ internal class DebugParser<T : Any>(private val parser: Parser<T>) : Parser<T> {
     override fun getDebugTree(): RuleDebugTreeNode? {
         return DebugEngine.root
     }
+
+    override fun replaceFirst(source: CharSequence, replacement: CharSequence): CharSequence {
+        DebugEngine.startDebugSession(source)
+        return parser.replaceFirst(source, replacement)
+    }
+
+    override fun replaceAll(source: CharSequence, replacement: CharSequence): CharSequence {
+        DebugEngine.startDebugSession(source)
+        return parser.replaceAll(source, replacement)
+    }
 }

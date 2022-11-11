@@ -2,6 +2,8 @@ package com.kotlinspirit.core
 
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
+import com.kotlinspirit.ext.appendRange
+import com.kotlinspirit.ext.replaceRanges
 
 internal abstract class BaseParser<T : Any>(protected val originRule: Rule<T>) : Parser<T> {
     protected abstract fun getRule(): Rule<T>
@@ -88,5 +90,49 @@ internal abstract class BaseParser<T : Any>(protected val originRule: Rule<T>) :
 
     override fun matchesAtBeginning(string: CharSequence): Boolean {
         return getRule().hasMatch(0, string)
+    }
+
+    override fun replaceFirst(source: CharSequence, replacement: CharSequence): CharSequence {
+        var seek = 0
+        val length = source.length
+        val rule = getRule()
+        do {
+            val result = rule.parse(seek, source)
+            if (result.getParseCode().isNotError()) {
+                return source.replaceRange(seek until result.getSeek(), replacement)
+            }
+            val newSeek = result.getSeek()
+            if (newSeek == seek) {
+                seek++
+            } else {
+                seek = newSeek
+            }
+        } while (seek < length)
+
+        return source
+    }
+
+    override fun replaceAll(source: CharSequence, replacement: CharSequence): CharSequence {
+        val ranges = ArrayList<IntRange>()
+
+        var seek = 0
+        val length = source.length
+        val rule = getRule()
+        do {
+            val result = rule.parse(seek, source)
+            if (result.getParseCode().isNotError()) {
+                val range = seek until result.getSeek()
+                ranges.add(range)
+            }
+            val newSeek = result.getSeek()
+            if (newSeek == seek) {
+                seek++
+            } else {
+                seek = newSeek
+            }
+
+        } while (seek < length)
+
+        return source.replaceRanges(ranges, replacement)
     }
 }
