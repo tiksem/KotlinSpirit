@@ -10,7 +10,7 @@ expressions checking.
 # Installation
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation("com.github.tiksem:KotlinSpirit:1.0.0")
+implementation "com.github.tiksem:KotlinSpirit:1.0.0"
 ```
 
 # Creating a simple parser
