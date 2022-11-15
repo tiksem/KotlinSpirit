@@ -128,42 +128,41 @@ class Replacer(
             return string
         }
 
-        val ranges = data.replacements.map {
-            it.range
-        }
-
-        val replacements = data.replacements.map {
-            it.replacementProvider(string)
-        }
-
-        return string.replaceRanges(ranges, replacements)
+        return applyReplace(data, string)
     }
 
     fun replaceFirst(string: CharSequence): CharSequence {
         val data = get(string)
         data.rule.findFirstSuccessfulSeek(string) { _, _ ->
-            var ranges = data.replacements.map {
-                it.range
-            }
-
-            var replacements = data.replacements.map {
-                it.replacementProvider(string)
-            }
-
-            if (data.listReplacements.isNotEmpty()) {
-                val mutableRanges = ranges.toMutableList()
-                val mutableReplacements = replacements.toMutableList()
-
-                data.appendListReplacements(string, mutableRanges, mutableReplacements)
-
-                ranges = mutableRanges
-                replacements = mutableReplacements
-            }
-
-            return string.replaceRanges(ranges, replacements)
+            return applyReplace(data, string)
         }
 
         return string
+    }
+
+    private fun applyReplace(
+        data: Replace,
+        string: CharSequence
+    ): CharSequence {
+        var ranges = data.replacements.map {
+            it.range
+        }
+
+        var replacements = data.replacements.map {
+            it.replacementProvider(string)
+        }
+
+        if (data.listReplacements.isNotEmpty()) {
+            val mutableRanges = ranges.toMutableList()
+            val mutableReplacements = replacements.toMutableList()
+
+            data.appendListReplacements(string, mutableRanges, mutableReplacements)
+
+            ranges = mutableRanges
+            replacements = mutableReplacements
+        }
+
+        return string.replaceRanges(ranges, replacements)
     }
 
     fun replaceAll(string: CharSequence): CharSequence {

@@ -96,5 +96,15 @@ class ReplaceTest {
             "I. A. 2,4,-10,12 U. A. 24,24,646,6",
             replacer.replaceAll("Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString()
         )
+
+        Assert.assertEquals(
+            "45Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3",
+            replacer.replaceIfMatch(0, "45Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString(),
+        )
+
+        Assert.assertEquals(
+            "I. A. 2,4,-10,12 Urvan Arven 12,12,323,3",
+            replacer.replaceIfMatch(0, "Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString(),
+        )
     }
 }
