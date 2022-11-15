@@ -31,7 +31,7 @@ open class OptionalRule<T : Any>(
             result.data = null
         }
         result.parseResult = createStepResult(
-            seek = result.seek,
+            seek = result.endSeek,
             parseCode = ParseCode.COMPLETE
         )
     }

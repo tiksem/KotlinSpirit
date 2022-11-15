@@ -30,7 +30,7 @@ class OneOrMoreRuleTest {
             r.data!!,
             listOf("Hello", "World")
         )
-        Assert.assertEquals(r.seek, "HelloWorld".length)
+        Assert.assertEquals(r.endSeek, "HelloWorld".length)
         Assert.assertEquals(r.isError, false)
     }
 

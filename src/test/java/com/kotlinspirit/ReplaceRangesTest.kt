@@ -1,8 +1,15 @@
 package com.kotlinspirit
 
 import com.kotlinspirit.ext.replaceRanges
+import com.kotlinspirit.rangeres.ParseRange
 import org.junit.Assert
 import org.junit.Test
+
+private fun list(vararg ranges: IntRange): List<ParseRange> {
+    return ranges.map {
+        ParseRange(it.first, it.last + 1)
+    }
+}
 
 class ReplaceRangesTest {
     @Test
@@ -12,25 +19,25 @@ class ReplaceRangesTest {
 
     @Test
     fun testOneRangeMiddle() {
-        Assert.assertEquals("Hello!".replaceRanges(listOf(1..4), "YO").toString(), "HYO!")
+        Assert.assertEquals("Hello!".replaceRanges(list(1..4), "YO").toString(), "HYO!")
     }
 
     @Test
     fun testOneRangeEnd() {
-        Assert.assertEquals("Hello!".replaceRanges(listOf(3..5), "YO").toString(), "HelYO")
+        Assert.assertEquals("Hello!".replaceRanges(list(3..5), "YO").toString(), "HelYO")
     }
 
     @Test
     fun testMix1() {
         Assert.assertEquals("Hello Vasia, How are you today".replaceRanges(
-            listOf(0..4, 6..10, 25..29), "YO"
+            list(0..4, 6..10, 25..29), "YO"
         ).toString(), "YO YO, How are you YO")
     }
 
     @Test
     fun testConnectedRanges() {
         Assert.assertEquals("Hello Vasia, How are you today".replaceRanges(
-            listOf(0..5, 6..10), "YO"
+            list(0..5, 6..10), "YO"
         ).toString(), "YOYO, How are you today")
     }
 
@@ -38,7 +45,7 @@ class ReplaceRangesTest {
     fun testIntersectionThrow() {
         Assert.assertThrows(IllegalStateException::class.java) {
             "Hello Vasia, How are you today".replaceRanges(
-                listOf(0..9, 6..10), "YO"
+                list(0..9, 6..10), "YO"
             )
         }
     }

@@ -1,11 +1,21 @@
 package com.kotlinspirit.expressive
 
 import com.kotlinspirit.char.CharPredicateRule
+import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.BaseRuleWithResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
+import com.kotlinspirit.rangeres.*
+import com.kotlinspirit.rangeres.callbacks.RangeResultCallbacksRuleDefaultRepeat
+import com.kotlinspirit.rangeres.callbacks.RangeResultCharCallbacksRule
+import com.kotlinspirit.rangeres.result.RangeResultCharCallbacksResultRule
+import com.kotlinspirit.rangeres.result.RangeResultCharResultRule
+import com.kotlinspirit.rangeres.result.RangeResultRuleCallbacksResultDefaultRepeat
+import com.kotlinspirit.rangeres.result.RangeResultRuleResultDefaultRepeat
+import com.kotlinspirit.rangeres.simple.RangeResultCharRule
+import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.repeat.RuleWithDefaultRepeatResult
 import com.kotlinspirit.str.StringCharPredicateRangeRule
@@ -82,6 +92,22 @@ class LazyCharPredicateRule(
             ruleProvider().debug(name ?: "lazy") as CharPredicateRule
         }
     }
+
+    override fun getRange(out: ParseRange): CharRule {
+        return RangeResultCharRule(this, out)
+    }
+
+    override fun getRange(callback: (ParseRange) -> Unit): CharRule {
+        return RangeResultCharCallbacksRule(this, callback)
+    }
+
+    override fun getRangeResult(out: ParseRangeResult<Char>): CharRule {
+        return RangeResultCharResultRule(this, out)
+    }
+
+    override fun getRangeResult(callback: (ParseRangeResult<Char>) -> Unit): CharRule {
+        return RangeResultCharCallbacksResultRule(this, callback)
+    }
 }
 
 open class LazyRule<T : Any>(
@@ -127,6 +153,22 @@ open class LazyRule<T : Any>(
                 ruleProvider().internalDebug() as RuleWithDefaultRepeat<T>
             }
         )
+    }
+
+    override fun getRange(out: ParseRange): RuleWithDefaultRepeat<T> {
+        return RangeResultRuleDefaultRepeat(this, out)
+    }
+
+    override fun getRange(callback: (ParseRange) -> Unit): RuleWithDefaultRepeat<T> {
+        return RangeResultCallbacksRuleDefaultRepeat(this, callback)
+    }
+
+    override fun getRangeResult(out: ParseRangeResult<T>): RuleWithDefaultRepeat<T> {
+        return RangeResultRuleResultDefaultRepeat(this, out)
+    }
+
+    override fun getRangeResult(callback: (ParseRangeResult<T>) -> Unit): RuleWithDefaultRepeat<T> {
+        return RangeResultRuleCallbacksResultDefaultRepeat(this, callback)
     }
 }
 

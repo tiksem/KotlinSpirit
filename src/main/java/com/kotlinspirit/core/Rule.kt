@@ -9,6 +9,8 @@ import com.kotlinspirit.ext.containsAny
 import com.kotlinspirit.ext.quoteIf
 import com.kotlinspirit.expressive.*
 import com.kotlinspirit.quoted.QuotedRule
+import com.kotlinspirit.rangeres.ParseRange
+import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.str.ExactStringRule
 import java.lang.RuntimeException
 
@@ -33,7 +35,7 @@ class ParseSeekResult(
     val isError: Boolean
         get() = stepResult.getParseCode().isError()
 
-    val seek: Int
+    val endSeek: Int
         get() = stepResult.getSeek()
 }
 
@@ -55,7 +57,7 @@ class ParseResult<T> {
     val isError: Boolean
         get() = parseResult.getParseCode().isError()
 
-    val seek: Int
+    val endSeek: Int
         get() = parseResult.getSeek()
 }
 
@@ -63,6 +65,84 @@ abstract class Rule<T : Any> {
     internal abstract fun parse(seek: Int, string: CharSequence): Long
     internal abstract fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
     internal abstract fun hasMatch(seek: Int, string: CharSequence): Boolean
+
+    internal inline fun findFirstSuccessfulSeek(string: CharSequence, callback: (Int, Int) -> Unit): Boolean {
+        var seek = 0
+        val length = string.length
+        do {
+            val result = parse(seek, string)
+            if (result.getParseCode().isNotError()) {
+                callback(seek, result.getSeek())
+                return true
+            }
+            val newSeek = result.getSeek()
+            if (newSeek == seek) {
+                seek++
+            } else {
+                seek = newSeek
+            }
+        } while (seek < length)
+
+        return false
+    }
+
+    internal inline fun findFirstSuccessfulResult(string: CharSequence, callback: (Int, ParseResult<T>) -> Unit): Boolean {
+        var seek = 0
+        val length = string.length
+        val result = ParseResult<T>()
+        do {
+            parseWithResult(seek, string, result)
+            if (!result.isError && result.data != null) {
+                callback(seek, result)
+                return true
+            }
+            val newSeek = result.endSeek
+            if (newSeek == seek) {
+                seek++
+            } else {
+                seek = newSeek
+            }
+        } while (seek < length)
+
+        return false
+    }
+
+    internal inline fun findSuccessfulRanges(string: CharSequence, callback: (Int, Int) -> Unit) {
+        var seek = 0
+        val length = string.length
+        do {
+            val result = parse(seek, string)
+            if (result.getParseCode().isNotError()) {
+                callback(seek, result.getSeek())
+            }
+            val newSeek = result.getSeek()
+            if (newSeek == seek) {
+                seek++
+            } else {
+                seek = newSeek
+            }
+
+        } while (seek < length)
+    }
+
+    internal inline fun findSuccessfulResults(string: CharSequence, callback: (Int, Int, T) -> Unit) {
+        var seek = 0
+        val length = string.length
+        val result = ParseResult<T>()
+        do {
+            parseWithResult(seek, string, result)
+            if (!result.isError && result.data != null) {
+                callback(seek, result.endSeek, result.data!!)
+            }
+            val newSeek = result.endSeek
+            if (newSeek == seek) {
+                seek++
+            } else {
+                seek = newSeek
+            }
+
+        } while (seek < length)
+    }
 
     open operator fun not(): Rule<*> {
         return NoRule(this)
@@ -124,6 +204,10 @@ abstract class Rule<T : Any> {
     abstract operator fun unaryPlus(): Rule<*>
 
     abstract operator fun invoke(callback: (T) -> Unit): BaseRuleWithResult<T>
+    abstract fun getRange(out: ParseRange): Rule<T>
+    abstract fun getRange(callback: (ParseRange) -> Unit): Rule<T>
+    abstract fun getRangeResult(out: ParseRangeResult<T>): Rule<T>
+    abstract fun getRangeResult(callback: (ParseRangeResult<T>) -> Unit): Rule<T>
 
     operator fun rem(divider: Rule<*>): SplitRule<T> {
         return split(divider = divider, range = 1..Int.MAX_VALUE)

@@ -38,7 +38,7 @@ open class BeforeRule<T : Any>(
             return
         }
 
-        val bResult = b.parse(result.seek, string)
+        val bResult = b.parse(result.endSeek, string)
         if (bResult.getParseCode().isError()) {
             result.parseResult = createStepResult(
                 seek = seek,

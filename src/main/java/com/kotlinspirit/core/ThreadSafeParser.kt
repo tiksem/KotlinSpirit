@@ -2,13 +2,13 @@ package com.kotlinspirit.core
 
 import java.util.concurrent.ConcurrentHashMap
 
-internal class ThreadSafeParser<T : Any>(originRule: Rule<T>): BaseParser<T>(originRule) {
-    private val ruleMap = ConcurrentHashMap<Thread, Rule<T>>().also {
-        it[Thread.currentThread()] = originRule
+internal class ThreadSafeParser<T : Any>(private val originRule: Rule<T>): BaseParser<T>() {
+    private val ruleMap = ConcurrentHashMap<Long, Rule<T>>().also {
+        it[Thread.currentThread().id] = originRule
     }
 
     override fun getRule(): Rule<T> {
-        return ruleMap.getOrPut(Thread.currentThread()) {
+        return ruleMap.getOrPut(Thread.currentThread().id) {
             originRule.clone()
         }
     }

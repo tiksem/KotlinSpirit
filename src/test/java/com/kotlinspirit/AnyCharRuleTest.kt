@@ -20,21 +20,21 @@ class AnyCharRuleTest {
     fun parseWithResult() {
         val result = char.compile().parseWithResult("a")
         Assert.assertEquals(result.data, 'a')
-        Assert.assertEquals(result.seek, 1)
+        Assert.assertEquals(result.endSeek, 1)
     }
 
     @Test
     fun parseWithResult2() {
         val result = char.compile().parseWithResult("adsdsds")
         Assert.assertEquals(result.data, 'a')
-        Assert.assertEquals(result.seek, 1)
+        Assert.assertEquals(result.endSeek, 1)
     }
 
     @Test
     fun parseEof() {
         val result = char.compile().parseWithResult("")
         Assert.assertEquals(result.errorCode, ParseCode.EOF)
-        Assert.assertEquals(result.seek, 0)
+        Assert.assertEquals(result.endSeek, 0)
 
         Assert.assertEquals(char.compile().tryParse(""), null)
     }
@@ -43,13 +43,13 @@ class AnyCharRuleTest {
     fun noTest() {
         val result = (!char).compile().parseWithResult("2")
         Assert.assertEquals(result.errorCode, ParseCode.NO_FAILED)
-        Assert.assertEquals(result.seek, 0)
+        Assert.assertEquals(result.endSeek, 0)
     }
 
     @Test
     fun noTestEof() {
         val result = (!char).compile().parseWithResult("")
         Assert.assertEquals(result.isError, false)
-        Assert.assertEquals(result.seek, 0)
+        Assert.assertEquals(result.endSeek, 0)
     }
 }

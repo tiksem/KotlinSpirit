@@ -53,7 +53,7 @@ class QuotedRuleTest {
             res.data!!.toTypedArray(),
             arrayOf(123,45,1234,-23)
         )
-        Assert.assertEquals(res.seek, str.length)
+        Assert.assertEquals(res.endSeek, str.length)
     }
 
     @Test
@@ -67,7 +67,7 @@ class QuotedRuleTest {
             res.data!!.toTypedArray(),
             arrayOf(123,45,1234,-23)
         )
-        Assert.assertEquals(res.seek, str.length)
+        Assert.assertEquals(res.endSeek, str.length)
     }
 
     @Test
@@ -81,7 +81,7 @@ class QuotedRuleTest {
             res.data!!.toTypedArray(),
             arrayOf("123","Julia","1234","Mordor")
         )
-        Assert.assertEquals(res.seek, str.length)
+        Assert.assertEquals(res.endSeek, str.length)
     }
 
     @Test
@@ -93,6 +93,6 @@ class QuotedRuleTest {
             res.data!!.toTypedArray(),
             arrayOf("Julia123Radon", "Anton234Simon")
         )
-        Assert.assertEquals(res.seek, str.length)
+        Assert.assertEquals(res.endSeek, str.length)
     }
 }

@@ -25,4 +25,8 @@ abstract class BaseRuleWithResult<T : Any>(
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return rule.hasMatch(seek, string)
     }
+
+    override fun isThreadSafe(): Boolean {
+        return false
+    }
 }

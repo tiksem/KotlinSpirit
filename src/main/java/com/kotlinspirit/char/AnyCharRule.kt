@@ -7,6 +7,12 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.core.BaseRuleWithResult
 import com.kotlinspirit.expressive.CharDiffRule
 import com.kotlinspirit.expressive.OptionalCharRule
+import com.kotlinspirit.rangeres.ParseRange
+import com.kotlinspirit.rangeres.ParseRangeResult
+import com.kotlinspirit.rangeres.callbacks.RangeResultCharCallbacksRule
+import com.kotlinspirit.rangeres.result.RangeResultCharCallbacksResultRule
+import com.kotlinspirit.rangeres.result.RangeResultCharResultRule
+import com.kotlinspirit.rangeres.simple.RangeResultCharRule
 import com.kotlinspirit.repeat.OneOrMoreRule
 import com.kotlinspirit.repeat.RepeatRule
 import com.kotlinspirit.repeat.ZeroOrMoreRule
@@ -30,6 +36,22 @@ open class CharResultRule(
         return OneOrMoreRule(this).asString()
     }
 
+    override fun getRange(out: ParseRange): CharRule {
+        return RangeResultCharRule(this, out)
+    }
+
+    override fun getRange(callback: (ParseRange) -> Unit): CharRule {
+        return RangeResultCharCallbacksRule(this, callback)
+    }
+
+    override fun getRangeResult(out: ParseRangeResult<Char>): CharRule {
+        return RangeResultCharResultRule(this, out)
+    }
+
+    override fun getRangeResult(callback: (ParseRangeResult<Char>) -> Unit): CharRule {
+        return RangeResultCharCallbacksResultRule(this, callback)
+    }
+
     override fun invoke(callback: (Char) -> Unit): CharResultRule {
         return CharResultRule(rule as CharRule, callback)
     }
@@ -44,10 +66,6 @@ open class CharResultRule(
 
     override val debugNameShouldBeWrapped: Boolean
         get() = rule.debugNameShouldBeWrapped
-
-    override fun isThreadSafe(): Boolean {
-        return rule.isThreadSafe()
-    }
 
     override fun ignoreCallbacks(): CharRule {
         return rule.ignoreCallbacks() as CharRule
@@ -69,6 +87,22 @@ abstract class CharRule : Rule<Char>() {
 
     override fun invoke(callback: (Char) -> Unit): BaseRuleWithResult<Char> {
         return CharResultRule(this, callback)
+    }
+
+    override fun getRange(out: ParseRange): CharRule {
+        return RangeResultCharRule(rule = this, outRange = out)
+    }
+
+    override fun getRange(callback: (ParseRange) -> Unit): CharRule {
+        return RangeResultCharCallbacksRule(rule = this, callback)
+    }
+
+    override fun getRangeResult(out: ParseRangeResult<Char>): CharRule {
+        return RangeResultCharResultRule(this, out)
+    }
+
+    override fun getRangeResult(callback: (ParseRangeResult<Char>) -> Unit): CharRule {
+        return RangeResultCharCallbacksResultRule(this, callback)
     }
 
     override fun repeat(): Rule<CharSequence> {

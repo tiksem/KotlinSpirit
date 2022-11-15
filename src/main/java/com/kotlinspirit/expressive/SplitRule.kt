@@ -94,7 +94,7 @@ open class SplitRule<T : Any>(
                 i = seekAfterRule
                 break
             }
-            seekAfterRule = itemResult.seek
+            seekAfterRule = itemResult.endSeek
             list.add(itemResult.data ?: throw IllegalStateException("item result should not be null"))
 
             val dividerRes = divider.parse(seekAfterRule, string)

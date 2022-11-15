@@ -34,7 +34,7 @@ open class QuotedRule<T : Any>(
         if (result.isError) {
             return
         }
-        val r = right.parse(result.seek, string)
+        val r = right.parse(result.endSeek, string)
         result.parseResult = r
         if (r.getParseCode().isError()) {
             result.data = null

@@ -347,7 +347,7 @@ class DoubleTest {
         double.parseWithResult(0 , "5.0  ", result)
         Assert.assertEquals(result.data ?: -1.0, 5.0, 0.00001)
         Assert.assertEquals(result.parseResult.getParseCode(), ParseCode.COMPLETE)
-        Assert.assertEquals(result.seek, "5.0".length)
+        Assert.assertEquals(result.endSeek, "5.0".length)
     }
 
     @Test

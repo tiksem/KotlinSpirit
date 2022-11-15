@@ -55,7 +55,8 @@ open class ExactStringRule(
         }
 
         val self = this.string
-        if (seek + self.length > string.length) {
+        val selfLength = self.length
+        if (seek + selfLength > string.length) {
             result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
@@ -63,21 +64,21 @@ open class ExactStringRule(
             return
         }
 
-        var i = seek
-        val end = self.length + seek
-        do {
-            if (self[i - seek] != string[i]) {
-                result.parseResult = createStepResult(
-                    seek = seek,
-                    parseCode = ParseCode.STRING_DOES_NOT_MATCH
-                )
-                return
-            }
-            i++
-        } while (i < end)
-
-        result.parseResult = createComplete(end)
-        result.data = this.string
+        if (string.regionMatches(
+                thisOffset = seek,
+                other = self,
+                otherOffset = 0,
+                length = selfLength
+            )) {
+            result.parseResult = createComplete(seek + selfLength)
+            result.data = this.string
+        } else {
+            result.parseResult = createStepResult(
+                seek = seek,
+                parseCode = ParseCode.STRING_DOES_NOT_MATCH
+            )
+            result.data = null
+        }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {

@@ -1,7 +1,7 @@
 package com.kotlinspirit.core
 
-internal class RegularParser<T : Any>(originalRule: Rule<T>) : BaseParser<T>(originalRule) {
+internal class RegularParser<T : Any>(private val originalRule: Rule<T>) : BaseParser<T>() {
     override fun getRule(): Rule<T> {
-        return originRule
+        return originalRule
     }
 }

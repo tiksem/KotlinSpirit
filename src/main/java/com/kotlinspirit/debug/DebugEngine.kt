@@ -61,13 +61,16 @@ class RuleDebugTreeNode(
     }
 }
 
-internal class DebugEngine {
-    private var root: RuleDebugTreeNode? = null
+class DebugEngine {
+    var root: RuleDebugTreeNode? = null
+        private set
+    private val history = ArrayList<RuleDebugTreeNode>()
     private var seek: RuleDebugTreeNode? = null
     private var string: CharSequence = ""
 
     fun startDebugSession(string: CharSequence) {
         this.string = string
+        history.clear()
         root = null
         seek = null
     }
@@ -76,7 +79,7 @@ internal class DebugEngine {
         val node = RuleDebugTreeNode(rule, string).also {
             it.startSeek = startSeek
         }
-        if (root == null) {
+        if (seek == null) {
             root = node
             seek = root
         } else {
@@ -97,20 +100,27 @@ internal class DebugEngine {
 
         seek.endSeek = result.getSeek()
         seek.parseCode = result.getParseCode()
+        if (seek.parent == null) {
+            history.add(seek)
+        }
+
         this.seek = seek.parent
     }
 
     companion object {
-        private val engines = ConcurrentHashMap<Thread, DebugEngine>()
+        private val engines = ConcurrentHashMap<Long, DebugEngine>()
 
         private fun getEngine(): DebugEngine {
-            return engines.getOrPut(Thread.currentThread()) {
+            return engines.getOrPut(Thread.currentThread().id) {
                 DebugEngine()
             }
         }
 
         val root: RuleDebugTreeNode?
             get() = getEngine().root
+
+        val history: List<RuleDebugTreeNode>
+            get() = getEngine().history
 
         fun startDebugSession(string: CharSequence) {
             getEngine().startDebugSession(string)

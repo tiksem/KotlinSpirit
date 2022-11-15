@@ -14,7 +14,7 @@ class DiffRuleTest {
         val result = ParseResult<T>()
         rule.parseWithResult(0, str, result)
         Assert.assertEquals(result.parseResult.getParseCode(), code)
-        Assert.assertEquals(result.seek, 0)
+        Assert.assertEquals(result.endSeek, 0)
     }
 
     private fun <T : Any> verifyDiffSuccess(rule: Rule<T>, str: String) {
