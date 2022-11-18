@@ -256,16 +256,6 @@ fun parse(string: CharSequence): ParseSeekResult
 ```
 Returns true if the string matches the rule from the beginning to the end.
 ```
-fun matches(string: CharSequence): Boolean
-```
-Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
-```
-fun matchOrThrow(string: CharSequence)
-```
-Returns true if the string matches the rule from the beginning only.
-```
-fun matchesAtBeginning(string: CharSequence): Boolean
-```
 
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recursion here.
