@@ -283,6 +283,33 @@ Retrurns results and ranges of all matches.
 fun findAllResults(string: CharSequence): List<ParseRangeResult<T>>
 ```
 
+## Replace functions
+
+Replaces the first match
+```
+fun replaceFirst(source: CharSequence, replacement: CharSequence): CharSequence
+```
+Replaces all matches
+```
+fun replaceAll(source: CharSequence, replacement: CharSequence): CharSequence
+```
+Replaces the first match using a custom replacementProvider, it takes the rule's result as its argument.
+```
+fun replaceFirst(source: CharSequence, replacementProvider: (T) -> Any): CharSequence
+```
+Replaces matches using a custom replacementProvider, it takes the rule's result as its argument.
+```
+fun replaceAll(source: CharSequence, replacementProvider: (T) -> Any): CharSequence
+```
+Replaces the first match. Returns null if the match was not found
+```
+fun replaceFirstOrNull(source: CharSequence, replacement: CharSequence): CharSequence?
+```
+Replaces the first match using a custom replacementProvider. Returns null if the match was not found
+```
+fun replaceFirstOrNull(source: CharSequence, replacementProvider: (T) -> CharSequence): CharSequence?
+```
+
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recursion here.
 
