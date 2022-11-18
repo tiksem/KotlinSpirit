@@ -220,38 +220,38 @@ Each rule contains its result after parsing, when you parse without a result, ju
 ## Matching functions
 
 Returns true if the string matches the rule from the beginning to the end.
-```
+```Kotlin
 fun matches(string: CharSequence): Boolean
-```
+```Kotlin
 Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
-```
+```Kotlin
 fun matchOrThrow(string: CharSequence)
-```
+```Kotlin
 Returns true if the string matches the rule from the beginning only.
-```
+```Kotlin
 fun matchesAtBeginning(string: CharSequence): Boolean
 ```
 
 ## Parsing functions
 
 Parses and gets the result, if the rule doesn't match throws ParseException
-```
+```Kotlin
 fun parseGetResultOrThrow(string: CharSequence): T
 ```
 Parses without any result returning the ending seek, if the rule doesn't match throws ParseException.
-```
+```Kotlin
 fun parseOrThrow(string: CharSequence): Int
 ```
 Parses without any result, returns ending seek if rule matches and null otherwise.
-```
+```Kotlin
 fun tryParse(string: CharSequence): Int?
 ```
 Parses with returning ParseResult. it contains the result or errorCode if the rule doesn't match
-```
+```Kotlin
 fun parseWithResult(string: CharSequence): ParseResult<T>
 ```
 Parses without a result returning ParseSeekResult. ParseSeekResult contains ending seek and errorCode.
-```
+```Kotlin
 fun parse(string: CharSequence): ParseSeekResult
 ```
 
@@ -259,54 +259,54 @@ fun parse(string: CharSequence): ParseSeekResult
 Unlike parsing functions, searching functions try to find the result from the beginning to the end, moving a seek. But parsing functions fail immidiatly if the result doesn't match at the beginning.
 
 Retrurns an index of the first match or null if the match is not found.
-```
+```Kotlin
 fun indexOf(string: CharSequence): Int?
 ```
 Retrurns a result and a range of the first match or null if the match is not found.
-```
+```Kotlin
 fun findFirstResult(string: CharSequence): ParseRangeResult<T>?
 ```
 Retrurns a result of the first match or null if the match is not found.
-```
+```Kotlin
 fun findFirst(string: CharSequence): T?
 ```
 Retrurns a range of the first match or null if the match is not found.
-```
+```Kotlin
 fun findFirstRange(string: CharSequence): ParseRange?
 ```
 Retrurns results of all matches.
-```
+```Kotlin
 fun findAll(string: CharSequence): List<T>
 ```
 Retrurns results and ranges of all matches.
-```
+```Kotlin
 fun findAllResults(string: CharSequence): List<ParseRangeResult<T>>
 ```
 
 ## Replace functions
 
 Replaces the first match
-```
+```Kotlin
 fun replaceFirst(source: CharSequence, replacement: CharSequence): CharSequence
 ```
 Replaces all matches
-```
+```Kotlin
 fun replaceAll(source: CharSequence, replacement: CharSequence): CharSequence
 ```
 Replaces the first match using a custom replacementProvider, it takes the rule's result as its argument.
-```
+```Kotlin
 fun replaceFirst(source: CharSequence, replacementProvider: (T) -> Any): CharSequence
 ```
 Replaces matches using a custom replacementProvider, it takes the rule's result as its argument.
-```
+```Kotlin
 fun replaceAll(source: CharSequence, replacementProvider: (T) -> Any): CharSequence
 ```
 Replaces the first match. Returns null if the match was not found
-```
+```Kotlin
 fun replaceFirstOrNull(source: CharSequence, replacement: CharSequence): CharSequence?
 ```
 Replaces the first match using a custom replacementProvider. Returns null if the match was not found
-```
+```Kotlin
 fun replaceFirstOrNull(source: CharSequence, replacementProvider: (T) -> CharSequence): CharSequence?
 ```
 
