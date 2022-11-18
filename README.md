@@ -214,7 +214,7 @@ parser.matches("123.bc") // false
 parser.matches("123.34") // false
 ```
 
-# Parser functions, and getting a result
+# Parser functions
 Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticeable.
 
 ## Matching functions
