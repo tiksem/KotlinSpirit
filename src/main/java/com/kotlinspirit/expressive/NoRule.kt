@@ -7,6 +7,10 @@ import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 
+/**
+ * Matches one character, if it doesn't match the original rule.
+ * If we are at the end of input, and the original rule doesn't match EOF, it outputs '\0' as a result
+ */
 open class NoRule(
     protected val rule: Rule<*>
 ) : CharRule() {
