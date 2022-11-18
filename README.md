@@ -232,7 +232,7 @@ Returns true if the string matches the rule from the beginning only.
 fun matchesAtBeginning(string: CharSequence): Boolean
 ```
 
-## Parsing Functions
+## Parsing functions
 
 Parses and gets the result, if the rule doesn't match throws ParseException
 ```
@@ -253,6 +253,34 @@ fun parseWithResult(string: CharSequence): ParseResult<T>
 Parses without a result returning ParseSeekResult. ParseSeekResult contains ending seek and errorCode.
 ```
 fun parse(string: CharSequence): ParseSeekResult
+```
+
+## Searching functions
+Unlike parsing functions, searching functions try to find the result from the beginning to the end, moving a seek. But parsing functions fail immidiatly if the result doesn't match at the beginning.
+
+Retrurns an index of the first match or null if the match is not found.
+```
+fun indexOf(string: CharSequence): Int?
+```
+Retrurns a result and a range of the first match or null if the match is not found.
+```
+fun findFirstResult(string: CharSequence): ParseRangeResult<T>?
+```
+Retrurns a result of the first match or null if the match is not found.
+```
+fun findFirst(string: CharSequence): T?
+```
+Retrurns a range of the first match or null if the match is not found.
+```
+fun findFirstRange(string: CharSequence): ParseRange?
+```
+Retrurns results of all matches.
+```
+fun findAll(string: CharSequence): List<T>
+```
+Retrurns results and ranges of all matches.
+```
+fun findAllResults(string: CharSequence): List<ParseRangeResult<T>>
 ```
 
 # Recursive expressions
