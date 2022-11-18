@@ -254,8 +254,6 @@ Parses without a result returning ParseSeekResult. ParseSeekResult contains endi
 ```
 fun parse(string: CharSequence): ParseSeekResult
 ```
-Returns true if the string matches the rule from the beginning to the end.
-```
 
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recursion here.
