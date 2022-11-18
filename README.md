@@ -396,6 +396,61 @@ val personRule = object : Grammar<Person>() {
 ```
 Note: `toRule` is used to convert the grammar to a rule.
 
+# Building advanced replacers
+Sometimes you need to create some advanced replace logic, so Parser repalce functions doesn't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements using groups. To describe the functionality of Replacer let's discuss and example: We want to replace a string containing a list of Name LastName, followed by a list of integer, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's cerate Repalcer for it.
+```Kotlin
+val replacer = Replacer {
+    val nameRange = range()
+    val lastNameRange = range()
+    val intsResult = rangeResultList<Int>()
+
+    val name = char('A'..'Z') + +char('a'..'z')
+    val nameAndLastName = name.getRange(nameRange) + ' ' + name.getRange(lastNameRange)
+
+    val ints = int.getRangeResult {
+        intsResult.add(it)
+    } % ','
+
+    fun replaceName(name: CharSequence): CharSequence {
+        return name[0].toString() + '.'
+    }
+
+    Replace(
+        rule = nameAndLastName + ' ' + ints
+    ) {
+        replace(nameRange, ::replaceName)
+        replace(lastNameRange, ::replaceName)
+        replace(intsResult) {
+            it * 2
+        }
+    }
+}
+```
+Let's test it
+```
+Assert.assertEquals(
+    "I. A. 2,4,-10,12 Urvan Arven 12,12,323,3",
+    replacer.replaceFirst("Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString()
+)
+
+Assert.assertEquals(
+    "I. A. 2,4,-10,12 U. A. 24,24,646,6",
+    replacer.replaceAll("Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString()
+)
+
+Assert.assertEquals(
+    "45Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3",
+    replacer.replaceIfMatch(0, "45Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString(),
+)
+
+Assert.assertEquals(
+    "I. A. 2,4,-10,12 Urvan Arven 12,12,323,3",
+    replacer.replaceIfMatch(0, "Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString(),
+)
+```
+In the exampler Repalcer takes Replace builder as an argument. The builder returns Replace object, containing the rule and another builder as the second argument, where we discribe how the replacement process goes.
+
+
 # Thread safety
 A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However if you use callbacks or getRange or getRangeResult in your rule, there are some edge cases you should consider. Callbacks and getRange hooks are not synchronized, so they might be called from different threads, when you call your parser functions from different threads. But it's totally safe to use callbacks or getRange or getRangeResult in Grammar or Replacer, because a copy of your Grammar/Replace is created for each thread.
 
