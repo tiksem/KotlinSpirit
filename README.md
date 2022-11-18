@@ -217,21 +217,55 @@ parser.matches("123.34") // false
 # Parser functions, and getting a result
 Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticeable.
 
-`fun parseGetResultOrThrow(string: CharSequence): T` Parses and gets the result, if the rule doesn't match throws ParseException
+## Matching functions
 
-`fun parseOrThrow(string: CharSequence): Int` Parses without any result returning the ending seek, if the rule doesn't match throws ParseException.
+Returns true if the string matches the rule from the beginning to the end.
+```
+fun matches(string: CharSequence): Boolean
+```
+Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
+```
+fun matchOrThrow(string: CharSequence)
+```
+Returns true if the string matches the rule from the beginning only.
+```
+fun matchesAtBeginning(string: CharSequence): Boolean
+```
 
-`fun tryParse(string: CharSequence): Int?` Parses without any result, returns ending seek if rule matches and null otherwise.
+## Parsing Functions
 
-`fun parseWithResult(string: CharSequence): ParseResult<T>` Parses with returning ParseResult. it contains the result or errorCode if the rule doesn't match
-
-`fun parse(string: CharSequence): ParseSeekResult` Parses without a result returning ParseSeekResult. ParseSeekResult contains ending seek and errorCode.
-
-`fun matches(string: CharSequence): Boolean` Returns true if the string matches the rule from the beginning to the end.
-
-`fun matchOrThrow(string: CharSequence)` Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
-
-`fun matchesAtBeginning(string: CharSequence): Boolean` Returns true if the string matches the rule from the beginning only.
+Parses and gets the result, if the rule doesn't match throws ParseException
+```
+fun parseGetResultOrThrow(string: CharSequence): T
+```
+Parses without any result returning the ending seek, if the rule doesn't match throws ParseException.
+```
+fun parseOrThrow(string: CharSequence): Int
+```
+Parses without any result, returns ending seek if rule matches and null otherwise.
+```
+fun tryParse(string: CharSequence): Int?
+```
+Parses with returning ParseResult. it contains the result or errorCode if the rule doesn't match
+```
+fun parseWithResult(string: CharSequence): ParseResult<T>
+```
+Parses without a result returning ParseSeekResult. ParseSeekResult contains ending seek and errorCode.
+```
+fun parse(string: CharSequence): ParseSeekResult
+```
+Returns true if the string matches the rule from the beginning to the end.
+```
+fun matches(string: CharSequence): Boolean
+```
+Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
+```
+fun matchOrThrow(string: CharSequence)
+```
+Returns true if the string matches the rule from the beginning only.
+```
+fun matchesAtBeginning(string: CharSequence): Boolean
+```
 
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recursion here.
@@ -260,6 +294,25 @@ You may be wondering how do we get results from nested rules during parsing. `pa
 
 ## Rule callbacks
 Each rule can have a custom callback specified, this callback is called when the rule is successful. Let's come back to our first example where we parsed a key-value pair of name and age. And specify callbacks to retrieve the results.
+```Kotlin
+var name = ""
+var age = -1
+val nameRule = char('A'..'Z') + +char('a'..'z')
+val rule = nameRule { name = it } + '=' + int { age = it }
+```
+Callbacks are usually used in Grammar or Repalcer. We will discuss them later.
+
+## getRange, getRangeResult hooks
+Sometimes you need to get a range of your rule's match. You can use getRange and getRangeResult hooks for that. Warning: getRange and getRangeResult are not properly synchronized for multithreading usage. So you need to use them inside Grammar or Replacer. See Thread safety section for reference. 
+
+getRange accepts ParseRange as a parameter. ParseRange is filled with startSeek and endSeek during parsing, when the rule is succesful. You can create a range using `range()` function. The example shows how to find int in a string and get its range
+```
+val range = range()
+val r = (!int).repeat() + int.getRange(range) + (!int).repeat()
+r.compile.match("yoyoyo322323yoyoyo")
+```
+getRangeResult is the same as getRange, but it also parses a result, so it takes ParseRangeResult. To create ParseRangeResult use `rangeResult()` function.
+
 ```Kotlin
 var name = ""
 var age = -1
@@ -301,7 +354,7 @@ val personRule = object : Grammar<Person>() {
 Note: `toRule` is used to convert the grammar to a rule.
 
 # Thread safety
-A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However, if you use grammar or lazy rules in your rule, Parser creates a copy of your rule for each thread internally. You don't need to worry about it a lot, KotlinSpirit does all the job underhood. However, it may affect performance slightly.
+A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However if you use callbacks or getRange or getRangeResult in your rule, there are some edges cases you should consider. Callbacks and getRange hooks are not synchronized, so they might be called from different threads, when you call your parser functions from different threads. But it's totally safe to use callbacks or getRange or getRangeResult in Grammar or Replacer, because a copy of your Grammar/Replace is created for each thread.
 
 # Debugging
 KotlinSpirit has a debugging engine included, which makes it easier to debug errors in your parser. To enable debugging you need to call `debug()` on your root rule.
