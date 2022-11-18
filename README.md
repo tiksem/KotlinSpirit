@@ -427,7 +427,7 @@ val replacer = Replacer {
 }
 ```
 Let's test it
-```
+```Kotlin
 Assert.assertEquals(
     "I. A. 2,4,-10,12 Urvan Arven 12,12,323,3",
     replacer.replaceFirst("Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString()
