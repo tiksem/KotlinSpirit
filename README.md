@@ -342,7 +342,7 @@ val personRule = object : Grammar<Person>() {
 Note: `toRule` is used to convert the grammar to a rule.
 
 # Thread safety
-A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However if you use callbacks or getRange or getRangeResult in your rule, there are some edges cases you should consider. Callbacks and getRange hooks are not synchronized, so they might be called from different threads, when you call your parser functions from different threads. But it's totally safe to use callbacks or getRange or getRangeResult in Grammar or Replacer, because a copy of your Grammar/Replace is created for each thread.
+A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However if you use callbacks or getRange or getRangeResult in your rule, there are some edge cases you should consider. Callbacks and getRange hooks are not synchronized, so they might be called from different threads, when you call your parser functions from different threads. But it's totally safe to use callbacks or getRange or getRangeResult in Grammar or Replacer, because a copy of your Grammar/Replace is created for each thread.
 
 # Debugging
 KotlinSpirit has a debugging engine included, which makes it easier to debug errors in your parser. To enable debugging you need to call `debug()` on your root rule.
