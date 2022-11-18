@@ -222,11 +222,11 @@ Each rule contains its result after parsing, when you parse without a result, ju
 Returns true if the string matches the rule from the beginning to the end.
 ```Kotlin
 fun matches(string: CharSequence): Boolean
-```Kotlin
+```
 Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
 ```Kotlin
 fun matchOrThrow(string: CharSequence)
-```Kotlin
+```
 Returns true if the string matches the rule from the beginning only.
 ```Kotlin
 fun matchesAtBeginning(string: CharSequence): Boolean
