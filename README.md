@@ -407,7 +407,7 @@ For example: `val debugIntRule = int.debug()`
 After parsing is finished you can get a tree of your parsing process using `parser.getDebugTree()`. The tree is passed to `ParseException` as well. The tree is also convertible to json string using `toString` method.
 
 ### Debug names
-KotlinSpirit assigns readable names for all the rules by default. However, if you want to specify your own custom name you can do it by applying `debug(name: String)` method to intermediate rules.
+KotlinSpirit assigns readable names for all the rules by default. However, if you want to specify your own custom name you can do it by applying `debug(name: String)` method to intermediate rules. If you use repalce or search functions you may get multiple trees during the process. Call `getDebugHistory()` to get trees of all the parsing attempts.
 
 Let's come back to our first example and make it debuggable.
 ```Kotlin
