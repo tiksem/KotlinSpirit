@@ -19,7 +19,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.0.0"
+implementation "com.github.tiksem:KotlinSpirit:1.0.1"
 ```
 
 # Creating a simple parser
@@ -214,24 +214,101 @@ parser.matches("123.bc") // false
 parser.matches("123.34") // false
 ```
 
-# Parser functions, and getting a result
+# Parser functions
 Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticeable.
 
-`fun parseGetResultOrThrow(string: CharSequence): T` Parses and gets the result, if the rule doesn't match throws ParseException
+## Matching functions
 
-`fun parseOrThrow(string: CharSequence): Int` Parses without any result returning the ending seek, if the rule doesn't match throws ParseException.
+Returns true if the string matches the rule from the beginning to the end.
+```Kotlin
+fun matches(string: CharSequence): Boolean
+```
+Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
+```Kotlin
+fun matchOrThrow(string: CharSequence)
+```
+Returns true if the string matches the rule from the beginning only.
+```Kotlin
+fun matchesAtBeginning(string: CharSequence): Boolean
+```
 
-`fun tryParse(string: CharSequence): Int?` Parses without any result, returns ending seek if rule matches and null otherwise.
+## Parsing functions
 
-`fun parseWithResult(string: CharSequence): ParseResult<T>` Parses with returning ParseResult. it contains the result or errorCode if the rule doesn't match
+Parses and gets the result, if the rule doesn't match throws ParseException
+```Kotlin
+fun parseGetResultOrThrow(string: CharSequence): T
+```
+Parses without any result returning the ending seek, if the rule doesn't match throws ParseException.
+```Kotlin
+fun parseOrThrow(string: CharSequence): Int
+```
+Parses without any result, returns ending seek if rule matches and null otherwise.
+```Kotlin
+fun tryParse(string: CharSequence): Int?
+```
+Parses with returning ParseResult. it contains the result or errorCode if the rule doesn't match
+```Kotlin
+fun parseWithResult(string: CharSequence): ParseResult<T>
+```
+Parses without a result returning ParseSeekResult. ParseSeekResult contains ending seek and errorCode.
+```Kotlin
+fun parse(string: CharSequence): ParseSeekResult
+```
 
-`fun parse(string: CharSequence): ParseSeekResult` Parses without a result returning ParseSeekResult. ParseSeekResult contains ending seek and errorCode.
+## Searching functions
+Unlike parsing functions, searching functions try to find the result from the beginning to the end, moving a seek. But parsing functions fail immidiatly if the result doesn't match at the beginning.
 
-`fun matches(string: CharSequence): Boolean` Returns true if the string matches the rule from the beginning to the end.
+Retrurns an index of the first match or null if the match is not found.
+```Kotlin
+fun indexOf(string: CharSequence): Int?
+```
+Retrurns a result and a range of the first match or null if the match is not found.
+```Kotlin
+fun findFirstResult(string: CharSequence): ParseRangeResult<T>?
+```
+Retrurns a result of the first match or null if the match is not found.
+```Kotlin
+fun findFirst(string: CharSequence): T?
+```
+Retrurns a range of the first match or null if the match is not found.
+```Kotlin
+fun findFirstRange(string: CharSequence): ParseRange?
+```
+Retrurns results of all matches.
+```Kotlin
+fun findAll(string: CharSequence): List<T>
+```
+Retrurns results and ranges of all matches.
+```Kotlin
+fun findAllResults(string: CharSequence): List<ParseRangeResult<T>>
+```
 
-`fun matchOrThrow(string: CharSequence)` Checks if the string matches the rule from the beginning to the end. If no, throws ParseException.
+## Replace functions
 
-`fun matchesAtBeginning(string: CharSequence): Boolean` Returns true if the string matches the rule from the beginning only.
+Replaces the first match
+```Kotlin
+fun replaceFirst(source: CharSequence, replacement: CharSequence): CharSequence
+```
+Replaces all matches
+```Kotlin
+fun replaceAll(source: CharSequence, replacement: CharSequence): CharSequence
+```
+Replaces the first match using a custom replacementProvider, it takes the rule's result as its argument.
+```Kotlin
+fun replaceFirst(source: CharSequence, replacementProvider: (T) -> Any): CharSequence
+```
+Replaces matches using a custom replacementProvider, it takes the rule's result as its argument.
+```Kotlin
+fun replaceAll(source: CharSequence, replacementProvider: (T) -> Any): CharSequence
+```
+Replaces the first match. Returns null if the match was not found
+```Kotlin
+fun replaceFirstOrNull(source: CharSequence, replacement: CharSequence): CharSequence?
+```
+Replaces the first match using a custom replacementProvider. Returns null if the match was not found
+```Kotlin
+fun replaceFirstOrNull(source: CharSequence, replacementProvider: (T) -> CharSequence): CharSequence?
+```
 
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recursion here.
@@ -260,6 +337,25 @@ You may be wondering how do we get results from nested rules during parsing. `pa
 
 ## Rule callbacks
 Each rule can have a custom callback specified, this callback is called when the rule is successful. Let's come back to our first example where we parsed a key-value pair of name and age. And specify callbacks to retrieve the results.
+```Kotlin
+var name = ""
+var age = -1
+val nameRule = char('A'..'Z') + +char('a'..'z')
+val rule = nameRule { name = it } + '=' + int { age = it }
+```
+Callbacks are usually used in Grammar or Repalcer. We will discuss them later.
+
+## getRange, getRangeResult hooks
+Sometimes you need to get a range of your rule's match. You can use getRange and getRangeResult hooks for that. Warning: getRange and getRangeResult are not properly synchronized for multithreading usage. So you need to use them inside Grammar or Replacer. See Thread safety section for reference. 
+
+getRange accepts ParseRange as a parameter. ParseRange is filled with startSeek and endSeek during parsing, when the rule is succesful. You can create a range using `range()` function. The example shows how to find int in a string and get its range
+```
+val range = range()
+val r = (!int).repeat() + int.getRange(range) + (!int).repeat()
+r.compile.match("yoyoyo322323yoyoyo")
+```
+getRangeResult is the same as getRange, but it also parses a result, so it takes ParseRangeResult. To create ParseRangeResult use `rangeResult()` function.
+
 ```Kotlin
 var name = ""
 var age = -1
@@ -300,8 +396,63 @@ val personRule = object : Grammar<Person>() {
 ```
 Note: `toRule` is used to convert the grammar to a rule.
 
+# Building advanced replacers
+Sometimes you need to create some advanced replace logic, so Parser repalce functions doesn't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements using groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integer, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
+```Kotlin
+val replacer = Replacer {
+    val nameRange = range()
+    val lastNameRange = range()
+    val intsResult = rangeResultList<Int>()
+
+    val name = char('A'..'Z') + +char('a'..'z')
+    val nameAndLastName = name.getRange(nameRange) + ' ' + name.getRange(lastNameRange)
+
+    val ints = int.getRangeResult {
+        intsResult.add(it)
+    } % ','
+
+    fun replaceName(name: CharSequence): CharSequence {
+        return name[0].toString() + '.'
+    }
+
+    Replace(
+        rule = nameAndLastName + ' ' + ints
+    ) {
+        replace(nameRange, ::replaceName)
+        replace(lastNameRange, ::replaceName)
+        replace(intsResult) {
+            it * 2
+        }
+    }
+}
+```
+Let's test it
+```Kotlin
+Assert.assertEquals(
+    "I. A. 2,4,-10,12 Urvan Arven 12,12,323,3",
+    replacer.replaceFirst("Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString()
+)
+
+Assert.assertEquals(
+    "I. A. 2,4,-10,12 U. A. 24,24,646,6",
+    replacer.replaceAll("Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString()
+)
+
+Assert.assertEquals(
+    "45Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3",
+    replacer.replaceIfMatch(0, "45Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString(),
+)
+
+Assert.assertEquals(
+    "I. A. 2,4,-10,12 Urvan Arven 12,12,323,3",
+    replacer.replaceIfMatch(0, "Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString(),
+)
+```
+In the exampler Repalcer takes Replace builder as an argument. The builder returns Replace object, containing the rule and another builder as the second argument, where we discribe how the replacement process goes.
+
+
 # Thread safety
-A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However, if you use grammar or lazy rules in your rule, Parser creates a copy of your rule for each thread internally. You don't need to worry about it a lot, KotlinSpirit does all the job underhood. However, it may affect performance slightly.
+A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However if you use callbacks or getRange or getRangeResult in your rule, there are some edge cases you should consider. Callbacks and getRange hooks are not synchronized, so they might be called from different threads, when you call your parser functions from different threads. But it's totally safe to use callbacks or getRange or getRangeResult in Grammar or Replacer, because a copy of your Grammar/Replace is created for each thread.
 
 # Debugging
 KotlinSpirit has a debugging engine included, which makes it easier to debug errors in your parser. To enable debugging you need to call `debug()` on your root rule.
@@ -311,7 +462,7 @@ For example: `val debugIntRule = int.debug()`
 After parsing is finished you can get a tree of your parsing process using `parser.getDebugTree()`. The tree is passed to `ParseException` as well. The tree is also convertible to json string using `toString` method.
 
 ### Debug names
-KotlinSpirit assigns readable names for all the rules by default. However, if you want to specify your own custom name you can do it by applying `debug(name: String)` method to intermediate rules.
+KotlinSpirit assigns readable names for all the rules by default. However, if you want to specify your own custom name you can do it by applying `debug(name: String)` method to intermediate rules. If you use repalce or search functions you may get multiple trees during the process. Call `getDebugHistory()` to get trees of all the parsing attempts.
 
 Let's come back to our first example and make it debuggable.
 ```Kotlin
