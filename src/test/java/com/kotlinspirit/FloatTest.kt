@@ -1,8 +1,7 @@
 package com.kotlinspirit
 
-import com.kotlinspirit.core.ParseCode
+import com.kotlinspirit.core.*
 import com.kotlinspirit.core.Rules.float
-import com.kotlinspirit.core.createStepResult
 import org.junit.Assert
 import org.junit.Test
 
@@ -340,6 +339,15 @@ class FloatTest {
     }
 
     @Test
+    fun testSpaceAfterFloat() {
+        val result = ParseResult<Float>()
+        float.parseWithResult(0 , "5.0  ", result)
+        Assert.assertEquals(result.data ?: -1.0f, 5.0f, 0.00001f)
+        Assert.assertEquals(result.parseResult.getParseCode(), ParseCode.COMPLETE)
+        Assert.assertEquals(result.endSeek, "5.0".length)
+    }
+
+    @Test
     fun notMoreDotError() {
         val str = ".."
         Assert.assertEquals(
@@ -364,7 +372,6 @@ class FloatTest {
     fun noParseTest4() {
         Assert.assertEquals(noFloat.tryParse("+__fff.0"), 1)
     }
-
 
     @Test
     fun noParseTest5() {

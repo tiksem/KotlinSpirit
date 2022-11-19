@@ -124,6 +124,8 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
                         } else {
                             return createComplete(saveI)
                         }
+                    } else {
+                        return createComplete(i - 1)
                     }
                 } else {
                     return createComplete(saveI)
@@ -411,6 +413,13 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
                                 integerPart + fractionPart
                             }
                             return
+                        }
+                    } else {
+                        result.parseResult = createComplete(i - 1)
+                        result.data = if (minus) {
+                            -integerPart - fractionPart
+                        } else {
+                            integerPart + fractionPart
                         }
                     }
                 } else {

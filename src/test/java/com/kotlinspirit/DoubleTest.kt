@@ -376,7 +376,6 @@ class DoubleTest {
         Assert.assertEquals(noDouble.tryParse("+__fff.0"), 1)
     }
 
-
     @Test
     fun noParseTest5() {
         Assert.assertEquals(noDouble.tryParse("-__fff"), 1)
