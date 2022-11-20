@@ -397,7 +397,7 @@ val personRule = object : Grammar<Person>() {
 Note: `toRule` is used to convert the grammar to a rule.
 
 # Building advanced replacers
-Sometimes you need to create some advanced replace logic, so Parser repalce functions don't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements using groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integer, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
+Sometimes you need to create some advanced replace logic, so Parser repalce functions don't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements with groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integer, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
 ```Kotlin
 val replacer = Replacer {
     val nameRange = range()
