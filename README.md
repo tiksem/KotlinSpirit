@@ -193,7 +193,7 @@ Quoted rule represents rule `a` quoted by `left` and `right` rules. If you speci
 
 Let's consider we want to implement quoted string parser:
 ```Kotlin
-val quotedStr = (char - '"').quoted('"').compile()
+val quotedStr = (char - '"').repeat().quoted('"').compile()
 val result = quotedStr.parseGetResultOrThrow("\"Hello, world!\"")
 ```
 In the example `result` will be `Hello, world!`. But not `"Hello world!"`
