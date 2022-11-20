@@ -448,7 +448,7 @@ Assert.assertEquals(
     replacer.replaceIfMatch(0, "Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString(),
 )
 ```
-In the exampler Repalcer takes Replace builder as an argument. The builder returns Replace object, containing the rule and another builder as the second argument, where we discribe how the replacement process goes.
+In the example Repalcer takes Replace builder as an argument. The builder returns Replace object, containing the rule and another builder as the second argument, where we discribe how the replacement process goes.
 
 
 # Thread safety
