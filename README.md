@@ -127,7 +127,7 @@ This rule is similar to some cases of the difference rule. For example `char - '
 `!char('a')` matches EOF, but `char - 'a'` doesn't match EOF.
 
 ## Repeat rules
-The resultType of repeat rules might be different, depending on the repeated rule kind. If the repeated rule is `Char` rule the result is `CharSequence` in all other cases it is `List<T>`, where `T` is the resultType of repeared rule.
+The resultType of repeat rules might be different, depending on the repeated rule kind. If the repeated rule is `Char` rule the result is `CharSequence` in all other cases it is `List<T>`, where `T` is the resultType of the repeared rule.
 
 Repeat rule is specified by:
 
