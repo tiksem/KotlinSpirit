@@ -314,7 +314,7 @@ fun replaceFirstOrNull(source: CharSequence, replacementProvider: (T) -> CharSeq
 Most of the Parser functions are added as string extensions for convinience. The drawback is that a rule is recreated all the time when you call the function again. So if you have a huge rule, it's recommended to compile it into Parser. And you should aware, that a rule is not synchronized. So you can't save a rule and execute it from different threads, unless `rule.isThreadSafe()` returns true
 
 The correct way of using an extension:
-```
+```Kotlin
 fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String>) {
     string.replaceAll(int % ',') { ides -> ides.joinToString(".") { id -> namesMap[id] ?: "error" } }
 }
@@ -322,7 +322,7 @@ fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String
 Here `int % ','` is recreated all the time we call `replaceIdesWithNamesSplittedByDots`. So it's totally safe to use it from different threads.
 
 The potentially wrong way:
-```
+```Kotlin
 val ints = int % ','
 fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String>) {
     string.replaceAll() { ides -> ides.joinToString(".") { id -> namesMap[id] ?: "error" } }
