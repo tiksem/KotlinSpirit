@@ -214,6 +214,20 @@ parser.matches("123.bc") // false
 parser.matches("123.34") // false
 ```
 
+## String wrapper rule
+Converts any rule to a rule with CharSequence result, reperesenting the match's substring.
+```Kotlin
+rule.asString()
+```
+Example. Let's parse list of names into a string.
+Kotlin
+```
+val name = char('A'..'Z') + +char('a'..'z')
+val names = (+name).asString()
+val namesString: CharSequence = names.compile.parseGetResultOrThrow("JhonIvanAbdula")
+```
+In this example we get the list of names as a string. However if we don't use `asString()`, names will have List<CharSequence> result.
+
 # Parser functions
 Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticeable.
 
