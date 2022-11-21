@@ -44,7 +44,7 @@ Let's describe basic rules used as simple units for creating complex rules. Don'
 ## Number rules
 Those rules represent the corresponding numbers, with bound checks for integers
 ```
-int, long, float, double, uint, ulong
+int, long, float, double, uint, ulong, short, ushort
 ```
 ## Char rules
 `char` represents any single chcracter
