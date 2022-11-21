@@ -22,7 +22,7 @@ open class BigIntegerRule : RuleWithDefaultRepeat<BigInteger>() {
         when (string[i]) {
             '0' -> {
                 i++
-                return if (i == length - 1 || !string[i].isDigit()) {
+                return if (i >= length || !string[i].isDigit()) {
                     createComplete(i)
                 } else {
                     createStepResult(

@@ -351,6 +351,38 @@ class DoubleTest {
     }
 
     @Test
+    fun testPositiveInfinity() {
+        val str = "0.0000000000000000000000000000000015e543434334433344443344343434343434343434343434343"
+        Assert.assertTrue(
+            double.compile().parseGetResultOrThrow(str) == Double.POSITIVE_INFINITY
+        )
+    }
+
+    @Test
+    fun testPositiveInfinity2() {
+        val str = "0.0000000000000000000000000000000015E543434334433344443344343434343434343434343434343"
+        Assert.assertTrue(
+            double.compile().parseGetResultOrThrow(str) == Double.POSITIVE_INFINITY,
+        )
+    }
+
+    @Test
+    fun testNegativeInfinity() {
+        val str = "-0.0000000000000000000000000000000015e543434334433344443344343434343434343434343434343"
+        Assert.assertTrue(
+            double.compile().parseGetResultOrThrow(str) == Double.NEGATIVE_INFINITY
+        )
+    }
+
+    @Test
+    fun testNegativeInfinity2() {
+        val str = "0.0000000000000000000000000000000015E-543434334433344443344343434343434343434343434343"
+        Assert.assertTrue(
+            double.compile().parseGetResultOrThrow(str) == 0.0
+        )
+    }
+
+    @Test
     fun notMoreDotError() {
         val str = ".."
         Assert.assertEquals(

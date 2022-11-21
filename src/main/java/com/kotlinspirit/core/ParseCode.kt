@@ -87,6 +87,8 @@ internal inline fun Int.parseCodeToString(): String {
         ParseCode.ONE_OF_STRING_NOT_FOUND -> "ONE_OF_STRING_NOT_FOUND"
         ParseCode.FAIL_PREDICATE -> "FAIL_PREDICATE"
         ParseCode.EXPECTATION_FAILED -> "EXPECTATION_FAILED"
+        ParseCode.INVALID_BIG_INTEGER -> "INVALID_BIG_INTEGER"
+        ParseCode.INVALID_BIG_DECIMAL -> "INVALID_BIG_DECIMAL"
         else -> "UNKNOWN"
     }
 }

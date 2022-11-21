@@ -8,10 +8,9 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 private inline fun getPowerOf10(exp: Int): Double {
-    return if (exp > POWERS_OF_10.size) {
-        Double.POSITIVE_INFINITY
-    } else {
-        POWERS_OF_10[exp]
+    return when {
+        exp > POWERS_OF_10.size || exp < 0 -> Double.POSITIVE_INFINITY
+        else -> POWERS_OF_10[exp]
     }
 }
 
@@ -195,8 +194,10 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                             c = string[i]
                                             if (c.isDigit()) {
                                                 i++
-                                                exp *= 10
-                                                exp += c - '0'
+                                                if (exp >= 0) {
+                                                    exp *= 10
+                                                    exp += c - '0'
+                                                }
                                             } else {
                                                 break
                                             }
@@ -239,8 +240,10 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                         c = string[i]
                                         if (c.isDigit()) {
                                             i++
-                                            exp *= 10
-                                            exp += c - '0'
+                                            if (exp >= 0) {
+                                                exp *= 10
+                                                exp += c - '0'
+                                            }
                                         } else {
                                             break
                                         }
@@ -304,8 +307,10 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                     c = string[i]
                                     if (c.isDigit()) {
                                         i++
-                                        exp *= 10
-                                        exp += c - '0'
+                                        if (exp >= 0) {
+                                            exp *= 10
+                                            exp += c - '0'
+                                        }
                                     } else {
                                         break
                                     }
@@ -348,8 +353,10 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
                                 c = string[i]
                                 if (c.isDigit()) {
                                     i++
-                                    exp *= 10
-                                    exp += c - '0'
+                                    if (exp >= 0) {
+                                        exp *= 10
+                                        exp += c - '0'
+                                    }
                                 } else {
                                     break
                                 }

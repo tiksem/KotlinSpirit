@@ -8,10 +8,9 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 private inline fun getPowerOf10(exp: Int): Float {
-    return if (exp > POWERS_OF_10_FLOAT.size) {
-        Float.POSITIVE_INFINITY
-    } else {
-        POWERS_OF_10_FLOAT[exp]
+    return when {
+        exp > POWERS_OF_10_FLOAT.size || exp < 0 -> Float.POSITIVE_INFINITY
+        else -> POWERS_OF_10_FLOAT[exp]
     }
 }
 
@@ -377,8 +376,10 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
                                             c = string[i]
                                             if (c.isDigit()) {
                                                 i++
-                                                exp *= 10
-                                                exp += c - '0'
+                                                if (exp >= 0) {
+                                                    exp *= 10
+                                                    exp += c - '0'
+                                                }
                                             } else {
                                                 break
                                             }
@@ -421,8 +422,10 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
                                         c = string[i]
                                         if (c.isDigit()) {
                                             i++
-                                            exp *= 10
-                                            exp += c - '0'
+                                            if (exp >= 0) {
+                                                exp *= 10
+                                                exp += c - '0'
+                                            }
                                         } else {
                                             break
                                         }
@@ -486,8 +489,10 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
                                     c = string[i]
                                     if (c.isDigit()) {
                                         i++
-                                        exp *= 10
-                                        exp += c - '0'
+                                        if (exp >= 0) {
+                                            exp *= 10
+                                            exp += c - '0'
+                                        }
                                     } else {
                                         break
                                     }
@@ -530,8 +535,10 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
                                 c = string[i]
                                 if (c.isDigit()) {
                                     i++
-                                    exp *= 10
-                                    exp += c - '0'
+                                    if (exp >= 0) {
+                                        exp *= 10
+                                        exp += c - '0'
+                                    }
                                 } else {
                                     break
                                 }

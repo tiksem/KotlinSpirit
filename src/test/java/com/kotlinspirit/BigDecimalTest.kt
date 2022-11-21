@@ -361,6 +361,12 @@ class BigDecimalTest {
     }
 
     @Test
+    fun largeExponent() {
+        val str = "+35237856237485623478562348756234785623478562347856234785623478562347856234758e4343323232"
+        Assert.assertEquals(ParseCode.INVALID_BIG_DECIMAL, bigDecimal.compile().parse(str).errorCode)
+    }
+
+    @Test
     fun testSpaceAfterDouble() {
         val result = ParseResult<BigDecimal>()
         bigDecimal.parseWithResult(0 , "5.0  ", result)
