@@ -13,11 +13,29 @@ open class BigDecimalRule : RuleWithDefaultRepeat<BigDecimal>() {
             seek = seek,
             string = string,
             invalidFloatErrorCode = ParseCode.INVALID_BIG_DECIMAL
-        )
+        ).let {
+            if (it.getParseCode().isError()) {
+                it
+            } else {
+                try {
+                    BigDecimal(string.substring(seek, it.getSeek()))
+                    it
+                } catch (e: NumberFormatException) {
+                    createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_BIG_DECIMAL
+                    )
+                }
+            }
+        }
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigDecimal>) {
-        val r = parse(seek, string)
+        val r = parseFloatingNumber(
+            seek = seek,
+            string = string,
+            invalidFloatErrorCode = ParseCode.INVALID_BIG_DECIMAL
+        )
         result.parseResult = r
         if (r.getParseCode().isError()) {
             result.data = null
@@ -27,7 +45,7 @@ open class BigDecimalRule : RuleWithDefaultRepeat<BigDecimal>() {
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return floatingNumberHasMatch(seek, string)
+        return parse(seek, string).getParseCode().isNotError()
     }
 
     override fun ignoreCallbacks(): BigDecimalRule {
