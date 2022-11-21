@@ -409,7 +409,7 @@ abstract class Rule<T : Any> {
         }
     }
 
-    internal abstract fun isThreadSafe(): Boolean
+    abstract fun isThreadSafe(): Boolean
 
     abstract fun debug(name: String? = null): Rule<T>
     internal fun internalDebug(name: String? = null): Rule<T> {

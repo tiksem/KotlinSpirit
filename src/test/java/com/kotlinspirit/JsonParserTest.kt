@@ -14,6 +14,7 @@ import org.junit.Assert
 import org.junit.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import java.util.*
+import kotlin.collections.ArrayList
 
 private val jsonString = (str("\\\"") or (char - '"')).repeat().asString().quoted('"')
 
@@ -197,21 +198,3 @@ class JsonParserTest {
         JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
     }
 }
-
-data class Person(
-    val name: String,
-    val age: Int
-)
-
-val personRule = object : Grammar<Person>() {
-    private var personName: CharSequence = ""
-    private var age: Int = -1
-
-    override val result: Person
-        get() = Person(name, age)
-
-    override fun defineRule(): Rule<*> {
-        val nameRule = char('A'..'Z') + +char('a'..'z')
-        return nameRule { personName = it } + '=' + int { age = it }
-    }
-}.toRule()
