@@ -7,23 +7,27 @@ object ParseCode {
     const val INVALID_UINT = 3
     const val INVALID_LONG = 4
     const val INVALID_ULONG = 5
-    const val INT_STARTED_FROM_ZERO = 6
-    const val INT_OUT_OF_BOUNDS = 7
-    const val UINT_OUT_OF_BOUNDS = 8
-    const val LONG_OUT_OF_BOUNDS = 9
-    const val ULONG_OUT_OF_BOUNDS = 10
-    const val DIFF_FAILED = 11
-    const val CHAR_PREDICATE_FAILED = 12
-    const val STRING_NOT_ENOUGH_DATA = 13
-    const val STRING_DOES_NOT_MATCH = 14
-    const val NO_FAILED = 15
-    const val INVALID_DOUBLE = 16
-    const val INVALID_FLOAT = 17
-    const val WHOLE_STRING_DOES_NOT_MATCH = 18
-    const val ONE_OF_STRING_NOT_FOUND = 19
-    const val FAIL_PREDICATE = 20
-    const val EXPECTATION_FAILED = 21
-    const val SPLIT_NOT_ENOUGH_DATA = 22
+    const val INVALID_SHORT = 6
+    const val INVALID_USHORT = 7
+    const val INT_STARTED_FROM_ZERO = 8
+    const val INT_OUT_OF_BOUNDS = 9
+    const val UINT_OUT_OF_BOUNDS = 10
+    const val SHORT_OUT_OF_BOUNDS = 11
+    const val USHORT_OUT_OF_BOUNDS = 12
+    const val LONG_OUT_OF_BOUNDS = 13
+    const val ULONG_OUT_OF_BOUNDS = 14
+    const val DIFF_FAILED = 15
+    const val CHAR_PREDICATE_FAILED = 16
+    const val STRING_NOT_ENOUGH_DATA = 17
+    const val STRING_DOES_NOT_MATCH = 18
+    const val NO_FAILED = 19
+    const val INVALID_DOUBLE = 20
+    const val INVALID_FLOAT = 21
+    const val WHOLE_STRING_DOES_NOT_MATCH = 22
+    const val ONE_OF_STRING_NOT_FOUND = 23
+    const val FAIL_PREDICATE = 24
+    const val EXPECTATION_FAILED = 25
+    const val SPLIT_NOT_ENOUGH_DATA = 26
 }
 
 internal inline fun Int.isError(): Boolean {

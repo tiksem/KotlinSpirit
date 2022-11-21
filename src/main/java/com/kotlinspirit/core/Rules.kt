@@ -19,11 +19,13 @@ object Rules {
         return LazyRule(ruleProvider)
     }
 
-    val int get() = IntRule()
-    val uint get() = UIntRule()
-    val ulong get() = ULongRule()
-    val long get() = LongRule()
-    val char get() = AnyCharRule()
+    val int = IntRule()
+    val uint = UIntRule()
+    val ulong = ULongRule()
+    val long = LongRule()
+    val short = ShortRule()
+    val ushort = UShortRule()
+    val char = AnyCharRule()
     val digit = char('0'..'9')
     val space: CharPredicateRule = charIf {
         it.isWhitespace()

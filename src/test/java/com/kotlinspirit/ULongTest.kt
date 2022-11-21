@@ -1,10 +1,7 @@
 package com.kotlinspirit
 
-import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.core.ParseException
-import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.*
 import com.kotlinspirit.core.Rules.ulong
-import com.kotlinspirit.core.getParseCode
 import org.junit.Assert
 import org.junit.Test
 
@@ -31,6 +28,20 @@ class ULongTest {
         val result = ParseResult<ULong>()
         ulong.parseWithResult(0, "18446744073709551616", result)
         Assert.assertEquals(ParseCode.ULONG_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+    }
+
+    @Test
+    fun invalid() {
+        val result = ParseResult<ULong>()
+        ulong.parseWithResult(0, "dsds65537", result)
+        Assert.assertEquals(ParseCode.INVALID_ULONG, result.parseResult.getParseCode())
+    }
+
+    @Test
+    fun invalid2() {
+        val result = ParseResult<ULong>()
+        ulong.parseWithResult(0, "-65537", result)
+        Assert.assertEquals(ParseCode.INVALID_ULONG, result.parseResult.getParseCode())
     }
 
     @Test

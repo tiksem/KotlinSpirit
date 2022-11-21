@@ -104,7 +104,7 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
                     }
                 }
                 successFlag -> {
-                    r.data = result.toUInt()
+                    r.data = result
                     r.parseResult = createComplete(i - 1)
                     return
                 }
@@ -119,7 +119,7 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
         } while (i < length)
 
         r.parseResult = createComplete(i)
-        r.data = result.toUInt()
+        r.data = result
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {

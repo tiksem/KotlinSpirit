@@ -7,7 +7,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class ULongRule : RuleWithDefaultRepeat<ULong>() {
+open class UShortRule : RuleWithDefaultRepeat<UShort>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -18,7 +18,7 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
         }
 
         var i = seek
-        var result = 0UL
+        var result = 0.toUShort()
         var successFlag = false
         do {
             val char = string[i++]
@@ -36,13 +36,13 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
                 char in '0'..'9' -> {
                     val resultBefore = result
                     successFlag = true
-                    result *= 10UL
-                    result += (char - '0').toULong()
+                    result = (result * 10u).toUShort()
+                    result = (result + (char - '0').toUShort()).toUShort()
                     // check int bounds
                     if (result < resultBefore) {
                         return createStepResult(
                             seek = i,
-                            parseCode = ParseCode.ULONG_OUT_OF_BOUNDS
+                            parseCode = ParseCode.USHORT_OUT_OF_BOUNDS
                         )
                     }
                 }
@@ -52,7 +52,7 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
                 else -> {
                     return createStepResult(
                         seek = i,
-                        parseCode = ParseCode.INVALID_ULONG
+                        parseCode = ParseCode.INVALID_USHORT
                     )
                 }
             }
@@ -61,7 +61,7 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
         return createComplete(i)
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<ULong>) {
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<UShort>) {
         val length = string.length
         if (seek >= length) {
             r.parseResult = createStepResult(
@@ -72,14 +72,14 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
         }
 
         var i = seek
-        var result = 0UL
+        var result = 0.toUShort()
         var successFlag = false
         do {
             val char = string[i++]
             when {
                 !successFlag && char == '0' -> {
                     if (i >= length || string[i] !in '0'..'9') {
-                        r.data = 0UL
+                        r.data = 0u
                         r.parseResult = createComplete(i)
                     } else {
                         r.parseResult = createStepResult(
@@ -90,28 +90,28 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
                     return
                 }
                 char in '0'..'9' -> {
-                    successFlag = true
                     val resultBefore = result
-                    result *= 10UL
-                    result += (char - '0').toULong()
+                    successFlag = true
+                    result = (result * 10u).toUShort()
+                    result = (result + (char - '0').toUShort()).toUShort()
                     // check int bounds
                     if (result < resultBefore) {
                         r.parseResult = createStepResult(
                             seek = i,
-                            parseCode = ParseCode.ULONG_OUT_OF_BOUNDS
+                            parseCode = ParseCode.USHORT_OUT_OF_BOUNDS
                         )
                         return
                     }
                 }
                 successFlag -> {
-                    r.data = result.toULong()
+                    r.data = result
                     r.parseResult = createComplete(i - 1)
                     return
                 }
                 else -> {
                     r.parseResult = createStepResult(
                         seek = i,
-                        parseCode = ParseCode.INVALID_ULONG
+                        parseCode = ParseCode.INVALID_USHORT
                     )
                     return
                 }
@@ -119,34 +119,34 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
         } while (i < length)
 
         r.parseResult = createComplete(i)
-        r.data = result.toULong()
+        r.data = result
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return parse(seek, string).getParseCode() == ParseCode.COMPLETE
     }
 
-    override fun clone(): ULongRule {
+    override fun clone(): UShortRule {
         return this
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): ULongRule {
-        return DebugULongRule(name ?: "ulong")
+    override fun debug(name: String?): UShortRule {
+        return DebugUShort(name ?: "ushort")
     }
 
     override fun isThreadSafe(): Boolean {
         return true
     }
 
-    override fun ignoreCallbacks(): ULongRule {
+    override fun ignoreCallbacks(): UShortRule {
         return this
     }
 }
 
-private class DebugULongRule(override val name: String): ULongRule(), DebugRule {
+private class DebugUShort(override val name: String): UShortRule(), DebugRule {
     override fun parse(seek: Int, string: CharSequence): Long {
         DebugEngine.ruleParseStarted(this, seek)
         return super.parse(seek, string).also {
@@ -154,7 +154,7 @@ private class DebugULongRule(override val name: String): ULongRule(), DebugRule 
         }
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<ULong>) {
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<UShort>) {
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, r)
         DebugEngine.ruleParseEnded(this, r.parseResult)

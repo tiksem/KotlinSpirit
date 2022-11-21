@@ -7,7 +7,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class ULongRule : RuleWithDefaultRepeat<ULong>() {
+open class ShortRule : RuleWithDefaultRepeat<Short>() {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -18,11 +18,24 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
         }
 
         var i = seek
-        var result = 0UL
+        var result: Short = 0
+        var sign: Short = 1
         var successFlag = false
         do {
             val char = string[i++]
             when {
+                char == '-' -> {
+                    if (successFlag) {
+                        return createComplete(i)
+                    } else if (sign == 1.toShort()) {
+                        sign = -1
+                    }
+                }
+                char == '+' -> {
+                    if (successFlag) {
+                        return createComplete(i)
+                    }
+                }
                 !successFlag && char == '0' -> {
                     return if (i >= length || string[i] !in '0'..'9') {
                         createComplete(i)
@@ -34,15 +47,14 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
                     }
                 }
                 char in '0'..'9' -> {
-                    val resultBefore = result
                     successFlag = true
-                    result *= 10UL
-                    result += (char - '0').toULong()
+                    result = (result * 10).toShort()
+                    result = (result + (char - '0').toShort()).toShort()
                     // check int bounds
-                    if (result < resultBefore) {
+                    if (result < 0) {
                         return createStepResult(
                             seek = i,
-                            parseCode = ParseCode.ULONG_OUT_OF_BOUNDS
+                            parseCode = ParseCode.SHORT_OUT_OF_BOUNDS
                         )
                     }
                 }
@@ -52,16 +64,23 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
                 else -> {
                     return createStepResult(
                         seek = i,
-                        parseCode = ParseCode.INVALID_ULONG
+                        parseCode = ParseCode.INVALID_SHORT
                     )
                 }
             }
         } while (i < length)
 
-        return createComplete(i)
+        return if (successFlag) {
+            createComplete(i)
+        } else {
+            createStepResult(
+                seek = seek,
+                parseCode = ParseCode.INVALID_SHORT
+            )
+        }
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<ULong>) {
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Short>) {
         val length = string.length
         if (seek >= length) {
             r.parseResult = createStepResult(
@@ -72,14 +91,31 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
         }
 
         var i = seek
-        var result = 0UL
+        var sign: Short = 1
+        var result: Short = 0
         var successFlag = false
         do {
             val char = string[i++]
             when {
+                (char == '-' || char == '+') && !successFlag -> {
+                    when {
+                        i == seek + 1 -> {
+                            if (char == '-') {
+                                sign = -1
+                            }
+                        }
+                        else -> {
+                            r.parseResult = createStepResult(
+                                seek = i,
+                                parseCode = ParseCode.INVALID_SHORT
+                            )
+                            return
+                        }
+                    }
+                }
                 !successFlag && char == '0' -> {
                     if (i >= length || string[i] !in '0'..'9') {
-                        r.data = 0UL
+                        r.data = (result * sign).toShort()
                         r.parseResult = createComplete(i)
                     } else {
                         r.parseResult = createStepResult(
@@ -91,62 +127,68 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
                 }
                 char in '0'..'9' -> {
                     successFlag = true
-                    val resultBefore = result
-                    result *= 10UL
-                    result += (char - '0').toULong()
+                    result = (result * 10).toShort()
+                    result = (result + (char - '0').toShort()).toShort()
                     // check int bounds
-                    if (result < resultBefore) {
+                    if (result < 0) {
                         r.parseResult = createStepResult(
                             seek = i,
-                            parseCode = ParseCode.ULONG_OUT_OF_BOUNDS
+                            parseCode = ParseCode.SHORT_OUT_OF_BOUNDS
                         )
                         return
                     }
                 }
                 successFlag -> {
-                    r.data = result.toULong()
+                    r.data = (result * sign).toShort()
                     r.parseResult = createComplete(i - 1)
                     return
                 }
                 else -> {
                     r.parseResult = createStepResult(
                         seek = i,
-                        parseCode = ParseCode.INVALID_ULONG
+                        parseCode = ParseCode.INVALID_SHORT
                     )
                     return
                 }
             }
         } while (i < length)
 
-        r.parseResult = createComplete(i)
-        r.data = result.toULong()
+        if (successFlag) {
+            r.data = (result * sign).toShort()
+            r.parseResult = createComplete(i)
+        } else {
+            r.parseResult = createStepResult(
+                seek = seek,
+                parseCode = ParseCode.INVALID_SHORT
+            )
+        }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return parse(seek, string).getParseCode() == ParseCode.COMPLETE
     }
 
-    override fun clone(): ULongRule {
+    override fun clone(): ShortRule {
         return this
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): ULongRule {
-        return DebugULongRule(name ?: "ulong")
+    override fun debug(name: String?): ShortRule {
+        return DebugShortRule(name ?: "short")
     }
 
     override fun isThreadSafe(): Boolean {
         return true
     }
 
-    override fun ignoreCallbacks(): ULongRule {
+    override fun ignoreCallbacks(): ShortRule {
         return this
     }
 }
 
-private class DebugULongRule(override val name: String): ULongRule(), DebugRule {
+private class DebugShortRule(override val name: String): ShortRule(), DebugRule {
     override fun parse(seek: Int, string: CharSequence): Long {
         DebugEngine.ruleParseStarted(this, seek)
         return super.parse(seek, string).also {
@@ -154,7 +196,7 @@ private class DebugULongRule(override val name: String): ULongRule(), DebugRule 
         }
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<ULong>) {
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Short>) {
         DebugEngine.ruleParseStarted(this, seek)
         super.parseWithResult(seek, string, r)
         DebugEngine.ruleParseEnded(this, r.parseResult)
