@@ -325,7 +325,7 @@ The potentially wrong way:
 ```Kotlin
 val ints = int % ','
 fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String>) {
-    string.replaceAll() { ides -> ides.joinToString(".") { id -> namesMap[id] ?: "error" } }
+    string.replaceAll(ints) { ides -> ides.joinToString(".") { id -> namesMap[id] ?: "error" } }
 }
 ```
 Here `int % ','` is created once. And we use the same rule from different threads. It's unsafe unless `(int % ',').isThreadSafe()` returns true.
