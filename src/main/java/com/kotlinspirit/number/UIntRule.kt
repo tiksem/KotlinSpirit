@@ -18,7 +18,7 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
         }
 
         var i = seek
-        var result = 0
+        var result = 0u
         var successFlag = false
         do {
             val char = string[i++]
@@ -34,14 +34,15 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
                     }
                 }
                 char in '0'..'9' -> {
+                    val resultBefore = result
                     successFlag = true
-                    result *= 10
-                    result += char - '0'
+                    result *= 10u
+                    result += (char - '0').toUInt()
                     // check int bounds
-                    if (result < 0) {
+                    if (result < resultBefore) {
                         return createStepResult(
                             seek = i,
-                            parseCode = ParseCode.INT_OUT_OF_BOUNDS
+                            parseCode = ParseCode.UINT_OUT_OF_BOUNDS
                         )
                     }
                 }
@@ -71,7 +72,7 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
         }
 
         var i = seek
-        var result = 0
+        var result = 0u
         var successFlag = false
         do {
             val char = string[i++]
@@ -89,14 +90,15 @@ open class UIntRule : RuleWithDefaultRepeat<UInt>() {
                     return
                 }
                 char in '0'..'9' -> {
+                    val resultBefore = result
                     successFlag = true
-                    result *= 10
-                    result += char - '0'
+                    result *= 10u
+                    result += (char - '0').toUInt()
                     // check int bounds
-                    if (result < 0) {
+                    if (result < resultBefore) {
                         r.parseResult = createStepResult(
                             seek = i,
-                            parseCode = ParseCode.INT_OUT_OF_BOUNDS
+                            parseCode = ParseCode.UINT_OUT_OF_BOUNDS
                         )
                         return
                     }

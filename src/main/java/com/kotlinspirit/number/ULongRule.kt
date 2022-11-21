@@ -18,7 +18,7 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
         }
 
         var i = seek
-        var result = 0L
+        var result = 0UL
         var successFlag = false
         do {
             val char = string[i++]
@@ -34,14 +34,15 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
                     }
                 }
                 char in '0'..'9' -> {
+                    val resultBefore = result
                     successFlag = true
-                    result *= 10
-                    result += char - '0'
+                    result *= 10UL
+                    result += (char - '0').toULong()
                     // check int bounds
-                    if (result < 0) {
+                    if (result < resultBefore) {
                         return createStepResult(
                             seek = i,
-                            parseCode = ParseCode.LONG_OUT_OF_BOUNDS
+                            parseCode = ParseCode.ULONG_OUT_OF_BOUNDS
                         )
                     }
                 }
@@ -71,14 +72,14 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
         }
 
         var i = seek
-        var result = 0L
+        var result = 0UL
         var successFlag = false
         do {
             val char = string[i++]
             when {
                 !successFlag && char == '0' -> {
                     if (i >= length || string[i] !in '0'..'9') {
-                        r.data = 0u
+                        r.data = 0UL
                         r.parseResult = createComplete(i)
                     } else {
                         r.parseResult = createStepResult(
@@ -90,13 +91,14 @@ open class ULongRule : RuleWithDefaultRepeat<ULong>() {
                 }
                 char in '0'..'9' -> {
                     successFlag = true
-                    result *= 10
-                    result += char - '0'
+                    val resultBefore = result
+                    result *= 10UL
+                    result += (char - '0').toULong()
                     // check int bounds
-                    if (result < 0) {
+                    if (result < resultBefore) {
                         r.parseResult = createStepResult(
                             seek = i,
-                            parseCode = ParseCode.LONG_OUT_OF_BOUNDS
+                            parseCode = ParseCode.ULONG_OUT_OF_BOUNDS
                         )
                         return
                     }

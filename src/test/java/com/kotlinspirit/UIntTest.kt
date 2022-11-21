@@ -29,8 +29,8 @@ class UIntTest {
     @Test
     fun outOfRange() {
         val result = ParseResult<UInt>()
-        uint.parseWithResult(0, "21474836473", result)
-        Assert.assertEquals(ParseCode.INT_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+        uint.parseWithResult(0, "4294967296", result)
+        Assert.assertEquals(ParseCode.UINT_OUT_OF_BOUNDS, result.parseResult.getParseCode())
     }
 
     @Test

@@ -29,8 +29,8 @@ class ULongTest {
     @Test
     fun outOfRange() {
         val result = ParseResult<ULong>()
-        ulong.parseWithResult(0, "9223372036854775808", result)
-        Assert.assertEquals(ParseCode.LONG_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+        ulong.parseWithResult(0, "18446744073709551616", result)
+        Assert.assertEquals(ParseCode.ULONG_OUT_OF_BOUNDS, result.parseResult.getParseCode())
     }
 
     @Test
