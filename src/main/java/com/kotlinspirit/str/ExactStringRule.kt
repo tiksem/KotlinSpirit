@@ -82,21 +82,12 @@ open class ExactStringRule(
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        val self = this.string
-        if (seek + self.length > string.length) {
-            return false
-        }
-
-        var i = seek
-        val end = string.length + seek
-        do {
-            if (self[i] != string[i]) {
-                return false
-            }
-            i++
-        } while (i < end)
-
-        return true
+        return string.regionMatches(
+            thisOffset = seek,
+            other = this.string,
+            otherOffset = 0,
+            length = this.string.length
+        )
     }
 
     infix fun or(anotherRule: ExactStringRule): OneOfStringRule {

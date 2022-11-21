@@ -12,14 +12,13 @@ private fun internalParse(seek: Int, string: CharSequence, main: Rule<*>, diff: 
     return if (mainRes.getParseCode().isError()) {
         mainRes
     } else {
-        val diffRes = diff.parse(seek, string)
-        if (diffRes.getParseCode().isError()) {
-            mainRes
-        } else {
+        if (diff.hasMatch(seek, string)) {
             return createStepResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED
             )
+        } else {
+            mainRes
         }
     }
 }
@@ -30,8 +29,7 @@ private fun <T : Any> internalParseWithResult(
     main.parseWithResult(seek, string, result)
     val stepResult = result.parseResult
     if (stepResult.getParseCode().isNotError()) {
-        val diffRes = diff.parse(seek, string)
-        if (diffRes.getParseCode().isNotError()) {
+        if (diff.hasMatch(seek, string)) {
             result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED

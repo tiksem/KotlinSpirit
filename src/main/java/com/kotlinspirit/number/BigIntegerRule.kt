@@ -1,0 +1,158 @@
+package com.kotlinspirit.number
+
+import com.kotlinspirit.core.*
+import com.kotlinspirit.core.createComplete
+import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.debug.DebugEngine
+import com.kotlinspirit.debug.DebugRule
+import com.kotlinspirit.repeat.RuleWithDefaultRepeat
+import java.math.BigInteger
+
+open class BigIntegerRule : RuleWithDefaultRepeat<BigInteger>() {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        val length = string.length
+        if (seek >= length) {
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.EOF
+            )
+        }
+
+        var i = 0
+        when (string[i]) {
+            '0' -> {
+                i++
+                return if (i == length - 1 || !string[i].isDigit()) {
+                    createComplete(i)
+                } else {
+                    createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INT_STARTED_FROM_ZERO
+                    )
+                }
+            }
+            in '1'..'9' -> {
+                i++
+            }
+            '+', '-' -> {
+                i++
+                if (i >= length) {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_BIG_INTEGER
+                    )
+                }
+
+                when (string[i]) {
+                    '0' -> {
+                        return if (i == length - 1 || !string[++i].isDigit()) {
+                            createComplete(i)
+                        } else {
+                            createStepResult(
+                                seek = seek,
+                                parseCode = ParseCode.INT_STARTED_FROM_ZERO
+                            )
+                        }
+                    }
+                    in '1'..'9' -> {
+                        i++
+                    }
+                    else -> {
+                        return createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_BIG_INTEGER
+                        )
+                    }
+                }
+            }
+            else -> {
+                return createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.INVALID_BIG_INTEGER
+                )
+            }
+        }
+
+        while (i < length && string[i] in '0'..'9' ) {
+            i++
+        }
+
+        return createComplete(i)
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigInteger>) {
+        val res = parse(seek, string)
+        result.parseResult = res
+        if (res.getParseCode().isError()) {
+            result.data = null
+        } else {
+            result.data = BigInteger(string.substring(seek, res.getSeek()))
+        }
+    }
+
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        val length = string.length
+        if (seek >= length) {
+            return false
+        }
+
+        return when (string[seek]) {
+            '0' -> {
+                seek == length - 1 || string[seek + 1] !in '0'..'9'
+            }
+            in '1'..'9' -> {
+               true
+            }
+            '+', '-' -> {
+                if (seek == length - 1) {
+                    return false
+                }
+
+                when (string[seek + 1]) {
+                    '0' -> {
+                        seek == length - 2 || !string[seek + 2].isDigit()
+                    }
+                    in '1'..'9' -> {
+                        true
+                    }
+                    else -> false
+                }
+            }
+            else -> false
+        }
+    }
+
+    override fun ignoreCallbacks(): BigIntegerRule {
+        return this
+    }
+
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun isThreadSafe(): Boolean {
+        return true
+    }
+
+    override fun clone(): BigIntegerRule {
+        return this
+    }
+
+    override fun debug(name: String?): RuleWithDefaultRepeat<BigInteger> {
+        return DebugBigIntegerRule(name ?: "bigint")
+    }
+}
+
+private class DebugBigIntegerRule(override val name: String): BigIntegerRule(), DebugRule {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        DebugEngine.ruleParseStarted(this, seek)
+        return super.parse(seek, string).also {
+            DebugEngine.ruleParseEnded(this, it)
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<BigInteger>) {
+        DebugEngine.ruleParseStarted(this, seek)
+        super.parseWithResult(seek, string, r)
+        DebugEngine.ruleParseEnded(this, r.parseResult)
+    }
+}

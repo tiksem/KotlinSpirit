@@ -54,7 +54,7 @@ open class ExactCharRule(
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return string.length < seek && string[seek] == char
+        return seek < string.length && string[seek] == char
     }
 
     override fun clone(): ExactCharRule {

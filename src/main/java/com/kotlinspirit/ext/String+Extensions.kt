@@ -8,6 +8,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
+import kotlin.time.Duration.Companion.milliseconds
 
 fun String.quote(start: Char, end: Char): String {
     return "$start$this$end"
@@ -247,4 +248,24 @@ fun <T : Any> CharSequence.replaceFirstOrNull(rule: Rule<T>, replacementProvider
 
 fun CharSequence.startsWith(rule: Rule<*>): Boolean {
     return rule.hasMatch(0, this)
+}
+
+fun <T : Any> CharSequence.parseWithResult(rule: Rule<T>): T? {
+    val result = ParseResult<T>()
+    rule.parseWithResult(0, this, result)
+    if (result.isError) {
+        return null
+    }
+
+    return result.data
+}
+
+fun CharSequence.parse(rule: Rule<*>): Int? {
+    return rule.parse(0, this).let {
+        if (it.getParseCode().isNotError()) {
+            it.getSeek()
+        } else {
+            null
+        }
+    }
 }

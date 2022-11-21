@@ -25,6 +25,9 @@ object Rules {
     val long = LongRule()
     val short = ShortRule()
     val ushort = UShortRule()
+    val bigint = BigIntegerRule()
+    val bigDecimal = BigDecimalRule()
+
     val char = AnyCharRule()
     val digit = char('0'..'9')
     val space: CharPredicateRule = charIf {

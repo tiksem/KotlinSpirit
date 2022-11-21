@@ -28,6 +28,8 @@ object ParseCode {
     const val FAIL_PREDICATE = 24
     const val EXPECTATION_FAILED = 25
     const val SPLIT_NOT_ENOUGH_DATA = 26
+    const val INVALID_BIG_INTEGER = 27
+    const val INVALID_BIG_DECIMAL = 28
 }
 
 internal inline fun Int.isError(): Boolean {
