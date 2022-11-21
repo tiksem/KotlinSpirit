@@ -219,9 +219,8 @@ Converts any rule to a rule with CharSequence result, reperesenting the match's 
 ```Kotlin
 rule.asString()
 ```
-Example. Let's parse list of names into a string.
-Kotlin
-```
+Example. Let's parse a list of names into a string.
+```Kotlin
 val name = char('A'..'Z') + +char('a'..'z')
 val names = (+name).asString()
 val namesString: CharSequence = names.compile.parseGetResultOrThrow("JhonIvanAbdula")
