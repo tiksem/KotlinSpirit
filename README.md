@@ -19,7 +19,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.0.1"
+implementation "com.github.tiksem:KotlinSpirit:1.0.2"
 ```
 
 # Creating a simple parser
@@ -309,6 +309,26 @@ Replaces the first match using a custom replacementProvider. Returns null if the
 ```Kotlin
 fun replaceFirstOrNull(source: CharSequence, replacementProvider: (T) -> CharSequence): CharSequence?
 ```
+
+## String extensions
+Most of the Parser functions are added as string extensions for convinience. The drawback is that a rule is recreated all the time when you call the function again. So if you have a huge rule, it's recommended to compile it into Parser. And you should aware, that a rule is not synchronized. So you can't save a rule and execute it from different threads, unless `rule.isThreadSafe()` returns true
+
+The correct way of using an extension:
+```Kotlin
+fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String>): CharSequence {
+    return string.replaceAll(int % ',') { ides -> ides.joinToString(".") { id -> namesMap[id] ?: "error" } }
+}
+```
+Here `int % ','` is recreated all the time we call `replaceIdesWithNamesSplittedByDots`. So it's totally safe to use it from different threads.
+
+The potentially wrong way:
+```Kotlin
+val ints = int % ','
+fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String>): CharSequence {
+    return string.replaceAll(ints) { ides -> ides.joinToString(".") { id -> namesMap[id] ?: "error" } }
+}
+```
+Here `int % ','` is created once. And we use the same rule from different threads. It's unsafe unless `(int % ',').isThreadSafe()` returns true.
 
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recursion here.
