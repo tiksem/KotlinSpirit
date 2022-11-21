@@ -2,8 +2,7 @@ package com.kotlinspirit.core
 
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
-import com.kotlinspirit.ext.replaceRanges
-import com.kotlinspirit.ext.toCharSequence
+import com.kotlinspirit.ext.*
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 
@@ -85,9 +84,7 @@ internal abstract class BaseParser<T : Any> : Parser<T> {
     }
 
     override fun matches(string: CharSequence): Boolean {
-        val rule = getRule()
-        val result = rule.parse(0, string)
-        return result.getParseCode().isNotError() && result.getSeek() == string.length
+        return string.matches(getRule())
     }
 
     override fun matchesAtBeginning(string: CharSequence): Boolean {
@@ -95,118 +92,50 @@ internal abstract class BaseParser<T : Any> : Parser<T> {
     }
 
     override fun replaceFirst(source: CharSequence, replacement: CharSequence): CharSequence {
-        getRule().findFirstSuccessfulSeek(source) { start, end ->
-            return source.replaceRange(start until end, replacement)
-        }
-
-        return source
+        return source.replaceFirst(getRule(), replacement)
     }
 
     override fun replaceAll(source: CharSequence, replacement: CharSequence): CharSequence {
-        val ranges = ArrayList<ParseRange>()
-
-        getRule().findSuccessfulRanges(source) { start, end ->
-            val range = ParseRange(start, end)
-            ranges.add(range)
-        }
-
-        return source.replaceRanges(ranges, replacement)
+        return source.replaceAll(getRule(), replacement)
     }
 
     override fun replaceFirst(source: CharSequence, replacementProvider: (T) -> Any): CharSequence {
-        getRule().findFirstSuccessfulResult(source) { start, result ->
-            return source.replaceRange(
-                range = start until result.endSeek,
-                replacement = replacementProvider(result.data!!).toCharSequence()
-            )
-        }
-
-        return source
+        return source.replaceFirst(getRule(), replacementProvider)
     }
 
     override fun replaceAll(source: CharSequence, replacementProvider: (T) -> Any): CharSequence {
-        val ranges = ArrayList<ParseRange>()
-        val replacements = ArrayList<CharSequence>()
-
-        getRule().findSuccessfulResults(source) { start, end, value ->
-            val range = ParseRange(start, end)
-            ranges.add(range)
-            replacements.add(replacementProvider(value).toCharSequence())
-        }
-
-        return source.replaceRanges(ranges, replacements)
+        return source.replaceAll(getRule(), replacementProvider)
     }
 
     override fun replaceFirstOrNull(source: CharSequence, replacement: CharSequence): CharSequence? {
-        getRule().findFirstSuccessfulSeek(source) { start, end ->
-            return source.replaceRange(start until end, replacement)
-        }
-
-        return null
+        return source.replaceFirstOrNull(getRule(), replacement)
     }
 
     override fun replaceFirstOrNull(source: CharSequence, replacementProvider: (T) -> CharSequence): CharSequence? {
-        getRule().findFirstSuccessfulResult(source) { start, result ->
-            return source.replaceRange(
-                range = start until result.endSeek,
-                replacement = replacementProvider(result.data!!)
-            )
-        }
-
-        return null
+        return source.replaceFirstOrNull(getRule(), replacementProvider)
     }
 
     override fun indexOf(string: CharSequence): Int? {
-        getRule().findFirstSuccessfulSeek(string) { start, _ ->
-            return start
-        }
-
-        return null
+        return string.indexOf(getRule())
     }
 
     override fun findFirstResult(string: CharSequence): ParseRangeResult<T>? {
-        getRule().findFirstSuccessfulResult(string) { start, result ->
-            return ParseRangeResult(
-                startSeek = start,
-                endSeek = result.endSeek,
-                data = result.data
-            )
-        }
-
-        return null
+        return string.findFirstResult(getRule())
     }
 
     override fun findFirstRange(string: CharSequence): ParseRange? {
-        getRule().findFirstSuccessfulSeek(string) { start, end ->
-            return ParseRange(start, end)
-        }
-
-        return null
+        return string.findFirstRange(getRule())
     }
 
     override fun findFirst(string: CharSequence): T? {
-        getRule().findFirstSuccessfulResult(string) { start, result ->
-            return result.data
-        }
-
-        return null
+        return string.findFirst(getRule())
     }
 
     override fun findAll(string: CharSequence): List<T> {
-        val result = ArrayList<T>()
-        getRule().findSuccessfulResults(string) { start, end, value ->
-            result.add(value)
-        }
-
-        return result
+        return string.findAll(getRule())
     }
 
     override fun findAllResults(string: CharSequence): List<ParseRangeResult<T>> {
-        val result = ArrayList<ParseRangeResult<T>>()
-        getRule().findSuccessfulResults(string) { start, end, value ->
-            result.add(ParseRangeResult(data = value, startSeek = start, endSeek = end))
-        }
-
-        return result
+        return string.findAllResults(getRule())
     }
 }
