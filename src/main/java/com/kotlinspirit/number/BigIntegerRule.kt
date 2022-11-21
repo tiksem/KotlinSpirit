@@ -46,7 +46,7 @@ open class BigIntegerRule : RuleWithDefaultRepeat<BigInteger>() {
                 when (string[i]) {
                     '0' -> {
                         return if (i == length - 1 || !string[++i].isDigit()) {
-                            createComplete(i)
+                            createComplete(i + 1)
                         } else {
                             createStepResult(
                                 seek = seek,
