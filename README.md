@@ -127,7 +127,7 @@ This rule is similar to some cases of the difference rule. For example `char - '
 `!char('a')` matches EOF, but `char - 'a'` doesn't match EOF.
 
 ## Repeat rules
-The resultType of repeat rules might be different, depending on the repeated rule kind. If the repeated rule is `Char` rule the result is `CharSequence` in all other cases it is `List<T>`, where `T` is the resultType of repeared rule.
+The resultType of repeat rules might be different, depending on the repeated rule kind. If the repeated rule is `Char` rule the result is `CharSequence` in all other cases it is `List<T>`, where `T` is the resultType of the repeared rule.
 
 Repeat rule is specified by:
 
@@ -186,14 +186,14 @@ Let's consider we want to create a name parser, where the name is not Jhon.
 val name = char('A'..'Z') + +char('a'..'z')
 val nameButNotJhon = name.failIf { it == "Jhon" }
 ```
-`nameButNotJhon` above is the same as `name - "Jhon"` if we use the difference rule instead
+`nameButNotJhon` is the same as `name - "Jhon"` if we use the difference rule instead
 
 ## Quoted rule
-Quoted rule represents rule `a` quoted by `left` and `right` rules. If you specify only a single rule as an argument of `quoted` `left` and `right` will be the same. You may ask what is the difference between sequence rule `left + a + right` and `a.quoted(left, right)`. The difference is the result. The resultType of sequence rule is always CharSequence from the beginning to the end of the rule, so quotes are included in the result as well. However the quoted rule result is the same as `a` result.
+Quoted rule represents rule `a` quoted by `left` and `right` rules. If you specify only a single rule as an argument of `quoted` `left` and `right` will be the same. You may ask what is the difference between sequence rule `left + a + right` and `a.quoted(left, right)`. The difference is the result. The resultType of sequence rule is always CharSequence, started from the beginning to the end of the match, so quotes are included in the result as well. However the quoted rule result is the same as `a` result.
 
 Let's consider we want to implement quoted string parser:
 ```Kotlin
-val quotedStr = (char - '"').quoted('"').compile()
+val quotedStr = (char - '"').repeat().quoted('"').compile()
 val result = quotedStr.parseGetResultOrThrow("\"Hello, world!\"")
 ```
 In the example `result` will be `Hello, world!`. But not `"Hello world!"`
@@ -397,7 +397,7 @@ val personRule = object : Grammar<Person>() {
 Note: `toRule` is used to convert the grammar to a rule.
 
 # Building advanced replacers
-Sometimes you need to create some advanced replace logic, so Parser repalce functions doesn't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements using groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integer, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
+Sometimes you need to create some advanced replace logic, so Parser repalce functions don't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements with groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integers, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
 ```Kotlin
 val replacer = Replacer {
     val nameRange = range()
@@ -448,7 +448,7 @@ Assert.assertEquals(
     replacer.replaceIfMatch(0, "Ivan Abdulan 1,2,-5,6 Urvan Arven 12,12,323,3").toString(),
 )
 ```
-In the exampler Repalcer takes Replace builder as an argument. The builder returns Replace object, containing the rule and another builder as the second argument, where we discribe how the replacement process goes.
+In the example Repalcer takes Replace builder as an argument. The builder returns Replace object, containing the rule and another builder as the second argument, where we discribe how the replacement process goes.
 
 
 # Thread safety
