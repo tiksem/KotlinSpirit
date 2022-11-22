@@ -34,17 +34,13 @@ object Rules {
         it.isWhitespace()
     }
 
-    fun char(vararg chars: Char): CharPredicateRule {
+    fun char(char: Char, vararg chars: Char): CharPredicateRule {
         if (chars.isEmpty()) {
-            throw IllegalArgumentException("char(...) chars should not be empty")
-        }
-
-        if (chars.size == 1) {
-            return ExactCharRule(chars[0])
+            return ExactCharRule(char)
         }
 
         return CharPredicateRule(
-            CharPredicateData(chars)
+            CharPredicateData(charArrayOf(char) + chars)
         )
     }
 

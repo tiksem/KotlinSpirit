@@ -30,6 +30,7 @@ object ParseCode {
     const val SPLIT_NOT_ENOUGH_DATA = 26
     const val INVALID_BIG_INTEGER = 27
     const val INVALID_BIG_DECIMAL = 28
+    const val BIG_DECIMAL_EXPONENT_OVERFLOW = 29
 }
 
 internal inline fun Int.isError(): Boolean {

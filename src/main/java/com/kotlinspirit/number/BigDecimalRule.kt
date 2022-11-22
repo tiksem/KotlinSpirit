@@ -23,7 +23,7 @@ open class BigDecimalRule : RuleWithDefaultRepeat<BigDecimal>() {
                 } catch (e: NumberFormatException) {
                     createStepResult(
                         seek = seek,
-                        parseCode = ParseCode.INVALID_BIG_DECIMAL
+                        parseCode = ParseCode.BIG_DECIMAL_EXPONENT_OVERFLOW
                     )
                 }
             }
@@ -31,11 +31,7 @@ open class BigDecimalRule : RuleWithDefaultRepeat<BigDecimal>() {
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigDecimal>) {
-        val r = parseFloatingNumber(
-            seek = seek,
-            string = string,
-            invalidFloatErrorCode = ParseCode.INVALID_BIG_DECIMAL
-        )
+        val r = parse(seek = seek, string = string)
         result.parseResult = r
         if (r.getParseCode().isError()) {
             result.data = null

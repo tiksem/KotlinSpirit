@@ -363,7 +363,7 @@ class BigDecimalTest {
     @Test
     fun largeExponent() {
         val str = "+35237856237485623478562348756234785623478562347856234785623478562347856234758e4343323232"
-        Assert.assertEquals(ParseCode.INVALID_BIG_DECIMAL, bigDecimal.compile().parse(str).errorCode)
+        Assert.assertEquals(ParseCode.BIG_DECIMAL_EXPONENT_OVERFLOW, bigDecimal.compile().parse(str).errorCode)
     }
 
     @Test
