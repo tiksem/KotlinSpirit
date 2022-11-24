@@ -186,20 +186,15 @@ class JsonParserTest {
                 "}"
         val p = jsonObject.compile(debug = true)
         var time = System.currentTimeMillis()
-//        repeat(1000) {
-//            JSONObject(str)
-//        }
-//        System.out.println(System.currentTimeMillis() - time)
-        time = System.currentTimeMillis()
-//        repeat(999) {
-//            p.parseGetResultOrThrow(str)
-//        }
-        val value = try {
-            p.parseGetResultOrThrow(str)
-        } catch (e: Exception) {
-            val tree = p.getDebugTree()
-            println(tree)
+        repeat(1000) {
+            JSONObject(str)
         }
+        System.out.println(System.currentTimeMillis() - time)
+        time = System.currentTimeMillis()
+        repeat(999) {
+            p.parseGetResultOrThrow(str)
+        }
+        val value = p.parseGetResultOrThrow(str)
         System.out.println(System.currentTimeMillis() - time)
         JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
     }
