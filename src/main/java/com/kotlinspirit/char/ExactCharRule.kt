@@ -65,5 +65,5 @@ open class ExactCharRule(
         get() = false
 
     override val defaultDebugName: String
-        get() = "char($char)"
+        get() = "char('$char')"
 }

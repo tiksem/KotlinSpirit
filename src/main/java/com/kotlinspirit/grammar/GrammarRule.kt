@@ -32,7 +32,7 @@ open class GrammarRule<T : Any>(
         stackSeek--
     }
 
-    protected open fun initRuleForParse(): Rule<*> {
+    private fun initRuleForParse(): Rule<*> {
         var r = ruleForParse
         if (r == null) {
             r = grammar.initRule().ignoreCallbacks()
@@ -42,10 +42,6 @@ open class GrammarRule<T : Any>(
         return r
     }
 
-    protected open fun initRule(grammar: Grammar<T>): Rule<*> {
-        return grammar.initRule()
-    }
-
     override fun parse(seek: Int, string: CharSequence): Long {
         return initRuleForParse().parse(seek, string)
     }
@@ -53,7 +49,7 @@ open class GrammarRule<T : Any>(
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         val grammar = pullGrammar()
         try {
-            val parseResult = initRule(grammar).parse(seek, string)
+            val parseResult = grammar.initRule().parse(seek, string)
             result.parseResult = parseResult
             if (parseResult.getParseCode().isNotError()) {
                 result.data = grammar.result
@@ -64,7 +60,7 @@ open class GrammarRule<T : Any>(
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return grammar.initRule().hasMatch(seek, string)
+        return initRuleForParse().hasMatch(seek, string)
     }
 
     override val debugNameShouldBeWrapped: Boolean
@@ -79,7 +75,7 @@ open class GrammarRule<T : Any>(
 
     override fun debug(engine: DebugEngine): DebugRule<T> {
         return DebugRule(
-            rule = DebugGrammarRule(engine, grammar, name),
+            rule = GrammarRule(DebugGrammar(grammar.clone(), engine), name),
             engine = engine
         )
     }
@@ -94,19 +90,5 @@ open class GrammarRule<T : Any>(
 
     override fun ignoreCallbacks(): GrammarRule<T> {
         return this
-    }
-}
-
-private class DebugGrammarRule<T : Any>(
-    private val engine: DebugEngine,
-    grammar: Grammar<T>,
-    name: String?
-) : GrammarRule<T>(grammar, name) {
-    override fun initRuleForParse(): Rule<*> {
-        return super.initRuleForParse().debug(engine)
-    }
-
-    override fun initRule(grammar: Grammar<T>): Rule<*> {
-        return grammar.initRule().debug(engine)
     }
 }

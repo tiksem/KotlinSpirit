@@ -1,6 +1,7 @@
 package com.kotlinspirit.grammar
 
 import com.kotlinspirit.core.Rule
+import com.kotlinspirit.debug.DebugEngine
 
 abstract class Grammar<T : Any> {
     private var r: Rule<*>? = null
@@ -8,7 +9,7 @@ abstract class Grammar<T : Any> {
     abstract fun defineRule(): Rule<*>
     open fun resetResult() {}
 
-    internal fun initRule(): Rule<*> {
+    internal open fun initRule(): Rule<*> {
         var rule = this.r
         if (rule == null) {
             rule = defineRule()
@@ -18,7 +19,7 @@ abstract class Grammar<T : Any> {
         return rule
     }
 
-    fun clone(): Grammar<T> {
+    open fun clone(): Grammar<T> {
         val constructor = javaClass.declaredConstructors[0]
         constructor.isAccessible = true
         return constructor.newInstance() as Grammar<T>
@@ -26,6 +27,26 @@ abstract class Grammar<T : Any> {
 
     fun toRule(): GrammarRule<T> {
         return GrammarRule(this, null)
+    }
+}
+
+internal class DebugGrammar<T : Any>(
+    private val grammar: Grammar<T>,
+    private val engine: DebugEngine
+) : Grammar<T>() {
+    override val result: T
+        get() = grammar.result
+
+    override fun defineRule(): Rule<*> {
+        return grammar.defineRule().debug(engine)
+    }
+
+    override fun resetResult() {
+        grammar.resetResult()
+    }
+
+    override fun clone(): DebugGrammar<T> {
+        return DebugGrammar(grammar.clone(), engine)
     }
 }
 

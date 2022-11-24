@@ -52,13 +52,14 @@ private val expressionInBrackets = expression.quoted('(', ')')
 class MathExpressionParserTest {
     @Test
     fun test1() {
-        val r = expression.compile()
-        Assert.assertEquals(r.parseGetResultOrThrow("5 + 10"), 15.0, 0.0001)
-        Assert.assertEquals(r.parseGetResultOrThrow("5.5 + 10.5"), 16.0, 0.0001)
-        Assert.assertEquals(r.parseGetResultOrThrow("5.5 - 10.5"), -5.0, 0.0001)
-        Assert.assertEquals(r.parseGetResultOrThrow("1.2 / 2.0"), 0.6, 0.0001)
-        Assert.assertEquals(r.parseGetResultOrThrow("1.2 * 2.0"), 2.4, 0.0001)
-        Assert.assertEquals(r.parseGetResultOrThrow("(1.2 * 2.0) + (3.4 - 1.2)"), 4.6, 0.0001)
-        Assert.assertEquals(r.parseGetResultOrThrow("3.4 + ((1.2 * 2.0) + (3.4 - 1.2))"), 8.0, 0.0001)
+        for (r in listOf(expression.compile(debug = true), expression.compile(debug = false))) {
+            Assert.assertEquals(r.parseGetResultOrThrow("5 + 10"), 15.0, 0.0001)
+            Assert.assertEquals(r.parseGetResultOrThrow("5.5 + 10.5"), 16.0, 0.0001)
+            Assert.assertEquals(r.parseGetResultOrThrow("5.5 - 10.5"), -5.0, 0.0001)
+            Assert.assertEquals(r.parseGetResultOrThrow("1.2 / 2.0"), 0.6, 0.0001)
+            Assert.assertEquals(r.parseGetResultOrThrow("1.2 * 2.0"), 2.4, 0.0001)
+            Assert.assertEquals(r.parseGetResultOrThrow("(1.2 * 2.0) + (3.4 - 1.2)"), 4.6, 0.0001)
+            Assert.assertEquals(r.parseGetResultOrThrow("3.4 + ((1.2 * 2.0) + (3.4 - 1.2))"), 8.0, 0.0001)
+        }
     }
 }
