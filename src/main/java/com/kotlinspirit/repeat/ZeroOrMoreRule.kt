@@ -7,9 +7,10 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import java.lang.IllegalStateException
 
-open class ZeroOrMoreRule<T : Any>(
-    protected val rule: Rule<T>
-) : RuleWithDefaultRepeat<List<T>>() {
+class ZeroOrMoreRule<T : Any>(
+    private val rule: Rule<T>,
+    name: String? = null
+) : RuleWithDefaultRepeat<List<T>>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         while (i < string.length) {
@@ -59,19 +60,25 @@ open class ZeroOrMoreRule<T : Any>(
     }
 
     override fun clone(): ZeroOrMoreRule<T> {
-        return ZeroOrMoreRule(rule = rule.clone())
+        return ZeroOrMoreRule(rule = rule.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): ZeroOrMoreRule<T> {
-        val debug = rule.internalDebug()
-        return DebugZeroOrMoreRule(
-            name = name ?: "${debug.debugNameWrapIfNeed}.repeat(0..<)",
-            rule = debug
+    override fun debug(engine: DebugEngine): DebugRule<List<T>> {
+        return DebugRule(
+            rule = ZeroOrMoreRule(rule.debug(engine), name),
+            engine = engine
         )
     }
+
+    override fun name(name: String): ZeroOrMoreRule<T> {
+        return ZeroOrMoreRule(rule, name)
+    }
+
+    override val defaultDebugName: String
+        get() = "*${rule.wrappedName}"
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
@@ -79,29 +86,5 @@ open class ZeroOrMoreRule<T : Any>(
 
     override fun ignoreCallbacks(): ZeroOrMoreRule<T> {
         return ZeroOrMoreRule(rule.ignoreCallbacks())
-    }
-}
-
-private class DebugZeroOrMoreRule<T : Any>(
-    override val name: String,
-    rule: Rule<T>
-) : ZeroOrMoreRule<T>(rule), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<List<T>>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): ZeroOrMoreRule<T> {
-        return DebugZeroOrMoreRule(name, rule.clone())
     }
 }

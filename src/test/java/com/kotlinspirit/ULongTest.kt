@@ -20,7 +20,7 @@ class ULongTest {
 
     @Test
     fun default() {
-        Assert.assertEquals(23523454.toULong(), ulong.debug().compile().parseGetResultOrThrow("23523454"))
+        Assert.assertEquals(23523454.toULong(), ulong.compile().parseGetResultOrThrow("23523454"))
     }
 
     @Test

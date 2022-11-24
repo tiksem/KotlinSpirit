@@ -40,7 +40,7 @@ class IntTest {
 
     @Test
     fun default() {
-        Assert.assertEquals(23523454, int.debug().compile().parseGetResultOrThrow("23523454"))
+        Assert.assertEquals(23523454, int.compile().parseGetResultOrThrow("23523454"))
     }
 
     @Test

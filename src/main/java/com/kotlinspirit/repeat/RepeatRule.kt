@@ -6,10 +6,11 @@ import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 
-open class RepeatRule<T : Any>(
-    protected val rule: Rule<T>,
-    protected val range: IntRange
-) : RuleWithDefaultRepeat<List<T>>() {
+class RepeatRule<T : Any>(
+    private val rule: Rule<T>,
+    private val range: IntRange,
+    name: String? = null
+) : RuleWithDefaultRepeat<List<T>>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         var resultsCount = 0
@@ -39,7 +40,7 @@ open class RepeatRule<T : Any>(
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
-        var i = seek
+        val i = seek
         val list = ArrayList<T>()
         val itemResult = ParseResult<T>()
         while (i < string.length  && list.size < range.last) {
@@ -94,19 +95,25 @@ open class RepeatRule<T : Any>(
     }
 
     override fun clone(): RepeatRule<T> {
-        return RepeatRule(rule.clone(), range)
+        return RepeatRule(rule.clone(), range, name)
     }
 
-    override fun debug(name: String?): RepeatRule<T> {
-        val debug = rule.internalDebug()
-        return DebugRepeatRule(
-            name = name ?: "${debug.debugNameWrapIfNeed}.repeat(${range.first}..${range.last})",
-            debug, range
+    override fun debug(engine: DebugEngine): DebugRule<List<T>> {
+        return DebugRule(
+            rule = RepeatRule(rule.debug(engine), range, name),
+            engine = engine
         )
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
+
+    override fun name(name: String): RepeatRule<T> {
+        return RepeatRule(rule, range, name)
+    }
+
+    override val defaultDebugName: String
+        get() = "${rule.wrappedName}.repeat($range)"
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
@@ -114,30 +121,5 @@ open class RepeatRule<T : Any>(
 
     override fun ignoreCallbacks(): RepeatRule<T> {
         return RepeatRule(rule.ignoreCallbacks(), range)
-    }
-}
-
-private class DebugRepeatRule<T : Any>(
-    override val name: String,
-    rule: Rule<T>,
-    range: IntRange
-): RepeatRule<T>(rule, range), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<List<T>>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): RepeatRule<T> {
-        return DebugRepeatRule(name, rule.clone(), range)
     }
 }

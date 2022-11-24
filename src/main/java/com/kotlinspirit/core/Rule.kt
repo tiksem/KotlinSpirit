@@ -4,10 +4,12 @@ import com.kotlinspirit.*
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.char.ExactCharRule
+import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.ext.containsAny
 import com.kotlinspirit.ext.quoteIf
 import com.kotlinspirit.expressive.*
+import com.kotlinspirit.ext.quote
 import com.kotlinspirit.quoted.QuotedRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
@@ -65,7 +67,10 @@ class ParseResult<T> {
  * Base class, representing a rule. A rule defines how the text is parsed.
  * @param T the type of the result of the rule.
  */
-abstract class Rule<T : Any> {
+abstract class Rule<T : Any>(name: String?) {
+    var name = name
+        private set
+
     internal abstract fun parse(seek: Int, string: CharSequence): Long
     internal abstract fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
     internal abstract fun hasMatch(seek: Int, string: CharSequence): Boolean
@@ -394,41 +399,36 @@ abstract class Rule<T : Any> {
 
     abstract fun clone(): Rule<T>
 
-    abstract val debugNameShouldBeWrapped: Boolean
-
-    fun compile(): Parser<T> {
-        val parser = if (isThreadSafe()) {
+    fun compile(debug: Boolean = false): Parser<T> {
+        return if (debug) {
+            DebugParser(originalRule = this)
+        } else if (isThreadSafe()) {
             RegularParser(originalRule = this)
         } else {
             ThreadSafeParser(originRule = this)
-        }
-        return if (this is DebugRule) {
-            DebugParser(parser)
-        } else {
-            parser
         }
     }
 
     abstract fun isThreadSafe(): Boolean
 
-    abstract fun debug(name: String? = null): Rule<T>
-    internal fun internalDebug(name: String? = null): Rule<T> {
-        return if (this is DebugRule) {
-            if (name == null || this.name == name) {
-                this
-            } else {
-                debug(name)
-            }
-        } else {
-            debug(name)
-        }
+    abstract fun name(name: String): Rule<T>
+
+    internal open fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(rule = this, engine = engine)
     }
 
-    internal val debugName: String
-        get() = (this as? DebugRule)?.name ?: throw RuntimeException()
+    internal abstract val debugNameShouldBeWrapped: Boolean
+    internal abstract val defaultDebugName: String
 
-    internal val debugNameWrapIfNeed: String
-        get() = (this as? DebugRule)?.name?.quoteIf('(', ')',
-            debugNameShouldBeWrapped && debugName.containsAny("() \n\t")
-        ) ?: throw RuntimeException()
+    val wrappedName: String
+        get() {
+            return if (debugNameShouldBeWrapped) {
+                debugName.quote('(',')')
+            } else {
+                debugName
+            }
+        }
+    
+    val debugName: String
+        get() = name ?: defaultDebugName
 }

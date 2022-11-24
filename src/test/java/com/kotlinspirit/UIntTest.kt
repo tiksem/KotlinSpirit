@@ -20,7 +20,7 @@ class UIntTest {
 
     @Test
     fun default() {
-        Assert.assertEquals(23523454u, uint.debug().compile().parseGetResultOrThrow("23523454"))
+        Assert.assertEquals(23523454u, uint.compile().parseGetResultOrThrow("23523454"))
     }
 
     @Test

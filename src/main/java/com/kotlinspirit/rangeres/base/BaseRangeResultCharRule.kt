@@ -3,13 +3,16 @@ package com.kotlinspirit.rangeres.base
 import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
+import com.kotlinspirit.debug.DebugEngine
+import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.core.RangeResultRuleCore
 
 internal abstract class BaseRangeResultCharRule(
-    val core: RangeResultRuleCore<Char>
-) : CharRule() {
+    val core: RangeResultRuleCore<Char>,
+    name: String?
+) : CharRule(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return core.parse(seek, string)
     }
@@ -28,6 +31,9 @@ internal abstract class BaseRangeResultCharRule(
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
+
+    final override val defaultDebugName: String
+        get() = core.debugName
 
     override fun isThreadSafe(): Boolean {
         return false

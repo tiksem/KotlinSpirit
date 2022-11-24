@@ -11,8 +11,9 @@ import com.kotlinspirit.repeat.ZeroOrMoreRule
 
 open class OrRule<T : Any>(
     protected val a: Rule<T>,
-    protected val b: Rule<T>
-) : RuleWithDefaultRepeat<T>() {
+    protected val b: Rule<T>,
+    name: String? = null,
+) : RuleWithDefaultRepeat<T>(name) {
     private var activeRule = a
     private var stepBeginSeek = -1
 
@@ -41,19 +42,28 @@ open class OrRule<T : Any>(
     }
 
     override fun clone(): OrRule<T> {
-        return OrRule(a.clone(), b.clone())
+        return OrRule(a.clone(), b.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = true
 
-    override fun debug(name: String?): OrRule<T> {
-        val a = a.internalDebug()
-        val b = b.internalDebug()
-        return DebugOrRule(
-            name = name ?: "${a.debugNameWrapIfNeed} or ${b.debugNameWrapIfNeed}",
-            a, b
+    override val defaultDebugName: String
+        get() = "${a.wrappedName} or ${b.wrappedName}"
+
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(
+            rule = OrRule(
+                a.debug(engine),
+                b.debug(engine),
+                name
+            ),
+            engine
         )
+    }
+
+    override fun name(name: String): OrRule<T> {
+        return OrRule(a, b, name)
     }
 
     override fun isThreadSafe(): Boolean {
@@ -61,71 +71,12 @@ open class OrRule<T : Any>(
     }
 
     override fun ignoreCallbacks(): OrRule<T> {
-        return OrRule(a.ignoreCallbacks(), b.ignoreCallbacks())
+        return OrRule(a.ignoreCallbacks(), b.ignoreCallbacks(), name)
     }
 }
 
-private class DebugOrRule<T : Any>(
-    override val name: String,
-    a: Rule<T>,
-    b: Rule<T>
-) : OrRule<T>(a, b), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<T>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): OrRule<T> {
-        return DebugOrRule(name, a.clone(), b.clone())
-    }
-}
-
-open class AnyOrRule(a: Rule<Any>, b: Rule<Any>) : OrRule<Any>(a, b) {
-    override fun debug(name: String?): OrRule<Any> {
-        val a = a.internalDebug()
-        val b = b.internalDebug()
-        return DebugAnyOrRule(
-            name = name ?: "${a.debugNameWrapIfNeed} or ${b.debugNameWrapIfNeed}",
-            a, b
-        )
-    }
-
+class AnyOrRule(a: Rule<Any>, b: Rule<Any>, name: String? = null) : OrRule<Any>(a, b, name) {
     override fun clone(): AnyOrRule {
-        return AnyOrRule(a.clone(), b.clone())
-    }
-}
-
-private class DebugAnyOrRule(
-    override val name: String,
-    a: Rule<Any>,
-    b: Rule<Any>
-) : AnyOrRule(a, b), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<Any>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): AnyOrRule {
-        return DebugAnyOrRule(name, a.clone(), b.clone())
+        return AnyOrRule(a.clone(), b.clone(), name)
     }
 }

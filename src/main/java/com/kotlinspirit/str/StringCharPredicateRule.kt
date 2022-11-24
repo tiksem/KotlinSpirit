@@ -2,13 +2,15 @@ package com.kotlinspirit.str
 
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 open class StringCharPredicateRule(
-    private val predicate: (Char) -> Boolean
-) : RuleWithDefaultRepeat<CharSequence>() {
+    private val predicate: (Char) -> Boolean,
+    name: String? = null
+) : RuleWithDefaultRepeat<CharSequence>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         while (i < string.length) {
@@ -51,9 +53,12 @@ open class StringCharPredicateRule(
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): RuleWithDefaultRepeat<CharSequence> {
-        return DebugStringCharPredicateRule(name ?: "stringPredicate", predicate)
+    override fun name(name: String): StringCharPredicateRule {
+        return StringCharPredicateRule(predicate, name)
     }
+
+    override val defaultDebugName: String
+        get() = "stringIf"
 
     override fun isThreadSafe(): Boolean {
         return true
@@ -61,25 +66,5 @@ open class StringCharPredicateRule(
 
     override fun ignoreCallbacks(): StringCharPredicateRule {
         return this
-    }
-}
-
-private class DebugStringCharPredicateRule(
-    override val name: String,
-    predicate: (Char) -> Boolean
-) : StringCharPredicateRule(predicate), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<CharSequence>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

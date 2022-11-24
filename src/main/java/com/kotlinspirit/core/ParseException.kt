@@ -4,8 +4,7 @@ import com.kotlinspirit.debug.RuleDebugTreeNode
 
 class ParseException(
     private val result: Long,
-    private val string: CharSequence,
-    val debugTree: RuleDebugTreeNode?
+    private val string: CharSequence
 ) : Exception(
     "Failed to parse token: ${string.subSequence(0, result.getSeek())}, error: ${
         result.getParseCode().parseCodeToString()

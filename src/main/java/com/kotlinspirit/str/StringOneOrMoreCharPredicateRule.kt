@@ -8,9 +8,10 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class StringOneOrMoreCharPredicateRule(
-    private val predicate: (Char) -> Boolean
-) : RuleWithDefaultRepeat<CharSequence>() {
+class StringOneOrMoreCharPredicateRule(
+    private val predicate: (Char) -> Boolean,
+    name: String? = null
+) : RuleWithDefaultRepeat<CharSequence>(name) {
 
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
@@ -86,31 +87,14 @@ open class StringOneOrMoreCharPredicateRule(
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): StringOneOrMoreCharPredicateRule {
-        return DebugStringOneOrMoreCharPredicateRule(name ?: "stringPredicate[1..<]", predicate)
+    override fun name(name: String): StringOneOrMoreCharPredicateRule {
+        return StringOneOrMoreCharPredicateRule(predicate, name)
     }
+
+    override val defaultDebugName: String
+        get() = "nonEmptyStrIf"
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-}
-
-private class DebugStringOneOrMoreCharPredicateRule(
-    override val name: String,
-    predicate: (Char) -> Boolean
-) : StringOneOrMoreCharPredicateRule(predicate), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<CharSequence>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

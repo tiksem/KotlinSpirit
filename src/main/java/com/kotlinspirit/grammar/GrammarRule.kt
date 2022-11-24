@@ -8,7 +8,10 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaultRepeat<T>() {
+open class GrammarRule<T : Any>(
+    private val grammar: Grammar<T>,
+    name: String?
+): RuleWithDefaultRepeat<T>(name) {
     private var ruleForParse: Rule<*>? = null
     private val stack = arrayListOf(grammar)
     private var stackSeek = 0
@@ -29,7 +32,7 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
         stackSeek--
     }
 
-    private fun initRuleForParse(): Rule<*> {
+    protected open fun initRuleForParse(): Rule<*> {
         var r = ruleForParse
         if (r == null) {
             r = grammar.initRule().ignoreCallbacks()
@@ -39,6 +42,10 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
         return r
     }
 
+    protected open fun initRule(grammar: Grammar<T>): Rule<*> {
+        return grammar.initRule()
+    }
+
     override fun parse(seek: Int, string: CharSequence): Long {
         return initRuleForParse().parse(seek, string)
     }
@@ -46,7 +53,7 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         val grammar = pullGrammar()
         try {
-            val parseResult = grammar.initRule().parse(seek, string)
+            val parseResult = initRule(grammar).parse(seek, string)
             result.parseResult = parseResult
             if (parseResult.getParseCode().isNotError()) {
                 result.data = grammar.result
@@ -63,19 +70,22 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
+    override val defaultDebugName: String
+        get() = "grammar"
+
     override fun clone(): GrammarRule<T> {
-        return GrammarRule(grammar.clone())
+        return GrammarRule(grammar.clone(), name)
     }
 
-    override fun debug(name: String?): GrammarRule<T> {
-        return DebugGrammarRule(name ?: grammar.name, object : Grammar<T>() {
-            override val result: T
-                get() = grammar.result
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(
+            rule = DebugGrammarRule(engine, grammar, name),
+            engine = engine
+        )
+    }
 
-            override fun defineRule(): Rule<*> {
-                return grammar.defineRule().internalDebug()
-            }
-        })
+    override fun name(name: String): GrammarRule<T> {
+        return GrammarRule(grammar, name)
     }
 
     override fun isThreadSafe(): Boolean {
@@ -88,19 +98,15 @@ open class GrammarRule<T : Any>(private val grammar: Grammar<T>): RuleWithDefaul
 }
 
 private class DebugGrammarRule<T : Any>(
-    override val name: String,
-    grammar: Grammar<T>
-) : GrammarRule<T>(grammar), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
+    private val engine: DebugEngine,
+    grammar: Grammar<T>,
+    name: String?
+) : GrammarRule<T>(grammar, name) {
+    override fun initRuleForParse(): Rule<*> {
+        return super.initRuleForParse().debug(engine)
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<T>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, r)
-        DebugEngine.ruleParseEnded(this, r.parseResult)
+    override fun initRule(grammar: Grammar<T>): Rule<*> {
+        return grammar.initRule().debug(engine)
     }
 }

@@ -26,4 +26,7 @@ internal class RangeResultGetRangeResultCore<T : Any>(
             out.data = null
         }
     }
+
+    override val debugName: String
+        get() = "getResultRange"
 }

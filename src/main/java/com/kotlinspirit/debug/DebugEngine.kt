@@ -24,6 +24,8 @@ class RuleDebugTreeNode(
         internal set
     var parseCode = -1
         internal set
+    var data: Any? = null
+        internal set
     var parent: RuleDebugTreeNode? = null
         internal set
     private val children = ArrayList<RuleDebugTreeNode>()
@@ -36,6 +38,9 @@ class RuleDebugTreeNode(
         return JSONObject().also {
             it.put("name", name)
             it.put("parseCode", parseCode.parseCodeToString())
+            if (data != null) {
+                it.put("result", data)
+            }
             if (parseCode.isError()) {
                 var token = string.subSequence(0, startSeek)
                 if (token.length > DEBUG_MAX_TOKEN_LENGTH) {
@@ -61,10 +66,10 @@ class RuleDebugTreeNode(
     }
 }
 
-class DebugEngine {
+internal class DebugEngine {
     var root: RuleDebugTreeNode? = null
         private set
-    private val history = ArrayList<RuleDebugTreeNode>()
+    val history = ArrayList<RuleDebugTreeNode>()
     private var seek: RuleDebugTreeNode? = null
     private var string: CharSequence = ""
 
@@ -89,7 +94,7 @@ class DebugEngine {
         }
     }
 
-    fun ruleParseEnded(rule: Rule<*>, result: Long) {
+    fun ruleParseEnded(rule: Rule<*>, result: Long, data: Any? = null) {
         val seek = this.seek
             ?: throw IllegalStateException("Undefined behaviour, " +
                     "ruleParseEnded was called before parsing was started")
@@ -100,38 +105,11 @@ class DebugEngine {
 
         seek.endSeek = result.getSeek()
         seek.parseCode = result.getParseCode()
+        seek.data = data
         if (seek.parent == null) {
             history.add(seek)
         }
 
         this.seek = seek.parent
-    }
-
-    companion object {
-        private val engines = ConcurrentHashMap<Long, DebugEngine>()
-
-        private fun getEngine(): DebugEngine {
-            return engines.getOrPut(Thread.currentThread().id) {
-                DebugEngine()
-            }
-        }
-
-        val root: RuleDebugTreeNode?
-            get() = getEngine().root
-
-        val history: List<RuleDebugTreeNode>
-            get() = getEngine().history
-
-        fun startDebugSession(string: CharSequence) {
-            getEngine().startDebugSession(string)
-        }
-
-        fun ruleParseStarted(rule: Rule<*>, startSeek: Int) {
-            getEngine().ruleParseStarted(rule, startSeek)
-        }
-
-        fun ruleParseEnded(rule: Rule<*>, result: Long) {
-            getEngine().ruleParseEnded(rule, result)
-        }
     }
 }

@@ -9,6 +9,7 @@ import com.kotlinspirit.expressive.LazyRule
 import com.kotlinspirit.grammar.Grammar
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.Rules.int
+import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import org.json.JSONObject
 import org.junit.Assert
 import org.junit.Test
@@ -23,7 +24,7 @@ private val skipper = str {
 }
 
 private val value: LazyRule<Any> = lazy {
-    jsonString or double or jsonObject or jsonArray
+    (jsonString or double or jsonObject or jsonArray) as RuleWithDefaultRepeat<Any>
 }
 
 private val jsonObject = object : Grammar<Map<String, Any>>() {

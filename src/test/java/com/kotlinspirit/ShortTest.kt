@@ -41,7 +41,7 @@ class ShortTest {
 
     @Test
     fun default() {
-        Assert.assertEquals(32767.toShort(), short.debug().compile().parseGetResultOrThrow("32767"))
+        Assert.assertEquals(32767.toShort(), short.compile().parseGetResultOrThrow("32767"))
     }
 
     @Test

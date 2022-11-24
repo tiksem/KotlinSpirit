@@ -1,6 +1,5 @@
 package com.kotlinspirit.expressive
 
-import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
@@ -8,9 +7,10 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class OptionalRule<T : Any>(
-    protected val rule: Rule<T>
-) : RuleWithDefaultRepeat<T>() {
+class OptionalRule<T : Any>(
+    private val rule: Rule<T>,
+    name: String? = null
+) : RuleWithDefaultRepeat<T>(name) {
 
     override fun parse(seek: Int, string: CharSequence): Long {
         val res = rule.parse(seek, string)
@@ -41,79 +41,34 @@ open class OptionalRule<T : Any>(
     }
 
     override fun clone(): OptionalRule<T> {
-        return OptionalRule(rule)
+        return OptionalRule(rule.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): OptionalRule<T> {
-        return DebugOptionalRule(name ?: "optional(${rule.debugName})", rule.internalDebug())
+    override val defaultDebugName: String
+        get() = "-${rule.wrappedName}"
+
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(
+            rule = OptionalRule(
+                rule = rule.debug(engine),
+                name
+            ),
+            engine = engine
+        )
     }
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
 
+    override fun name(name: String): OptionalRule<T> {
+        return OptionalRule(rule, name)
+    }
+
     override fun ignoreCallbacks(): OptionalRule<T> {
         return OptionalRule(rule.ignoreCallbacks())
     }
 }
-
-private class DebugOptionalRule<T : Any>(
-    override val name: String,
-    rule: Rule<T>
-): OptionalRule<T>(rule), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<T>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-}
-
-open class OptionalCharRule(rule: CharRule) : OptionalRule<Char>(rule) {
-    override fun clone(): OptionalCharRule {
-        return OptionalCharRule((rule as CharRule).clone())
-    }
-
-    override fun debug(name: String?): OptionalCharRule {
-        val debug = rule.internalDebug()
-        return DebugOptionalCharRule(name ?: "optional(${debug.debugName})",
-            debug as CharRule
-        )
-    }
-}
-
-private class DebugOptionalCharRule(
-    override val name: String,
-    rule: CharRule
-): OptionalCharRule(rule), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<Char>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): OptionalCharRule {
-        return DebugOptionalCharRule(name, rule.clone() as CharRule)
-    }
-}
-

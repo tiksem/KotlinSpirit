@@ -7,7 +7,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class LongRule : RuleWithDefaultRepeat<Long>() {
+class LongRule(name: String? = null) : RuleWithDefaultRepeat<Long>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -175,9 +175,12 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): LongRule {
-        return DebugLongRule(name ?: "long")
+    override fun name(name: String): LongRule {
+        return LongRule(name)
     }
+
+    override val defaultDebugName: String
+        get() = "long"
 
     override fun isThreadSafe(): Boolean {
         return true
@@ -185,20 +188,5 @@ open class LongRule : RuleWithDefaultRepeat<Long>() {
 
     override fun ignoreCallbacks(): LongRule {
         return this
-    }
-}
-
-private class DebugLongRule(override val name: String): LongRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Long>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, r)
-        DebugEngine.ruleParseEnded(this, r.parseResult)
     }
 }

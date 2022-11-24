@@ -17,10 +17,6 @@ operator fun Char.plus(rule: CharRule): StringRuleWrapper {
     return (ExactCharRule(this) + rule).asString()
 }
 
-operator fun Char.plus(rule: OptionalCharRule): StringRuleWrapper {
-    return (ExactCharRule(this) + rule).asString()
-}
-
 infix fun Char.or(rule: Rule<*>): OrRule<*> {
     return ExactCharRule(this) or rule
 }

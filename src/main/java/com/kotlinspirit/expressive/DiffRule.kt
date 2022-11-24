@@ -46,15 +46,16 @@ private fun internalHasMatch(
 }
 
 private fun generateDebugName(main: Rule<*>, diff: Rule<*>): String {
-    val mainName = main.debugNameWrapIfNeed
-    val diffName = diff.debugNameWrapIfNeed
-    return "$mainName - $diffName"
+    val mainName = main.wrappedName
+    val diffName = diff.wrappedName
+    return "$mainName-$diffName"
 }
 
-open class DiffRuleWithDefaultRepeat<T : Any>(
+class DiffRuleWithDefaultRepeat<T : Any>(
     protected val main: Rule<T>,
-    protected val diff: Rule<*>
-) : RuleWithDefaultRepeat<T>() {
+    protected val diff: Rule<*>,
+    name: String? = null
+) : RuleWithDefaultRepeat<T>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return internalParse(seek, string, main, diff)
     }
@@ -68,22 +69,23 @@ open class DiffRuleWithDefaultRepeat<T : Any>(
     }
 
     override fun clone(): DiffRuleWithDefaultRepeat<T> {
-        return DiffRuleWithDefaultRepeat(main.clone(), diff.clone())
+        return DiffRuleWithDefaultRepeat(main.clone(), diff.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = true
 
-    override fun debug(name: String?): DiffRuleWithDefaultRepeat<T> {
-        val main = main.internalDebug()
-        val diff = diff.internalDebug()
-
-        return DebugDiffRuleWithDefaultRepeat(
-            name = name ?: generateDebugName(main, diff),
-            main = main,
-            diff = diff
-        )
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        val rule = DiffRuleWithDefaultRepeat(main.debug(engine), diff.debug(engine), name)
+        return DebugRule(rule = rule, engine = engine)
     }
+
+    override fun name(name: String): Rule<T> {
+        return DiffRuleWithDefaultRepeat(main, diff, name)
+    }
+
+    override val defaultDebugName: String
+        get() = generateDebugName(main, diff)
 
     override fun isThreadSafe(): Boolean {
         return main.isThreadSafe() && diff.isThreadSafe()
@@ -94,33 +96,11 @@ open class DiffRuleWithDefaultRepeat<T : Any>(
     }
 }
 
-private class DebugDiffRuleWithDefaultRepeat<T : Any>(
-    override val name: String,
-    main: Rule<T>,
-    diff: Rule<*>
-) : DiffRuleWithDefaultRepeat<T>(main, diff), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): DiffRuleWithDefaultRepeat<T> {
-        return DebugDiffRuleWithDefaultRepeat(name, main.clone(), diff.clone())
-    }
-}
-
-open class CharDiffRule(
+class CharDiffRule(
     protected val main: Rule<Char>,
-    protected val diff: Rule<*>
-) : CharRule() {
+    protected val diff: Rule<*>,
+    name: String? = null
+) : CharRule(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return internalParse(seek, string, main, diff)
     }
@@ -137,19 +117,22 @@ open class CharDiffRule(
         get() = true
 
     override fun clone(): CharDiffRule {
-        return CharDiffRule(main.clone(), diff.clone())
+        return CharDiffRule(main.clone(), diff.clone(), name)
     }
 
-    override fun debug(name: String?): CharDiffRule {
-        val main = main.internalDebug()
-        val diff = diff.internalDebug()
-
-        return DebugCharDiffRule(
-            name = name ?: generateDebugName(main, diff),
-            main = main,
-            diff = diff
+    override fun debug(engine: DebugEngine): DebugRule<Char> {
+        return DebugRule(
+            rule = CharDiffRule(main.debug(engine), diff.debug(engine), name),
+            engine = engine
         )
     }
+
+    override fun name(name: String): CharDiffRule {
+        return CharDiffRule(main, diff, name)
+    }
+
+    override val defaultDebugName: String
+        get() = generateDebugName(main, diff)
 
     override fun isThreadSafe(): Boolean {
         return main.isThreadSafe() && diff.isThreadSafe()
@@ -157,29 +140,6 @@ open class CharDiffRule(
 
     override fun ignoreCallbacks(): CharDiffRule {
         return CharDiffRule(main.ignoreCallbacks(), diff.ignoreCallbacks())
-    }
-}
-
-private class DebugCharDiffRule(
-    override val name: String,
-    main: Rule<Char>,
-    diff: Rule<*>
-) : CharDiffRule(main, diff), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): CharDiffRule {
-        return DebugCharDiffRule(name, main.clone(), diff.clone())
     }
 }
 

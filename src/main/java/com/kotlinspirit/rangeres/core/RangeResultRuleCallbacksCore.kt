@@ -23,4 +23,7 @@ internal class RangeResultRuleCallbacksCore<T : Any>(
             callback(ParseRange(seek, result.endSeek))
         }
     }
+
+    override val debugName: String
+        get() = "getRange"
 }

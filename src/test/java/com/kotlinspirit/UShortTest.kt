@@ -20,7 +20,7 @@ class UShortTest {
 
     @Test
     fun default() {
-        Assert.assertEquals(2352u.toUShort(), ushort.debug().compile().parseGetResultOrThrow("2352"))
+        Assert.assertEquals(2352u.toUShort(), ushort.compile().parseGetResultOrThrow("2352"))
     }
 
     @Test

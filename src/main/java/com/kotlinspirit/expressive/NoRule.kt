@@ -11,9 +11,10 @@ import com.kotlinspirit.debug.DebugRule
  * Matches one character, if it doesn't match the original rule.
  * If we are at the end of input, and the original rule doesn't match EOF, it outputs '\0' as a result
  */
-open class NoRule(
-    protected val rule: Rule<*>
-) : CharRule() {
+class NoRule(
+    private val rule: Rule<*>,
+    name: String? = null
+) : CharRule(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         val rResult = rule.parse(seek, string)
         val parseCode = rResult.getParseCode()
@@ -53,18 +54,24 @@ open class NoRule(
     }
 
     override fun clone(): NoRule {
-        return NoRule(rule.clone())
+        return NoRule(rule.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): NoRule {
-        val debug = rule.internalDebug()
-        return DebugNoRule(
-            name = name ?: "!${debug.debugNameWrapIfNeed}",
-            rule = debug
+    override val defaultDebugName: String
+        get() = "!${rule.wrappedName}"
+
+    override fun debug(engine: DebugEngine): DebugRule<Char> {
+        return DebugRule(
+            rule = NoRule(rule.debug(engine), name),
+            engine = engine
         )
+    }
+
+    override fun name(name: String): NoRule {
+        return NoRule(rule, name)
     }
 
     override fun isThreadSafe(): Boolean {
@@ -73,29 +80,5 @@ open class NoRule(
 
     override fun ignoreCallbacks(): NoRule {
         return NoRule(rule.ignoreCallbacks())
-    }
-}
-
-private class DebugNoRule(
-    override val name: String,
-    rule: Rule<*>
-) : NoRule(rule), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<Char>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): NoRule {
-        return DebugNoRule(name, rule.clone())
     }
 }

@@ -18,20 +18,21 @@ open class CharPredicateRule : CharRule {
     internal constructor(
         data: CharPredicateData?,
         predicate: (Char) -> Boolean,
-        eofParseCode: Int = ParseCode.EOF
-    ) {
+        eofParseCode: Int = ParseCode.EOF,
+        name: String? = null
+    ) : super(name) {
         this.data = data
         this.predicate = predicate
         this.eofParseCode = eofParseCode
     }
 
-    internal constructor(data: CharPredicateData, eofParseCode: Int = ParseCode.EOF) {
+    internal constructor(data: CharPredicateData, eofParseCode: Int = ParseCode.EOF, name: String? = null) : super(name) {
         this.data = data
         this.predicate = data.toPredicate()
         this.eofParseCode = eofParseCode
     }
 
-    internal constructor(predicate: (Char) -> Boolean, eofParseCode: Int = ParseCode.EOF) {
+    internal constructor(predicate: (Char) -> Boolean, eofParseCode: Int = ParseCode.EOF, name: String? = null) : super(name) {
         this.predicate = predicate
         this.data = null
         this.eofParseCode = eofParseCode
@@ -148,59 +149,35 @@ open class CharPredicateRule : CharRule {
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    private fun generateDebugName(): String {
-        val data = data
-        if (data != null) {
-            val chars = if (data.chars.isEmpty()) {
-                ""
+    override val defaultDebugName: String
+        get() {
+            val data = data
+            if (data != null) {
+                val chars = if (data.chars.isEmpty()) {
+                    ""
+                } else {
+                    "(" + data.chars.joinToString(",") {
+                        if (it == ',') "`,`" else it.toString()
+                    } + ")"
+                }
+                val ranges = data.ranges.joinToString("") {
+                    "[${it.first}..${it.last}]"
+                }
+                return "char$chars$ranges"
             } else {
-                "(" + data.chars.joinToString(",") {
-                    if (it == ',') "`,`" else it.toString()
-                } + ")"
+                return "charWithCustomPredicate"
             }
-            val ranges = data.ranges.joinToString("") {
-                "[${it.first}..${it.last}]"
-            }
-            return "char$chars$ranges"
-        } else {
-            return "charWithCustomPredicate"
         }
-    }
-
-    override fun debug(name: String?): CharPredicateRule {
-        return DebugCharPredicateRule(
-            name = name ?: generateDebugName(),
-            data = data,
-            predicate = predicate,
-            eofParseCode = eofParseCode
-        )
-    }
 
     override fun isThreadSafe(): Boolean {
         return true
     }
 
+    override fun name(name: String): Rule<Char> {
+        return CharPredicateRule(data, predicate, eofParseCode, name)
+    }
+
     override fun ignoreCallbacks(): CharPredicateRule {
         return this
-    }
-}
-
-private class DebugCharPredicateRule(
-    override val name: String,
-    data: CharPredicateData?,
-    predicate: (Char) -> Boolean,
-    eofParseCode: Int
-) : CharPredicateRule(data, predicate, eofParseCode), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

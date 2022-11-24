@@ -8,7 +8,7 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import java.math.BigInteger
 
-open class BigIntegerRule : RuleWithDefaultRepeat<BigInteger>() {
+open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteger>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -129,30 +129,18 @@ open class BigIntegerRule : RuleWithDefaultRepeat<BigInteger>() {
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
+    override fun name(name: String): BigIntegerRule {
+        return BigIntegerRule(name)
+    }
+
+    override val defaultDebugName: String
+        get() = "bigint"
+
     override fun isThreadSafe(): Boolean {
         return true
     }
 
     override fun clone(): BigIntegerRule {
         return this
-    }
-
-    override fun debug(name: String?): RuleWithDefaultRepeat<BigInteger> {
-        return DebugBigIntegerRule(name ?: "bigint")
-    }
-}
-
-private class DebugBigIntegerRule(override val name: String): BigIntegerRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<BigInteger>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, r)
-        DebugEngine.ruleParseEnded(this, r.parseResult)
     }
 }

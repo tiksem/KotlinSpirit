@@ -1,12 +1,8 @@
 package com.kotlinspirit.char
 
-import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.debug.DebugRule
-import com.kotlinspirit.core.BaseRuleWithResult
 import com.kotlinspirit.expressive.CharDiffRule
-import com.kotlinspirit.expressive.OptionalCharRule
+import com.kotlinspirit.expressive.OptionalRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.callbacks.RangeResultCharCallbacksRule
@@ -20,10 +16,11 @@ import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
 import com.kotlinspirit.str.StringOneOrMoreCharPredicateRule
 
-open class CharResultRule(
+class CharResultRule(
     rule: CharRule,
-    callback: (Char) -> Unit
-) : BaseRuleWithResult<Char>(rule, callback) {
+    callback: (Char) -> Unit,
+    name: String? = null
+) : BaseRuleWithResult<Char>(rule, callback, name) {
     override fun repeat(): Rule<CharSequence> {
         return ZeroOrMoreRule(this).asString()
     }
@@ -57,12 +54,15 @@ open class CharResultRule(
     }
 
     override fun clone(): CharResultRule {
-        return CharResultRule(rule.clone() as CharRule, callback)
+        return CharResultRule(rule.clone() as CharRule, callback, name)
     }
 
-    override fun debug(name: String?): CharResultRule {
-        return CharResultRule(rule.internalDebug(name) as CharRule, callback)
+    override fun name(name: String): CharResultRule {
+        return CharResultRule(rule as CharRule, callback, name)
     }
+
+    override val defaultDebugName: String
+        get() = "charResult"
 
     override val debugNameShouldBeWrapped: Boolean
         get() = rule.debugNameShouldBeWrapped
@@ -72,7 +72,7 @@ open class CharResultRule(
     }
 }
 
-abstract class CharRule : Rule<Char>() {
+abstract class CharRule(name: String?) : Rule<Char>(name) {
     override fun minus(rule: Rule<*>): CharDiffRule {
         return CharDiffRule(main = this, diff = rule)
     }
@@ -117,15 +117,10 @@ abstract class CharRule : Rule<Char>() {
         return OneOrMoreRule(this).asString()
     }
 
-    override fun unaryMinus(): OptionalCharRule {
-        return OptionalCharRule(this)
-    }
-
     abstract override fun clone(): CharRule
-    abstract override fun debug(name: String?): CharRule
 }
 
-open class AnyCharRule : CharRule() {
+open class AnyCharRule(name: String? = null) : CharRule(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         if (seek >= string.length) {
             return createStepResult(
@@ -164,21 +159,14 @@ open class AnyCharRule : CharRule() {
         return this
     }
 
-    override val debugNameShouldBeWrapped: Boolean
-        get() = false
-
-    override fun debug(name: String?): AnyCharRule {
-        return DebugAnyCharRule(name ?: "char")
-    }
-
     override fun repeat(): StringCharPredicateRule {
         //TODO: Optimise
-        return StringCharPredicateRule { true }
+        return StringCharPredicateRule(predicate = { true })
     }
 
     override fun unaryPlus(): StringOneOrMoreCharPredicateRule {
         //TODO: Optimise
-        return StringOneOrMoreCharPredicateRule { true }
+        return StringOneOrMoreCharPredicateRule(predicate = { true })
     }
 
     override fun repeat(range: IntRange): StringCharPredicateRangeRule {
@@ -207,19 +195,14 @@ open class AnyCharRule : CharRule() {
     override fun ignoreCallbacks(): AnyCharRule {
         return this
     }
-}
 
-private class DebugAnyCharRule(override val name: String) : AnyCharRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
+    override val debugNameShouldBeWrapped: Boolean
+        get() = false
+
+    override fun name(name: String): AnyCharRule {
+        return AnyCharRule(name)
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
+    override val defaultDebugName: String
+        get() = "char"
 }

@@ -8,9 +8,6 @@ abstract class Grammar<T : Any> {
     abstract fun defineRule(): Rule<*>
     open fun resetResult() {}
 
-    open val name: String
-        get() = "grammar"
-
     internal fun initRule(): Rule<*> {
         var rule = this.r
         if (rule == null) {
@@ -28,7 +25,7 @@ abstract class Grammar<T : Any> {
     }
 
     fun toRule(): GrammarRule<T> {
-        return GrammarRule(this)
+        return GrammarRule(this, null)
     }
 }
 

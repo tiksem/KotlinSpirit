@@ -6,10 +6,11 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class ExpectationRule<T : Any>(
-    protected val a: Rule<T>,
-    protected val b: Rule<*>
-) : RuleWithDefaultRepeat<T>() {
+class ExpectationRule<T : Any>(
+    private val a: Rule<T>,
+    private val b: Rule<*>,
+    name: String? = null
+) : RuleWithDefaultRepeat<T>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         val aResult = a.parse(seek, string)
         if (aResult.getParseCode().isError()) {
@@ -57,46 +58,31 @@ open class ExpectationRule<T : Any>(
     }
 
     override fun clone(): ExpectationRule<T> {
-        return ExpectationRule(a.clone(), b.clone())
+        return ExpectationRule(a.clone(), b.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = true
 
-    override fun debug(name: String?): ExpectationRule<T> {
-        val a = a.internalDebug()
-        val b = b.internalDebug()
-        return DebugExpectationRule(name ?: "${a.debugName} expects ${b.debugName}", a, b)
-    }
+    override val defaultDebugName: String
+        get() = "${a.wrappedName} expects ${b.wrappedName}"
 
     override fun isThreadSafe(): Boolean {
         return a.isThreadSafe() && b.isThreadSafe()
     }
 
+    override fun name(name: String): ExpectationRule<T> {
+        return ExpectationRule(a, b, name)
+    }
+
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(
+            rule = ExpectationRule(a.debug(engine), b.debug(engine), name),
+            engine = engine
+        )
+    }
+
     override fun ignoreCallbacks(): ExpectationRule<T> {
         return ExpectationRule(a.ignoreCallbacks(), b.ignoreCallbacks())
-    }
-}
-
-private class DebugExpectationRule<T : Any>(
-    override val name: String,
-    a: Rule<T>,
-    b: Rule<*>
-) : ExpectationRule<T>(a, b), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): ExpectationRule<T> {
-        return DebugExpectationRule(name, a.clone(), b.clone())
     }
 }

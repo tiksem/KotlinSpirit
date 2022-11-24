@@ -7,11 +7,12 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class QuotedRule<T : Any>(
-    protected val main: Rule<T>,
-    protected val left: Rule<*>,
-    protected val right: Rule<*>
-) : RuleWithDefaultRepeat<T>() {
+class QuotedRule<T : Any>(
+    private val main: Rule<T>,
+    private val left: Rule<*>,
+    private val right: Rule<*>,
+    name: String? = null
+) : RuleWithDefaultRepeat<T>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         val l = left.parse(seek, string)
         if (l.getParseCode().isError()) {
@@ -67,43 +68,20 @@ open class QuotedRule<T : Any>(
     }
 
     override fun clone(): QuotedRule<T> {
-        return QuotedRule(main.clone(), left.clone(), right.clone())
+        return QuotedRule(main.clone(), left.clone(), right.clone(), name)
     }
 
-    override fun debug(name: String?): QuotedRule<T> {
-        val main = main.internalDebug()
-        val left = left.internalDebug()
-        val right = right.internalDebug()
-
-        val n = name ?: arrayOf(
-            left.debugNameWrapIfNeed,
-            main.debugNameWrapIfNeed,
-            right.debugNameWrapIfNeed
-        ).joinToString(" + ")
-        return DebugQuotedRule(n, main, left, right)
-    }
-}
-
-private class DebugQuotedRule<T : Any>(
-    override val name: String,
-    main: Rule<T>,
-    left: Rule<*>,
-    right: Rule<*>
-): QuotedRule<T>(main, left, right), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(
+            rule = QuotedRule(main.debug(engine), left.debug(engine), right.debug(engine), name),
+            engine = engine
+        )
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
+    override fun name(name: String): QuotedRule<T> {
+        return QuotedRule(main, left, right, name)
     }
 
-    override fun clone(): QuotedRule<T> {
-        return DebugQuotedRule(name, main.clone(), left.clone(), right.clone())
-    }
+    override val defaultDebugName: String
+        get() = "${main.wrappedName}.quoted(${left.debugName}, ${right.debugName})"
 }

@@ -11,40 +11,24 @@ import com.kotlinspirit.rangeres.core.RangeResultRuleGetRangeCore
 
 internal open class RangeResultCharRule(
     rule: Rule<Char>,
-    internal val outRange: ParseRange
+    internal val outRange: ParseRange,
+    name: String? = null
 ) : BaseRangeResultCharRule(
-    core = RangeResultRuleGetRangeCore(rule, outRange)
+    core = RangeResultRuleGetRangeCore(rule, outRange),
+    name
 ) {
     override fun clone(): CharRule {
-        return RangeResultCharRule(rule = core.rule.clone(), outRange)
+        return RangeResultCharRule(rule = core.rule.clone(), outRange, name)
     }
 
-    override fun debug(name: String?): CharRule {
-        return DebugRangeResultCharRule(
-            name = name ?: "rangeResult",
-            rule = core.rule.internalDebug(),
-            outRange = outRange
+    override fun debug(engine: DebugEngine): DebugRule<Char> {
+        return DebugRule(
+            rule = core.rule.debug(engine),
+            engine = engine
         )
     }
-}
 
-private class DebugRangeResultCharRule(
-    override val name: String,
-    rule: Rule<Char>,
-    outRange: ParseRange
-) : RangeResultCharRule(rule, outRange), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<Char>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
+    override fun name(name: String): RangeResultCharRule {
+        return RangeResultCharRule(rule = core.rule, outRange, name)
     }
 }

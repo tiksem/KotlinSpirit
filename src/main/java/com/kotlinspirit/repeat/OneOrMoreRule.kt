@@ -1,15 +1,13 @@
 package com.kotlinspirit.repeat
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
-import java.lang.IllegalStateException
 
-open class OneOrMoreRule<T : Any>(
-    protected val rule: Rule<T>
-) : RuleWithDefaultRepeat<List<T>>() {
+class OneOrMoreRule<T : Any>(
+    private val rule: Rule<T>,
+    name: String? = null
+) : RuleWithDefaultRepeat<List<T>>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         var i = seek
         var success = false
@@ -76,49 +74,31 @@ open class OneOrMoreRule<T : Any>(
     }
 
     override fun clone(): OneOrMoreRule<T> {
-        return OneOrMoreRule(rule.clone())
+        return OneOrMoreRule(rule.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): OneOrMoreRule<T> {
-        val debug = rule.internalDebug()
-        return DebugOneOrMoreRule(
-            name ?: "${debug.debugNameWrapIfNeed}.repeat(1..<)",
-            debug
+    override fun debug(engine: DebugEngine): DebugRule<List<T>> {
+        return DebugRule(
+            rule = OneOrMoreRule(rule.debug(engine), name),
+            engine = engine
         )
     }
+
+    override fun name(name: String): OneOrMoreRule<T> {
+        return OneOrMoreRule(rule, name)
+    }
+
+    override val defaultDebugName: String
+        get() = "+${rule.wrappedName}"
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
 
     override fun ignoreCallbacks(): OneOrMoreRule<T> {
-        return OneOrMoreRule(rule.ignoreCallbacks())
-    }
-}
-
-private class DebugOneOrMoreRule<T : Any>(
-    override val name: String,
-    rule: Rule<T>
-) : OneOrMoreRule<T>(rule), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<List<T>>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): OneOrMoreRule<T> {
-        return DebugOneOrMoreRule(name, rule.clone())
+        return OneOrMoreRule(rule.ignoreCallbacks(), name)
     }
 }

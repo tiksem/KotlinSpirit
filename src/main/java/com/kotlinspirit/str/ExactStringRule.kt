@@ -9,8 +9,9 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
 
 open class ExactStringRule(
-    internal val string: String
-) : RuleWithDefaultRepeat<CharSequence>() {
+    internal val string: String,
+    name: String? = null
+) : RuleWithDefaultRepeat<CharSequence>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         if (seek >= string.length) {
             return createStepResult(
@@ -105,9 +106,12 @@ open class ExactStringRule(
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): ExactStringRule {
-        return DebugExactStringRule(name ?: "str($string)", string)
+    override fun name(name: String): ExactStringRule {
+        return ExactStringRule(string, name)
     }
+
+    override val defaultDebugName: String
+        get() = "str:$string"
 
     override fun isThreadSafe(): Boolean {
         return true
@@ -118,7 +122,7 @@ open class ExactStringRule(
     }
 }
 
-open class EmptyStringRule: ExactStringRule("") {
+class EmptyStringRule(name: String? = null): ExactStringRule("", name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return createComplete(seek)
     }
@@ -136,40 +140,6 @@ open class EmptyStringRule: ExactStringRule("") {
         return true
     }
 
-    override fun debug(name: String?): ExactStringRule {
-        return DebugEmptyStringRule(name ?: "str()")
-    }
-}
-
-private class DebugExactStringRule(override val name: String, string: String) :
-    ExactStringRule(string),
-    DebugRule
-{
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-}
-
-private class DebugEmptyStringRule(override val name: String) : EmptyStringRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
+    override val defaultDebugName: String
+        get() = "emptyString"
 }

@@ -11,43 +11,28 @@ import com.kotlinspirit.rangeres.core.RangeResultRuleCallbacksCore
 
 internal open class RangeResultCharCallbacksRule(
     rule: Rule<Char>,
-    private val callback: (ParseRange) -> Unit
+    private val callback: (ParseRange) -> Unit,
+    name: String? = null
 ) : BaseRangeResultCharRule(
-    core = RangeResultRuleCallbacksCore<Char>(rule, callback)
+    core = RangeResultRuleCallbacksCore<Char>(rule, callback),
+    name
 ){
     override fun clone(): CharRule {
         return RangeResultCharCallbacksRule(
             rule = core.rule.clone(),
-            callback = callback
+            callback = callback,
+            name = name
         )
     }
 
-    override fun debug(name: String?): CharRule {
-        return DebugRangeResultCharCallbacksRule(
-            name = name ?: "rangeResult",
-            rule = core.rule.internalDebug(),
-            callback = callback
+    override fun name(name: String): RangeResultCharCallbacksRule {
+        return RangeResultCharCallbacksRule(rule = core.rule, callback = callback, name = name)
+    }
+
+    override fun debug(engine: DebugEngine): DebugRule<Char> {
+        return DebugRule(
+            rule = RangeResultCharCallbacksRule(rule = core.rule.debug(engine), callback = callback, name = name),
+            engine = engine
         )
-    }
-}
-
-private class DebugRangeResultCharCallbacksRule(
-    override val name: String,
-    rule: Rule<Char>,
-    callback: (ParseRange) -> Unit
-) : RangeResultCharCallbacksRule(rule, callback), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<Char>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

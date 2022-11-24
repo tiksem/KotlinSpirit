@@ -196,7 +196,7 @@ internal fun floatingNumberHasMatch(seek: Int, string: CharSequence): Boolean {
     }
 }
 
-open class FloatRule : RuleWithDefaultRepeat<Float>() {
+class FloatRule(name: String? = null) : RuleWithDefaultRepeat<Float>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return parseFloatingNumber(
             seek = seek,
@@ -595,26 +595,14 @@ open class FloatRule : RuleWithDefaultRepeat<Float>() {
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): FloatRule {
-        return DebugFloatRule(name ?: "float")
+    override fun name(name: String): FloatRule {
+        return FloatRule(name)
     }
+
+    override val defaultDebugName: String
+        get() = "float"
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-}
-
-private class DebugFloatRule(override val name: String) : FloatRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Float>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

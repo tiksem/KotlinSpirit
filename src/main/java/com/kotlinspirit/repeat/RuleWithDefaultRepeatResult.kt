@@ -1,5 +1,6 @@
 package com.kotlinspirit.repeat
 
+import com.beust.klaxon.Debug
 import com.kotlinspirit.char.CharPredicateRule
 import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.BaseRuleWithResult
@@ -21,9 +22,10 @@ import com.kotlinspirit.str.StringCharPredicateRule
 import com.kotlinspirit.str.StringOneOrMoreCharPredicateRule
 
 open class RuleWithDefaultRepeatResult<T : Any>(
-    rule: RuleWithDefaultRepeat<T>,
-    callback: (T) -> Unit
-) : BaseRuleWithResult<T>(rule, callback) {
+    rule: Rule<T>,
+    callback: (T) -> Unit,
+    name: String? = null
+) : BaseRuleWithResult<T>(rule, callback, name) {
     override fun repeat(): Rule<List<T>> {
         return rule.repeat() as Rule<List<T>>
     }
@@ -47,11 +49,18 @@ open class RuleWithDefaultRepeatResult<T : Any>(
     override val debugNameShouldBeWrapped: Boolean
         get() = rule.debugNameShouldBeWrapped
 
-    override fun debug(name: String?): RuleWithDefaultRepeatResult<T> {
-        return DebugRuleWithDefaultRepeatResult(
-            name = name ?: "result",
-            rule = rule.internalDebug() as RuleWithDefaultRepeat<T>, callback
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(
+            rule = RuleWithDefaultRepeatResult(
+                rule = rule.debug(engine),
+                callback, name
+            ),
+            engine = engine
         )
+    }
+
+    override fun name(name: String): RuleWithDefaultRepeatResult<T> {
+        return RuleWithDefaultRepeatResult(rule, callback, name)
     }
 
     override fun isThreadSafe(): Boolean {
@@ -79,35 +88,18 @@ open class RuleWithDefaultRepeatResult<T : Any>(
     }
 }
 
-private class DebugRuleWithDefaultRepeatResult<T : Any>(
-    override val name: String,
-    rule: RuleWithDefaultRepeat<T>,
-    callback: (T) -> Unit
-) : RuleWithDefaultRepeatResult<T>(rule, callback), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
+open class CharPredicateResultRule private constructor(
+    rule: Rule<Char>,
+    callback: (Char) -> Unit,
+    name: String? = null
+) : BaseRuleWithResult<Char>(rule, callback, name) {
+    internal constructor(
+        rule: CharPredicateRule,
+        callback: (Char) -> Unit,
+        name: String? = null
+    ) : this(rule as Rule<Char>, callback, name) {
     }
 
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<T>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): RuleWithDefaultRepeatResult<T> {
-        return DebugRuleWithDefaultRepeatResult(name, rule.clone() as RuleWithDefaultRepeat<T>, callback)
-    }
-}
-
-open class CharPredicateResultRule(
-    rule: CharPredicateRule,
-    callback: (Char) -> Unit
-) : BaseRuleWithResult<Char>(rule, callback) {
     override fun repeat(): StringCharPredicateRule {
         return (rule as CharPredicateRule).repeat()
     }
@@ -134,14 +126,24 @@ open class CharPredicateResultRule(
     }
 
     override fun clone(): CharPredicateResultRule {
-        return CharPredicateResultRule((rule as CharPredicateRule).clone(), callback)
+        return CharPredicateResultRule(rule.clone(), callback)
+    }
+
+    override fun name(name: String): CharPredicateResultRule {
+        return CharPredicateResultRule(rule, callback, name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): CharPredicateResultRule {
-        return DebugCharPredicateResultRule(name ?: "result", rule.internalDebug() as CharPredicateRule, callback)
+    override fun debug(engine: DebugEngine): DebugRule<Char> {
+        return DebugRule(
+            rule = CharPredicateResultRule(
+                rule = rule.debug(engine),
+                callback, name
+            ),
+            engine = engine
+        )
     }
 
     override fun ignoreCallbacks(): CharPredicateRule {
@@ -162,30 +164,5 @@ open class CharPredicateResultRule(
 
     override fun getRangeResult(callback: (ParseRangeResult<Char>) -> Unit): CharRule {
         return RangeResultCharCallbacksResultRule(this, callback)
-    }
-}
-
-private class DebugCharPredicateResultRule(
-    override val name: String,
-    rule: CharPredicateRule,
-    callback: (Char) -> Unit
-) : CharPredicateResultRule(rule, callback), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<Char>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): CharPredicateResultRule {
-        return DebugCharPredicateResultRule(name, rule.clone() as CharPredicateRule, callback)
     }
 }

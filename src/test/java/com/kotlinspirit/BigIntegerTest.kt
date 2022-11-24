@@ -41,14 +41,14 @@ class BigIntegerTest {
 
     @Test
     fun default() {
-        Assert.assertEquals(BigInteger.valueOf(23523454), bigint.debug().compile().parseGetResultOrThrow("23523454"))
+        Assert.assertEquals(BigInteger.valueOf(23523454), bigint.compile().parseGetResultOrThrow("23523454"))
     }
 
     @Test
     fun large() {
         Assert.assertEquals(
             BigInteger("56237456237845623748526345782364527834652374856234785623434523754627345"),
-            bigint.debug().compile().parseGetResultOrThrow(
+            bigint.compile().parseGetResultOrThrow(
             "56237456237845623748526345782364527834652374856234785623434523754627345"
         ))
     }
@@ -57,7 +57,7 @@ class BigIntegerTest {
     fun largePlus() {
         Assert.assertEquals(
             BigInteger("56237456237845623748526345782364527834652374856234785623434523754627345"),
-            bigint.debug().compile().parseGetResultOrThrow(
+            bigint.compile().parseGetResultOrThrow(
                 "+56237456237845623748526345782364527834652374856234785623434523754627345"
             ))
     }
@@ -66,7 +66,7 @@ class BigIntegerTest {
     fun largeMinus() {
         Assert.assertEquals(
             BigInteger("-56237456237845623748526345782364527834652374856234785623434523754627345"),
-            bigint.debug().compile().parseGetResultOrThrow(
+            bigint.compile().parseGetResultOrThrow(
                 "-56237456237845623748526345782364527834652374856234785623434523754627345"
             ))
     }

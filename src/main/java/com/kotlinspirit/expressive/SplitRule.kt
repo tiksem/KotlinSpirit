@@ -7,11 +7,12 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class SplitRule<T : Any>(
-    protected val r: Rule<T>,
-    protected val divider: Rule<*>,
-    protected val range: IntRange
-) : RuleWithDefaultRepeat<List<T>>() {
+class SplitRule<T : Any>(
+    private val r: Rule<T>,
+    private val divider: Rule<*>,
+    private val range: IntRange,
+    name: String? = null
+) : RuleWithDefaultRepeat<List<T>>(name) {
     init {
         if (range.first < 0) {
             throw IllegalStateException("negative range.first value")
@@ -127,47 +128,25 @@ open class SplitRule<T : Any>(
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
+    override val defaultDebugName: String
+        get() = "${r.wrappedName}.split(${divider.debugName} , $range)"
+
     override fun clone(): SplitRule<T> {
-        return SplitRule(r.clone(), divider.clone(), range)
+        return SplitRule(r.clone(), divider.clone(), range, name)
     }
 
-    override fun debug(name: String?): SplitRule<T> {
-        val r = r.internalDebug()
-        val divider = divider.internalDebug()
-        return DebugSplitRule(
-            name = name ?: "${r.debugNameWrapIfNeed}.split(${divider.debugName} , $range)",
-            r, divider, range
+    override fun debug(engine: DebugEngine): DebugRule<List<T>> {
+        return DebugRule(
+            rule = SplitRule(r.debug(engine), divider.debug(engine), range),
+            engine = engine
         )
     }
 
     override fun isThreadSafe(): Boolean {
         return r.isThreadSafe() && divider.isThreadSafe()
     }
-}
 
-private class DebugSplitRule<T : Any>(
-    override val name: String,
-    r: Rule<T>,
-    divider: Rule<*>,
-    range: IntRange
-) : SplitRule<T>(r, divider, range), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<List<T>>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): SplitRule<T> {
-        return DebugSplitRule(name, r.clone(), divider.clone(), range)
+    override fun name(name: String): SplitRule<T> {
+        return SplitRule(r, divider, range, name)
     }
 }
-

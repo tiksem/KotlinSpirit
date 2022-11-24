@@ -2,8 +2,9 @@ package com.kotlinspirit.core
 
 abstract class BaseRuleWithResult<T : Any>(
     protected val rule: Rule<T>,
-    protected val callback: (T) -> Unit
-) : Rule<T>() {
+    protected val callback: (T) -> Unit,
+    name: String?,
+) : Rule<T>(name) {
     private val result = ParseResult<T>()
 
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -29,4 +30,7 @@ abstract class BaseRuleWithResult<T : Any>(
     override fun isThreadSafe(): Boolean {
         return false
     }
+
+    override val defaultDebugName: String
+        get() = "result"
 }

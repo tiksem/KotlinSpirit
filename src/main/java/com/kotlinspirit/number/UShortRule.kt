@@ -7,7 +7,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class UShortRule : RuleWithDefaultRepeat<UShort>() {
+class UShortRule(name: String? = null) : RuleWithDefaultRepeat<UShort>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -133,9 +133,12 @@ open class UShortRule : RuleWithDefaultRepeat<UShort>() {
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): UShortRule {
-        return DebugUShort(name ?: "ushort")
+    override fun name(name: String): UShortRule {
+        return UShortRule(name)
     }
+
+    override val defaultDebugName: String
+        get() = "ushort"
 
     override fun isThreadSafe(): Boolean {
         return true
@@ -143,20 +146,5 @@ open class UShortRule : RuleWithDefaultRepeat<UShort>() {
 
     override fun ignoreCallbacks(): UShortRule {
         return this
-    }
-}
-
-private class DebugUShort(override val name: String): UShortRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<UShort>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, r)
-        DebugEngine.ruleParseEnded(this, r.parseResult)
     }
 }

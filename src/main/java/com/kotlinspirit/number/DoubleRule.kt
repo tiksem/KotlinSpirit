@@ -14,7 +14,7 @@ private inline fun getPowerOf10(exp: Int): Double {
     }
 }
 
-open class DoubleRule : RuleWithDefaultRepeat<Double>() {
+class DoubleRule(name: String? = null) : RuleWithDefaultRepeat<Double>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return parseFloatingNumber(
             seek = seek,
@@ -413,26 +413,14 @@ open class DoubleRule : RuleWithDefaultRepeat<Double>() {
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): DoubleRule {
-        return DebugDoubleRule(name ?: "double")
+    override fun name(name: String): DoubleRule {
+        return DoubleRule(name)
     }
+
+    override val defaultDebugName: String
+        get() = "double"
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-}
-
-private class DebugDoubleRule(override val name: String) : DoubleRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Double>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
     }
 }

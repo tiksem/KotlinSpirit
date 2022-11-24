@@ -31,4 +31,7 @@ internal class RangeResultRuleGetRangeCore<T: Any>(
             outRange.endSeek = -1
         }
     }
+
+    override val debugName: String
+        get() = "getRange"
 }

@@ -7,7 +7,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-open class IntRule : RuleWithDefaultRepeat<Int>() {
+class IntRule(name: String? = null) : RuleWithDefaultRepeat<Int>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         val length = string.length
         if (seek >= length) {
@@ -175,9 +175,12 @@ open class IntRule : RuleWithDefaultRepeat<Int>() {
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): IntRule {
-        return DebugIntRule(name ?: "int")
+    override fun name(name: String): IntRule {
+        return IntRule(name)
     }
+
+    override val defaultDebugName: String
+        get() = "int"
 
     override fun isThreadSafe(): Boolean {
         return true
@@ -185,20 +188,5 @@ open class IntRule : RuleWithDefaultRepeat<Int>() {
 
     override fun ignoreCallbacks(): IntRule {
         return this
-    }
-}
-
-private class DebugIntRule(override val name: String): IntRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Int>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, r)
-        DebugEngine.ruleParseEnded(this, r.parseResult)
     }
 }

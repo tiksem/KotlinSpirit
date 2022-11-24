@@ -4,7 +4,6 @@ import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.core.isError
 import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.ext.replaceRanges
 import com.kotlinspirit.ext.toCharSequence
 import com.kotlinspirit.rangeres.ParseRange
@@ -86,37 +85,69 @@ abstract class BaseReplace {
     }
 }
 
-class Replace(
-    internal val rule: Rule<*>,
-    builder: ReplaceBuilder.() -> Unit
-) : BaseReplace() {
-    override val replacements: List<ReplaceAction>
-    override val listReplacements: List<ListReplaceAction>
+open class Replace: BaseReplace {
+    internal val rule: Rule<*>
+    final override val replacements: List<ReplaceAction>
+    final override val listReplacements: List<ListReplaceAction>
 
-    init {
+    constructor(rule: Rule<*>, builder: ReplaceBuilder.() -> Unit) {
+        this.rule = rule
         val replacements = ArrayList<ReplaceAction>()
         val listReplacements = ArrayList<ListReplaceAction>()
         ReplaceBuilder(replacements, listReplacements).builder()
         this.replacements = replacements
         this.listReplacements = listReplacements
     }
+
+    internal constructor(
+        rule: Rule<*>,
+        replacements: List<ReplaceAction>,
+        listReplacements: List<ListReplaceAction>
+    ) {
+        this.rule = rule
+        this.replacements = replacements
+        this.listReplacements = listReplacements
+    }
+
+    internal fun debug(engine: DebugEngine): DebugReplace {
+        return DebugReplace(rule.debug(engine), replacements, listReplacements, engine)
+    }
+}
+
+internal class DebugReplace(
+    rule: Rule<*>,
+    replacements: List<ReplaceAction>,
+    listReplacements: List<ListReplaceAction>,
+    val engine: DebugEngine
+) : Replace(rule, replacements, listReplacements) {
+
 }
 
 class Replacer(
-    private val provider: () -> Replace
+    private val debug: Boolean = false,
+    private val provider: () -> Replace,
 ) {
     private val map = ConcurrentHashMap<Long, Replace>()
+    private val debugEngines by lazy { ConcurrentHashMap<Long, DebugEngine>() }
 
     private fun get(string: CharSequence): Replace {
         return map.getOrPut(Thread.currentThread().id) {
-            provider().also {
-                if (it.rule is DebugRule) {
-                    DebugEngine.startDebugSession(string)
+            provider().let {
+                if (debug) {
+                    val engine = debugEngines.getOrPut(Thread.currentThread().id) {
+                        DebugEngine()
+                    }
+                    it.debug(engine)
+                } else {
+                    it
                 }
             }
         }.apply {
             listReplacements.forEach {
                 it.ranges.clear()
+            }
+            if (this is DebugReplace) {
+                engine.startDebugSession(string)
             }
         }
     }

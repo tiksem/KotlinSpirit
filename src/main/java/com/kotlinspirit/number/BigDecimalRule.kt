@@ -7,7 +7,7 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import java.math.BigDecimal
 
-open class BigDecimalRule : RuleWithDefaultRepeat<BigDecimal>() {
+class BigDecimalRule(name: String? = null) : RuleWithDefaultRepeat<BigDecimal>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return parseFloatingNumber(
             seek = seek,
@@ -59,22 +59,10 @@ open class BigDecimalRule : RuleWithDefaultRepeat<BigDecimal>() {
         return this
     }
 
-    override fun debug(name: String?): BigDecimalRule {
-        return DebugBigDecimalRule(name ?: "bigDecimal")
-    }
-}
-
-private class DebugBigDecimalRule(override val name: String): BigDecimalRule(), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
+    override fun name(name: String): BigDecimalRule {
+        return BigDecimalRule(name)
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<BigDecimal>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, r)
-        DebugEngine.ruleParseEnded(this, r.parseResult)
-    }
+    override val defaultDebugName: String
+        get() = "bigDecimal"
 }

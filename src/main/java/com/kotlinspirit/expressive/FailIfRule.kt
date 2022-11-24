@@ -1,16 +1,15 @@
 package com.kotlinspirit.expressive
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import java.lang.IllegalStateException
 
-open class FailIfRule<T : Any>(
-    protected val rule: Rule<T>,
-    protected val failPredicate: (T) -> Boolean
-) : RuleWithDefaultRepeat<T>() {
+class FailIfRule<T : Any>(
+    private val rule: Rule<T>,
+    private val failPredicate: (T) -> Boolean,
+    name: String? = null
+) : RuleWithDefaultRepeat<T>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         val result = ParseResult<T>()
         rule.parseWithResult(seek, string, result)
@@ -55,14 +54,24 @@ open class FailIfRule<T : Any>(
     }
 
     override fun clone(): RuleWithDefaultRepeat<T> {
-        return FailIfRule(rule.clone(), failPredicate)
+        return FailIfRule(rule.clone(), failPredicate, name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
-        get() = rule.debugNameShouldBeWrapped
+        get() = false
 
-    override fun debug(name: String?): FailIfRule<T> {
-        return DebugFailIfRule(name ?: "failIf", rule.internalDebug(), failPredicate)
+    override val defaultDebugName: String
+        get() = "failIf"
+
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(
+            rule = FailIfRule(rule.debug(engine), failPredicate, name),
+            engine = engine
+        )
+    }
+
+    override fun name(name: String): Rule<T> {
+        return FailIfRule(rule, failPredicate, name)
     }
 
     override fun isThreadSafe(): Boolean {
@@ -71,28 +80,5 @@ open class FailIfRule<T : Any>(
 
     override fun ignoreCallbacks(): FailIfRule<T> {
         return FailIfRule(rule.ignoreCallbacks(), failPredicate)
-    }
-}
-
-private class DebugFailIfRule<T : Any>(
-    override val name: String,
-    rule: Rule<T>,
-    failPredicate: (T) -> Boolean
-) : FailIfRule<T>(rule, failPredicate), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): RuleWithDefaultRepeat<T> {
-        return DebugFailIfRule(name, rule.clone(), failPredicate)
     }
 }

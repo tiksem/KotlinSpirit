@@ -9,7 +9,7 @@ import org.junit.Assert
 import org.junit.Test
 import java.lang.IllegalStateException
 
-private val skipper = space.repeat().debug("skipper")
+private val skipper = space.repeat()
 
 private val expression: Rule<Double> = object : Grammar<Double>() {
     private var sign = 'x'
@@ -45,10 +45,6 @@ private val expression: Rule<Double> = object : Grammar<Double>() {
         b = 0.0
         sign = 'x'
     }
-
-    override val name: String
-        get() = "expression"
-
 }.toRule()
 
 private val expressionInBrackets = expression.quoted('(', ')')

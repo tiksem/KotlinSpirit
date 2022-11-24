@@ -1,62 +1,40 @@
 package com.kotlinspirit.rangeres.result
 
-import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.base.BaseRangeResultDefaultRepeatRule
-import com.kotlinspirit.rangeres.core.RangeResultGetRangeResultCore
 import com.kotlinspirit.rangeres.core.RangeResultRuleResultCallbacksCore
-import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 internal open class RangeResultRuleCallbacksResultDefaultRepeat<T : Any>(
     rule: Rule<T>,
-    protected val callback: (ParseRangeResult<T>) -> Unit
+    protected val callback: (ParseRangeResult<T>) -> Unit,
+    name: String? = null
 ) : BaseRangeResultDefaultRepeatRule<T>(
-    core = RangeResultRuleResultCallbacksCore(rule, callback)
+    core = RangeResultRuleResultCallbacksCore(rule, callback),
+    name
 ) {
     override fun clone(): RangeResultRuleCallbacksResultDefaultRepeat<T> {
         return RangeResultRuleCallbacksResultDefaultRepeat(
             rule = core.rule.clone(),
-            callback = callback
+            callback = callback,
+            name = name
         )
     }
 
-    override fun debug(name: String?): RangeResultRuleCallbacksResultDefaultRepeat<T> {
-        return DebugRangeResultRuleCallbacksResultDefaultRepeat(
-            name = "rangeResult",
-            rule = core.rule.internalDebug(),
-            callback = callback
+    override fun debug(engine: DebugEngine): DebugRule<T> {
+        return DebugRule(
+            rule = RangeResultRuleCallbacksResultDefaultRepeat(
+                rule = core.rule.debug(engine),
+                callback = callback,
+                name = name
+            ),
+            engine = engine
         )
     }
-}
 
-private class DebugRangeResultRuleCallbacksResultDefaultRepeat<T : Any>(
-    override val name: String,
-    rule: Rule<T>,
-    callback: (ParseRangeResult<T>) -> Unit
-) : RangeResultRuleCallbacksResultDefaultRepeat<T>(rule, callback), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<T>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): DebugRangeResultRuleCallbacksResultDefaultRepeat<T> {
-        return DebugRangeResultRuleCallbacksResultDefaultRepeat(
-            name = name,
-            rule = core.rule.clone() as RuleWithDefaultRepeat<T>,
-            callback = callback
-        )
+    override fun name(name: String): RangeResultRuleCallbacksResultDefaultRepeat<T> {
+        return RangeResultRuleCallbacksResultDefaultRepeat(rule = core.rule, callback = callback, name = name)
     }
 }

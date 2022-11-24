@@ -8,9 +8,10 @@ import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.repeat.RuleWithDefaultRepeatResult
 
-open class StringRuleWrapper(
-    protected val rule: Rule<*>
-) : RuleWithDefaultRepeat<CharSequence>() {
+class StringRuleWrapper(
+    private val rule: Rule<*>,
+    name: String? = null
+) : RuleWithDefaultRepeat<CharSequence>(name) {
 
     override fun invoke(callback: (CharSequence) -> Unit): RuleWithDefaultRepeatResult<CharSequence> {
         return RuleWithDefaultRepeatResult(this, callback)
@@ -37,19 +38,25 @@ open class StringRuleWrapper(
     }
 
     override fun clone(): StringRuleWrapper {
-        return StringRuleWrapper(rule = rule.clone())
+        return StringRuleWrapper(rule = rule.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun debug(name: String?): StringRuleWrapper {
-        val debug = rule.internalDebug()
-        return DebugStringRuleWrapper(
-            name = name ?: "${debug.debugNameWrapIfNeed}.asString()",
-            rule = debug
+    override fun debug(engine: DebugEngine): DebugRule<CharSequence> {
+        return DebugRule(
+            rule = StringRuleWrapper(rule.debug(engine), name),
+            engine = engine
         )
     }
+
+    override fun name(name: String): StringRuleWrapper {
+        return StringRuleWrapper(rule, name)
+    }
+
+    override val defaultDebugName: String
+        get() = "asString"
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
@@ -57,29 +64,5 @@ open class StringRuleWrapper(
 
     override fun ignoreCallbacks(): StringRuleWrapper {
         return StringRuleWrapper(rule.ignoreCallbacks())
-    }
-}
-
-private class DebugStringRuleWrapper(
-    override val name: String,
-    rule: Rule<*>
-) : StringRuleWrapper(rule), DebugRule {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        DebugEngine.ruleParseStarted(this, seek)
-        return super.parse(seek, string).also {
-            DebugEngine.ruleParseEnded(this, it)
-        }
-    }
-
-    override fun parseWithResult(
-        seek: Int, string: CharSequence, result: ParseResult<CharSequence>
-    ) {
-        DebugEngine.ruleParseStarted(this, seek)
-        super.parseWithResult(seek, string, result)
-        DebugEngine.ruleParseEnded(this, result.parseResult)
-    }
-
-    override fun clone(): StringRuleWrapper {
-        return DebugStringRuleWrapper(name, rule.clone())
     }
 }

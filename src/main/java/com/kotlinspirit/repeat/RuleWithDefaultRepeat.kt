@@ -8,7 +8,7 @@ import com.kotlinspirit.rangeres.result.RangeResultRuleCallbacksResultDefaultRep
 import com.kotlinspirit.rangeres.result.RangeResultRuleResultDefaultRepeat
 import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
 
-abstract class RuleWithDefaultRepeat<T : Any> : Rule<T>() {
+abstract class RuleWithDefaultRepeat<T : Any>(name: String?) : Rule<T>(name) {
     override fun repeat(): Rule<List<T>> {
         return ZeroOrMoreRule(this)
     }
@@ -42,5 +42,4 @@ abstract class RuleWithDefaultRepeat<T : Any> : Rule<T>() {
     }
 
     abstract override fun clone(): RuleWithDefaultRepeat<T>
-    abstract override fun debug(name: String?): RuleWithDefaultRepeat<T>
 }

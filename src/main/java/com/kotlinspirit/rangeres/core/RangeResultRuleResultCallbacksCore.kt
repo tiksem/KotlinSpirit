@@ -25,4 +25,7 @@ internal class RangeResultRuleResultCallbacksCore<T : Any>(
             callback(it)
         }
     }
+
+    override val debugName: String
+        get() = "getResultRange"
 }

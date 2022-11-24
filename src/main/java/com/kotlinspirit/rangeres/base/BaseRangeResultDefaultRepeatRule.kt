@@ -2,6 +2,8 @@ package com.kotlinspirit.rangeres.base
 
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
+import com.kotlinspirit.debug.DebugEngine
+import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
@@ -9,8 +11,9 @@ import com.kotlinspirit.rangeres.core.RangeResultRuleCore
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 internal abstract class BaseRangeResultDefaultRepeatRule<T : Any> internal constructor(
-    internal val core: RangeResultRuleCore<T>
-) : RuleWithDefaultRepeat<T>() {
+    internal val core: RangeResultRuleCore<T>,
+    name: String?
+) : RuleWithDefaultRepeat<T>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return core.parse(seek, string)
     }
@@ -29,6 +32,9 @@ internal abstract class BaseRangeResultDefaultRepeatRule<T : Any> internal const
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
+
+    final override val defaultDebugName: String
+        get() = core.debugName
 
     override fun isThreadSafe(): Boolean {
         return false
