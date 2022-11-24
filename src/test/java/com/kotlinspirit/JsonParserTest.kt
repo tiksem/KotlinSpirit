@@ -17,15 +17,15 @@ import org.skyscreamer.jsonassert.JSONAssert
 import java.util.*
 import kotlin.collections.ArrayList
 
-private val jsonString = (str("\\\"") or (char - '"')).repeat().asString().quoted('"')
+private val jsonString = (str("\\\"") or (char - '"')).repeat().asString().quoted('"').name("jsonString")
 
 private val skipper = str {
     it.isWhitespace()
-}
+}.name("skipper")
 
 private val value: LazyRule<Any> = lazy {
-    (jsonString or double or jsonObject or jsonArray) as RuleWithDefaultRepeat<Any>
-}
+    jsonString or double or jsonObject or jsonArray
+}.name("value")
 
 private val jsonObject = object : Grammar<Map<String, Any>>() {
     private var key: String = ""
@@ -47,10 +47,10 @@ private val jsonObject = object : Grammar<Map<String, Any>>() {
             range = 0..Int.MAX_VALUE
         ) + '}'
     }
-}.toRule()
+}.toRule().name("object")
 
 private val jsonArray = value.split(char(',').quoted(skipper), 0..Int.MAX_VALUE)
-    .quoted('[' + skipper, skipper + ']')
+    .quoted('[' + skipper, skipper + ']').name("array")
 
 private fun Map<out Any, Any>.contentEquals(other: Map<out Any, Any>): Boolean {
     if (size != other.size) {
@@ -172,7 +172,7 @@ class JsonParserTest {
                 "      }\n" +
                 "    }\n" +
                 "  }],\n" +
-                "  \"included\": [\n" +
+                "  \"included\": [\n " +
                 "    {\n" +
                 "      \"type\": \"people\",\n" +
                 "      \"id\": \"42\",\n" +
@@ -184,17 +184,22 @@ class JsonParserTest {
                 "    }\n" +
                 "  ]\n" +
                 "}"
-        val p = jsonObject.compile()
+        val p = jsonObject.compile(debug = true)
         var time = System.currentTimeMillis()
-        repeat(1000) {
-            JSONObject(str)
-        }
-        System.out.println(System.currentTimeMillis() - time)
+//        repeat(1000) {
+//            JSONObject(str)
+//        }
+//        System.out.println(System.currentTimeMillis() - time)
         time = System.currentTimeMillis()
-        repeat(999) {
+//        repeat(999) {
+//            p.parseGetResultOrThrow(str)
+//        }
+        val value = try {
             p.parseGetResultOrThrow(str)
+        } catch (e: Exception) {
+            val tree = p.getDebugTree()
+            println(tree)
         }
-        val value = p.parseGetResultOrThrow(str)
         System.out.println(System.currentTimeMillis() - time)
         JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
     }

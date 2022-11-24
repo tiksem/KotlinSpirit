@@ -32,5 +32,5 @@ abstract class BaseRuleWithResult<T : Any>(
     }
 
     override val defaultDebugName: String
-        get() = "result"
+        get() = "result(${rule.debugName})"
 }

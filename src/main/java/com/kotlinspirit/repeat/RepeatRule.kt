@@ -5,6 +5,7 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
+import com.kotlinspirit.ext.debugString
 
 class RepeatRule<T : Any>(
     private val rule: Rule<T>,
@@ -113,7 +114,7 @@ class RepeatRule<T : Any>(
     }
 
     override val defaultDebugName: String
-        get() = "${rule.wrappedName}.repeat($range)"
+        get() = "${rule.wrappedName}.repeat(${range.debugString})"
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()

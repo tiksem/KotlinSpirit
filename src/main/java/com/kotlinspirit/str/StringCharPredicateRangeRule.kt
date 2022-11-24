@@ -5,6 +5,7 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
+import com.kotlinspirit.ext.debugString
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import kotlin.math.min
 
@@ -90,7 +91,7 @@ open class StringCharPredicateRangeRule(
     }
 
     override val defaultDebugName: String
-        get() = "stringIf[$range]"
+        get() = "stringIf[${range.debugString}]"
 
     override fun isThreadSafe(): Boolean {
         return true

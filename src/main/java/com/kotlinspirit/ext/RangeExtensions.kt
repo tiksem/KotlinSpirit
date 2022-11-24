@@ -1,5 +1,7 @@
 package com.kotlinspirit.ext
 
+import java.util.StringJoiner
+
 internal operator fun CharRange.minus(range: CharRange): List<CharRange> {
     if (range.first <= this.first && range.last >= this.last) {
         return emptyList()
@@ -88,3 +90,12 @@ internal fun List<CharRange>.excludeRanges(ranges: List<CharRange>): List<CharRa
         it.first
     }.optimizeRanges()
 }
+
+internal val IntRange.debugString: String
+    get() {
+        if (this.last == Int.MAX_VALUE) {
+            return "$first,max"
+        } else {
+            return "$first,$last"
+        }
+    }

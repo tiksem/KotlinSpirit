@@ -422,7 +422,7 @@ abstract class Rule<T : Any>(name: String?) {
 
     val wrappedName: String
         get() {
-            return if (debugNameShouldBeWrapped) {
+            return if (debugNameShouldBeWrapped && name == null) {
                 debugName.quote('(',')')
             } else {
                 debugName

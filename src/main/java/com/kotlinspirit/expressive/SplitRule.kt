@@ -5,6 +5,7 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
+import com.kotlinspirit.ext.debugString
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class SplitRule<T : Any>(
@@ -129,7 +130,7 @@ class SplitRule<T : Any>(
         get() = false
 
     override val defaultDebugName: String
-        get() = "${r.wrappedName}.split(${divider.debugName} , $range)"
+        get() = "${r.wrappedName}.split(${divider.debugName} , ${range.debugString})"
 
     override fun clone(): SplitRule<T> {
         return SplitRule(r.clone(), divider.clone(), range, name)
