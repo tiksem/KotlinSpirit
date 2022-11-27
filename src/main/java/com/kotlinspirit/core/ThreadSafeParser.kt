@@ -1,7 +1,7 @@
 package com.kotlinspirit.core
 
-import org.springframework.util.ConcurrentReferenceHashMap
-import org.springframework.util.ConcurrentReferenceHashMap.ReferenceType
+import com.kotlinspirit.ext.ConcurrentReferenceHashMap
+import com.kotlinspirit.ext.ConcurrentReferenceHashMap.ReferenceType
 
 internal open class ThreadSafeParser<T : Any>(private val originRule: Rule<T>): BaseParser<T>() {
     private val ruleMap = ConcurrentReferenceHashMap<Thread, Rule<T>>(

@@ -2,7 +2,7 @@ package com.kotlinspirit.core
 
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.RuleDebugTreeNode
-import org.springframework.util.ConcurrentReferenceHashMap
+import com.kotlinspirit.ext.ConcurrentReferenceHashMap
 
 internal class DebugParser<T : Any>(originalRule: Rule<T>) : ThreadSafeParser<T>(originalRule) {
     private val engines = ConcurrentReferenceHashMap<Thread, DebugEngine>(

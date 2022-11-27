@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.util;
+package com.kotlinspirit.ext;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
