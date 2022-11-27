@@ -10,7 +10,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'com.tiksem.kotlinspirit'
             artifactId = 'release'
-            version = "1.0.0"
+            version = "1.0.5"
             from components.java
 
             pom {
