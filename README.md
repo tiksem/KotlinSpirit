@@ -19,7 +19,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.0.4"
+implementation "com.github.tiksem:KotlinSpirit:1.0.5"
 ```
 
 # Creating a simple parser
@@ -488,22 +488,21 @@ In the example Repalcer takes Replace builder as an argument. The builder return
 A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However if you use callbacks or getRange or getRangeResult in your rule, there are some edge cases you should consider. Callbacks and getRange hooks are not synchronized, so they might be called from different threads, when you call your parser functions from different threads. But it's totally safe to use callbacks or getRange or getRangeResult in Grammar or Replacer, because a copy of your Grammar/Replace is created for each thread.
 
 # Debugging
-KotlinSpirit has a debugging engine included, which makes it easier to debug errors in your parser. To enable debugging you need to call `debug()` on your root rule.
+KotlinSpirit has a debugging engine included, which makes it easier to debug errors in your parser. To enable debugging you need to create a parser using  `rule.compile(debug = true)`.
 
-For example: `val debugIntRule = int.debug()`
+For example: `val debugIntParser = int.compile(debug = true)`
 
-After parsing is finished you can get a tree of your parsing process using `parser.getDebugTree()`. The tree is passed to `ParseException` as well. The tree is also convertible to json string using `toString` method.
+After parsing is finished you can get a tree of your parsing process using `parser.getDebugTree()`. The tree is convertible to json string using `toString` method.
 
 ### Debug names
-KotlinSpirit assigns readable names for all the rules by default. However, if you want to specify your own custom name you can do it by applying `debug(name: String)` method to intermediate rules. If you use repalce or search functions you may get multiple trees during the process. Call `getDebugHistory()` to get trees of all the parsing attempts.
+KotlinSpirit assigns readable names for all the rules by default. However, if you want to specify your own custom name you can do it by applying `name(name: String)` method to intermediate rules. If you use repalce or search functions you may get multiple trees during the process. Call `getDebugHistory()` to get trees of all the parsing attempts.
 
 Let's come back to our first example and make it debuggable.
 ```Kotlin
 val name = char('A'..'Z') + +char('a'..'z')
 val age = int
-val r = (name.debug("name") + '=' + age.debug("age")).debug()
+val parser = (name.debug("name") + '=' + age.debug("age")).compile(debug = true)
 ```
-Don't forget to make your root rule debuggable by calling `.debug()`
 
 ### Debug performance
-Adding `debug()` to your rules affects performance and after you finish testing and debugging your rules you need to remove `debug()` calls.
+Making your parser debuggable affects performance and after you finish testing and debugging your rules you need to remove `debug = true`.
