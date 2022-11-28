@@ -501,7 +501,7 @@ Let's come back to our first example and make it debuggable.
 ```Kotlin
 val name = char('A'..'Z') + +char('a'..'z')
 val age = int
-val parser = (name.debug("name") + '=' + age.debug("age")).compile(debug = true)
+val parser = (name.name("name") + '=' + age.name("age")).compile(debug = true)
 ```
 
 ### Debug performance
