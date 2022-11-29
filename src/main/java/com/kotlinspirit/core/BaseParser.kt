@@ -1,8 +1,8 @@
 package com.kotlinspirit.core
 
 import com.kotlinspirit.ext.*
-import com.kotlinspirit.rangeres.ParseRange
-import com.kotlinspirit.rangeres.ParseRangeResult
+import com.kotlinspirit.hook.ParseRange
+import com.kotlinspirit.hook.ParseRangeResult
 
 internal abstract class BaseParser<T : Any> : Parser<T> {
     protected abstract fun getRule(string: CharSequence): Rule<T>

@@ -2,7 +2,7 @@ package com.kotlinspirit
 
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.int
-import com.kotlinspirit.rangeres.*
+import com.kotlinspirit.hook.*
 import com.kotlinspirit.replacer.Replace
 import com.kotlinspirit.replacer.Replacer
 import org.junit.Assert

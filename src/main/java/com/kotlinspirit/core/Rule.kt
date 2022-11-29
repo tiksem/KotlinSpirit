@@ -6,15 +6,12 @@ import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.char.ExactCharRule
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
-import com.kotlinspirit.ext.containsAny
-import com.kotlinspirit.ext.quoteIf
 import com.kotlinspirit.expressive.*
 import com.kotlinspirit.ext.quote
 import com.kotlinspirit.quoted.QuotedRule
-import com.kotlinspirit.rangeres.ParseRange
-import com.kotlinspirit.rangeres.ParseRangeResult
+import com.kotlinspirit.hook.ParseRange
+import com.kotlinspirit.hook.ParseRangeResult
 import com.kotlinspirit.str.ExactStringRule
-import java.lang.RuntimeException
 
 private val DEFAULT_STEP_RESULT = createStepResult(
     seek = 0,

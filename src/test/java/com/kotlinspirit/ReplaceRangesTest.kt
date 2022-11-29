@@ -1,7 +1,7 @@
 package com.kotlinspirit
 
 import com.kotlinspirit.ext.replaceRanges
-import com.kotlinspirit.rangeres.ParseRange
+import com.kotlinspirit.hook.ParseRange
 import org.junit.Assert
 import org.junit.Test
 

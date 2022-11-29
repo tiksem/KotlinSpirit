@@ -4,12 +4,12 @@ import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
-import com.kotlinspirit.rangeres.ParseRange
-import com.kotlinspirit.rangeres.ParseRangeResult
-import com.kotlinspirit.rangeres.callbacks.RangeResultCallbacksRuleDefaultRepeat
-import com.kotlinspirit.rangeres.result.RangeResultRuleCallbacksResultDefaultRepeat
-import com.kotlinspirit.rangeres.result.RangeResultRuleResultDefaultRepeat
-import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
+import com.kotlinspirit.hook.ParseRange
+import com.kotlinspirit.hook.ParseRangeResult
+import com.kotlinspirit.hook.callbacks.RangeResultCallbacksRuleDefaultRepeat
+import com.kotlinspirit.hook.result.RangeResultRuleCallbacksResultDefaultRepeat
+import com.kotlinspirit.hook.result.RangeResultRuleResultDefaultRepeat
+import com.kotlinspirit.hook.simple.RangeResultRuleDefaultRepeat
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class LazyRule<T : Any> internal constructor(

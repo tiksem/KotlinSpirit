@@ -4,11 +4,8 @@ import com.kotlinspirit.core.*
 import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.core.getSeek
 import com.kotlinspirit.core.isNotError
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
-import com.kotlinspirit.rangeres.ParseRange
-import com.kotlinspirit.rangeres.ParseRangeResult
-import kotlin.time.Duration.Companion.milliseconds
+import com.kotlinspirit.hook.ParseRange
+import com.kotlinspirit.hook.ParseRangeResult
 
 fun String.quote(start: Char, end: Char): String {
     return "$start$this$end"

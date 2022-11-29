@@ -3,8 +3,8 @@ package com.kotlinspirit.debug
 import com.kotlinspirit.core.BaseRuleWithResult
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
-import com.kotlinspirit.rangeres.ParseRange
-import com.kotlinspirit.rangeres.ParseRangeResult
+import com.kotlinspirit.hook.ParseRange
+import com.kotlinspirit.hook.ParseRangeResult
 
 internal class DebugRule<T : Any>(
     private val rule: Rule<T>,

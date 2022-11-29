@@ -1,8 +1,8 @@
 package com.kotlinspirit.core
 
 import com.kotlinspirit.debug.RuleDebugTreeNode
-import com.kotlinspirit.rangeres.ParseRange
-import com.kotlinspirit.rangeres.ParseRangeResult
+import com.kotlinspirit.hook.ParseRange
+import com.kotlinspirit.hook.ParseRangeResult
 
 interface Parser<T : Any> {
     fun parseGetResultOrThrow(string: CharSequence): T

@@ -6,8 +6,8 @@ import com.kotlinspirit.core.isError
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.ext.replaceRanges
 import com.kotlinspirit.ext.toCharSequence
-import com.kotlinspirit.rangeres.ParseRange
-import com.kotlinspirit.rangeres.ParseRangeResult
+import com.kotlinspirit.hook.ParseRange
+import com.kotlinspirit.hook.ParseRangeResult
 import java.util.concurrent.ConcurrentHashMap
 
 internal class ReplaceAction(

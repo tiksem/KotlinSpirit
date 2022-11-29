@@ -2,13 +2,12 @@ package com.kotlinspirit.char
 
 import com.kotlinspirit.core.*
 import com.kotlinspirit.expressive.CharDiffRule
-import com.kotlinspirit.expressive.OptionalRule
-import com.kotlinspirit.rangeres.ParseRange
-import com.kotlinspirit.rangeres.ParseRangeResult
-import com.kotlinspirit.rangeres.callbacks.RangeResultCharCallbacksRule
-import com.kotlinspirit.rangeres.result.RangeResultCharCallbacksResultRule
-import com.kotlinspirit.rangeres.result.RangeResultCharResultRule
-import com.kotlinspirit.rangeres.simple.RangeResultCharRule
+import com.kotlinspirit.hook.ParseRange
+import com.kotlinspirit.hook.ParseRangeResult
+import com.kotlinspirit.hook.callbacks.RangeResultCharCallbacksRule
+import com.kotlinspirit.hook.result.RangeResultCharCallbacksResultRule
+import com.kotlinspirit.hook.result.RangeResultCharResultRule
+import com.kotlinspirit.hook.simple.RangeResultCharRule
 import com.kotlinspirit.repeat.OneOrMoreRule
 import com.kotlinspirit.repeat.RepeatRule
 import com.kotlinspirit.repeat.ZeroOrMoreRule
