@@ -19,7 +19,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.0.6"
+implementation "com.github.tiksem:KotlinSpirit:1.0.7"
 ```
 
 # Creating a simple parser
@@ -334,7 +334,7 @@ fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String
 ```
 Here `int % ','` is recreated all the time we call `replaceIdesWithNamesSplittedByDots`. So it's totally safe to use it from different threads.
 
-The potentially wrong way:
+A potentially wrong way:
 ```Kotlin
 val ints = int % ','
 fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String>): CharSequence {
@@ -379,7 +379,7 @@ val rule = nameRule { name = it } + '=' + int { age = it }
 Callbacks are usually used in Grammar or Repalcer. We will discuss them later.
 
 ## getRange, getRangeResult hooks
-Sometimes you need to get a range of your rule's match. You can use getRange and getRangeResult hooks for that. Warning: getRange and getRangeResult are not properly synchronized for multithreading usage. So you need to use them inside Grammar or Replacer. See Thread safety section for reference. 
+Sometimes you need to get a range of your rule's match. You can use getRange and getRangeResult hooks for that. Warning: getRange and getRangeResult are not properly synchronized for multithreading usage. So you need to use them inside Grammar or Replacer. See Thread safety section for a reference. 
 
 getRange accepts ParseRange as a parameter. ParseRange is filled with startSeek and endSeek during parsing, when the rule is succesful. You can create a range using `range()` function. The example shows how to find int in a string and get its range
 ```
@@ -501,7 +501,7 @@ Let's come back to our first example and make it debuggable.
 ```Kotlin
 val name = char('A'..'Z') + +char('a'..'z')
 val age = int
-val parser = (name.debug("name") + '=' + age.debug("age")).compile(debug = true)
+val parser = (name.name("name") + '=' + age.name("age")).compile(debug = true)
 ```
 
 ### Debug performance
