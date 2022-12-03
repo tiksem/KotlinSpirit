@@ -2,16 +2,14 @@ package com.kotlinspirit.core
 
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.RuleDebugTreeNode
-import com.kotlinspirit.ext.ConcurrentReferenceHashMap
+import java.util.concurrent.ConcurrentHashMap
 
 internal class DebugParser<T : Any>(originalRule: Rule<T>) : ThreadSafeParser<T>(originalRule) {
-    private val engines = ConcurrentReferenceHashMap<Thread, DebugEngine>(
-        16, ConcurrentReferenceHashMap.ReferenceType.WEAK
-    )
+    private val engines = ConcurrentHashMap<Long, DebugEngine>()
 
     override fun getRule(string: CharSequence): Rule<T> {
         val rule = super.getRule(string)
-        val engine = engines.getOrPut(Thread.currentThread()) {
+        val engine = engines.getOrPut(Thread.currentThread().id) {
             DebugEngine()
         }
         engine.startDebugSession(string)
@@ -19,10 +17,10 @@ internal class DebugParser<T : Any>(originalRule: Rule<T>) : ThreadSafeParser<T>
     }
 
     override fun getDebugTree(): RuleDebugTreeNode? {
-        return engines[Thread.currentThread()]?.root
+        return engines[Thread.currentThread().id]?.root
     }
 
     override fun getDebugHistory(): List<RuleDebugTreeNode> {
-        return engines[Thread.currentThread()]?.history ?: emptyList()
+        return engines[Thread.currentThread().id]?.history ?: emptyList()
     }
 }

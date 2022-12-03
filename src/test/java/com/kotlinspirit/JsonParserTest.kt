@@ -3,19 +3,15 @@ package com.kotlinspirit
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.double
-import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.core.Rules.lazy
+import com.kotlinspirit.core.Rules.str
+import com.kotlinspirit.core.plus
 import com.kotlinspirit.expressive.LazyRule
 import com.kotlinspirit.grammar.Grammar
-import com.kotlinspirit.core.*
-import com.kotlinspirit.core.Rules.int
-import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import org.json.JSONObject
 import org.junit.Assert
 import org.junit.Test
 import org.skyscreamer.jsonassert.JSONAssert
-import java.util.*
-import kotlin.collections.ArrayList
 
 private val jsonString = (str("\\\"") or (char - '"')).repeat().asString().quoted('"').name("jsonString")
 
@@ -185,17 +181,16 @@ class JsonParserTest {
                 "  ]\n" +
                 "}"
         val p = jsonObject.compile(debug = true)
-        var time = System.currentTimeMillis()
-        repeat(1000) {
-            JSONObject(str)
+
+        (0..10).map {
+            Thread {
+                val value = p.parseGetResultOrThrow(str)
+                JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
+            }.also {
+                it.start()
+            }
+        }.forEach {
+            it.join()
         }
-        System.out.println(System.currentTimeMillis() - time)
-        time = System.currentTimeMillis()
-        repeat(999) {
-            p.parseGetResultOrThrow(str)
-        }
-        val value = p.parseGetResultOrThrow(str)
-        System.out.println(System.currentTimeMillis() - time)
-        JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
     }
 }
