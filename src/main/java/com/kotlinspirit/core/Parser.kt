@@ -1,6 +1,7 @@
 package com.kotlinspirit.core
 
 import com.kotlinspirit.debug.RuleDebugTreeNode
+import com.kotlinspirit.ext.count
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 
@@ -28,6 +29,8 @@ interface Parser<T : Any> {
 
     fun replaceFirstOrNull(source: CharSequence, replacement: CharSequence): CharSequence?
     fun replaceFirstOrNull(source: CharSequence, replacementProvider: (T) -> CharSequence): CharSequence?
+
+    fun count(string: CharSequence): Int
 
     fun getDebugTree(): RuleDebugTreeNode? {
         return null

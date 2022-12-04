@@ -269,3 +269,24 @@ fun CharSequence.parse(rule: Rule<*>): Int? {
         }
     }
 }
+
+fun CharSequence.count(rule: Rule<*>): Int {
+    var count = 0
+    var i = 0
+    while (i < length) {
+        val rRes = rule.parse(i, this)
+        if (rRes.getParseCode().isNotError()) {
+            val seek = rRes.getSeek()
+            if (seek == i) {
+                i++
+            } else {
+                i = seek
+            }
+            count++
+        } else {
+            i++
+        }
+    }
+
+    return count
+}

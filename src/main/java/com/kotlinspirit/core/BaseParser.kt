@@ -126,4 +126,8 @@ internal abstract class BaseParser<T : Any> : Parser<T> {
     override fun findAllResults(string: CharSequence): List<ParseRangeResult<T>> {
         return string.findAllResults(getRule(string))
     }
+
+    override fun count(string: CharSequence): Int {
+        return string.count(getRule(string))
+    }
 }
