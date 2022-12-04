@@ -19,7 +19,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.0.7"
+implementation "com.github.tiksem:KotlinSpirit:1.0.8"
 ```
 
 # Creating a simple parser
@@ -294,6 +294,10 @@ fun findAll(string: CharSequence): List<T>
 Retrurns results and ranges of all matches.
 ```Kotlin
 fun findAllResults(string: CharSequence): List<ParseRangeResult<T>>
+```
+Returns a number of all matches
+```Kotlin
+fun count(string: CharSequence): Int
 ```
 
 ## Replace functions
