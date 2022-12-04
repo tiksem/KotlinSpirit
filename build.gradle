@@ -1,66 +1,72 @@
 plugins {
-    id 'java'
-    id 'java-library'
-    id 'org.jetbrains.kotlin.jvm' version '1.7.20'
-    id 'maven-publish'
+    id 'org.jetbrains.kotlin.multiplatform' version '1.7.21'
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.tiksem.kotlinspirit'
-            artifactId = 'release'
-            version = "1.0.7"
-            from components.java
-
-            pom {
-                name = 'KotlinSpirit'
-                description = 'Lightweight library for creating parsers using Kotlin'
-            }
-
-            repositories {
-                maven {
-                    name = "GitHubPackages"
-                    url = uri("https://maven.pkg.github.com/tiksem/KotlinSpirit")
-                    credentials {
-                        username = "tiksem"
-                        password = System.getenv("GITHUB_TOKEN")
-                    }
-                }
-            }
-        }
-    }
-}
+group = 'me.semyon'
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-}
-
-dependencies {
-    implementation files('libs/fastutil-core-8.5.8.jar')
-    implementation 'com.beust:klaxon:5.6'
-    implementation 'org.json:json:20220924'
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.json:json:20180813'
-    testImplementation 'org.skyscreamer:jsonassert:1.5.1'
-
-    testRuntimeOnly('org.junit.vintage:junit-vintage-engine:5.9.0')
-}
-
-test {
-    useJUnitPlatform()
-}
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
+kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = '1.8'
+        }
+        withJava()
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
     }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
+    js(BOTH) {
+        browser {
+            commonWebpackConfig {
+                cssSupport.enabled = true
+            }
+        }
+    }
+    def hostOs = System.getProperty("os.name")
+    def isMingwX64 = hostOs.startsWith("Windows")
+    def nativeTarget
+    if (hostOs == "Mac OS X") nativeTarget = macosX64('native')
+    else if (hostOs == "Linux") nativeTarget = linuxX64("native")
+    else if (isMingwX64) nativeTarget = mingwX64("native")
+    else throw new GradleException("Host OS is not supported in Kotlin/Native.")
+
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation 'org.json:json:20220924'
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation kotlin('test')
+            }
+        }
+        jvmMain {
+
+        }
+        jvmTest {
+            dependencies {
+                implementation 'junit:junit:4.13.2'
+                implementation 'org.json:json:20180813'
+                implementation 'org.skyscreamer:jsonassert:1.5.1'
+            }
+        }
+        jsMain {
+
+        }
+        jsTest {
+
+        }
+        nativeMain {
+
+        }
+        nativeTest {
+
+        }
     }
 }
