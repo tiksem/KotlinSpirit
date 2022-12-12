@@ -19,7 +19,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.0.8"
+implementation "com.github.tiksem:KotlinSpirit:1.0.9"
 ```
 
 # Creating a simple parser
