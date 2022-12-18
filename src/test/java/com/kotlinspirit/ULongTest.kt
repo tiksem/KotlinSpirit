@@ -7,13 +7,6 @@ import org.junit.Test
 
 class ULongTest {
     @Test
-    fun startedWithZero() {
-        Assert.assertThrows(ParseException::class.java) {
-            ulong.compile().parseGetResultOrThrow("034534554")
-        }
-    }
-
-    @Test
     fun zero() {
         Assert.assertEquals(0.toULong(), ulong.compile().parseGetResultOrThrow("0"))
     }
@@ -55,7 +48,7 @@ class ULongTest {
         Assert.assertEquals(r.matchesAtBeginning("+4"), true)
         Assert.assertEquals(r.matchesAtBeginning("-0"), true)
         Assert.assertEquals(r.matchesAtBeginning("0"), false)
-        Assert.assertEquals(r.matchesAtBeginning("0345"), true)
+        Assert.assertEquals(r.matchesAtBeginning("0345"), false)
         Assert.assertEquals(r.matchesAtBeginning("456"), false)
         Assert.assertEquals(r.matchesAtBeginning(""), true)
     }

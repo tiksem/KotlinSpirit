@@ -1,7 +1,9 @@
 package com.kotlinspirit
 
+import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.digit
+import com.kotlinspirit.core.Rules.double
 import com.kotlinspirit.core.Rules.oneOf
 import org.junit.Test
 import kotlin.random.Random

@@ -23,16 +23,6 @@ class ULongRule(name: String? = null) : RuleWithDefaultRepeat<ULong>(name) {
         do {
             val char = string[i++]
             when {
-                !successFlag && char == '0' -> {
-                    return if (i >= length || string[i] !in '0'..'9') {
-                        createComplete(i)
-                    } else {
-                        createStepResult(
-                            seek = i,
-                            parseCode = ParseCode.INT_STARTED_FROM_ZERO
-                        )
-                    }
-                }
                 char in '0'..'9' -> {
                     val resultBefore = result
                     successFlag = true
@@ -77,18 +67,6 @@ class ULongRule(name: String? = null) : RuleWithDefaultRepeat<ULong>(name) {
         do {
             val char = string[i++]
             when {
-                !successFlag && char == '0' -> {
-                    if (i >= length || string[i] !in '0'..'9') {
-                        r.data = 0UL
-                        r.parseResult = createComplete(i)
-                    } else {
-                        r.parseResult = createStepResult(
-                            seek = i,
-                            parseCode = ParseCode.INT_STARTED_FROM_ZERO
-                        )
-                    }
-                    return
-                }
                 char in '0'..'9' -> {
                     successFlag = true
                     val resultBefore = result

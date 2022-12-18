@@ -8,13 +8,6 @@ import org.junit.Test
 
 class ShortTest {
     @Test
-    fun startedWithZero() {
-        Assert.assertThrows(ParseException::class.java) {
-            short.compile().parseGetResultOrThrow("0345")
-        }
-    }
-
-    @Test
     fun zero() {
         Assert.assertEquals(0.toShort(), short.compile().parseGetResultOrThrow("0"))
     }
@@ -69,7 +62,7 @@ class ShortTest {
         Assert.assertEquals(r.matchesAtBeginning("+4"), false)
         Assert.assertEquals(r.matchesAtBeginning("-0"), false)
         Assert.assertEquals(r.matchesAtBeginning("0"), false)
-        Assert.assertEquals(r.matchesAtBeginning("0345"), true)
+        Assert.assertEquals(r.matchesAtBeginning("0345"), false)
         Assert.assertEquals(r.matchesAtBeginning("456"), false)
         Assert.assertEquals(r.matchesAtBeginning(""), true)
     }

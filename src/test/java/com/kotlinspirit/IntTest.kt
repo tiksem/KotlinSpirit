@@ -7,13 +7,6 @@ import org.junit.Test
 
 class IntTest {
     @Test
-    fun startedWithZero() {
-        Assert.assertThrows(ParseException::class.java) {
-            int.compile().parseGetResultOrThrow("034534554")
-        }
-    }
-
-    @Test
     fun zero() {
         Assert.assertEquals(0, int.compile().parseGetResultOrThrow("0"))
     }
@@ -68,7 +61,7 @@ class IntTest {
         Assert.assertEquals(r.matchesAtBeginning("+4"), false)
         Assert.assertEquals(r.matchesAtBeginning("-0"), false)
         Assert.assertEquals(r.matchesAtBeginning("0"), false)
-        Assert.assertEquals(r.matchesAtBeginning("0345"), true)
+        Assert.assertEquals(r.matchesAtBeginning("0345"), false)
         Assert.assertEquals(r.matchesAtBeginning("456"), false)
         Assert.assertEquals(r.matchesAtBeginning(""), true)
     }

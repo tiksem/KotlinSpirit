@@ -8,13 +8,6 @@ import java.math.BigInteger
 
 class BigIntegerTest {
     @Test
-    fun startedWithZero() {
-        Assert.assertThrows(ParseException::class.java) {
-            bigint.compile().parseGetResultOrThrow("034534554")
-        }
-    }
-
-    @Test
     fun zero() {
         Assert.assertEquals(BigInteger.valueOf(0), bigint.compile().parseGetResultOrThrow("0"))
     }
@@ -89,7 +82,7 @@ class BigIntegerTest {
         Assert.assertEquals(r.matchesAtBeginning("+4"), false)
         Assert.assertEquals(r.matchesAtBeginning("-0"), false)
         Assert.assertEquals(r.matchesAtBeginning("0"), false)
-        Assert.assertEquals(r.matchesAtBeginning("0345"), true)
+        Assert.assertEquals(r.matchesAtBeginning("0345"), false)
         Assert.assertEquals(r.matchesAtBeginning("456"), false)
         Assert.assertEquals(r.matchesAtBeginning(""), true)
     }

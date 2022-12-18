@@ -36,16 +36,6 @@ class LongRule(name: String? = null) : RuleWithDefaultRepeat<Long>(name) {
                         return createComplete(i)
                     }
                 }
-                !successFlag && char == '0' -> {
-                    return if (i >= length || string[i] !in '0'..'9') {
-                        createComplete(i)
-                    } else {
-                        createStepResult(
-                            seek = i,
-                            parseCode = ParseCode.INT_STARTED_FROM_ZERO
-                        )
-                    }
-                }
                 char in '0'..'9' -> {
                     successFlag = true
                     result *= 10
@@ -112,18 +102,6 @@ class LongRule(name: String? = null) : RuleWithDefaultRepeat<Long>(name) {
                             return
                         }
                     }
-                }
-                !successFlag && char == '0' -> {
-                    if (i >= length || string[i] !in '0'..'9') {
-                        r.data = result * sign
-                        r.parseResult = createComplete(i)
-                    } else {
-                        r.parseResult = createStepResult(
-                            seek = i,
-                            parseCode = ParseCode.INT_STARTED_FROM_ZERO
-                        )
-                    }
-                    return
                 }
                 char in '0'..'9' -> {
                     successFlag = true

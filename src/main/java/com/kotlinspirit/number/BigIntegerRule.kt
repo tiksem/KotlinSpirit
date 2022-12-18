@@ -20,18 +20,7 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
 
         var i = 0
         when (string[i]) {
-            '0' -> {
-                i++
-                return if (i >= length || !string[i].isDigit()) {
-                    createComplete(i)
-                } else {
-                    createStepResult(
-                        seek = seek,
-                        parseCode = ParseCode.INT_STARTED_FROM_ZERO
-                    )
-                }
-            }
-            in '1'..'9' -> {
+            in '0'..'9' -> {
                 i++
             }
             '+', '-' -> {
@@ -44,17 +33,7 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
                 }
 
                 when (string[i]) {
-                    '0' -> {
-                        return if (i == length - 1 || !string[++i].isDigit()) {
-                            createComplete(i + 1)
-                        } else {
-                            createStepResult(
-                                seek = seek,
-                                parseCode = ParseCode.INT_STARTED_FROM_ZERO
-                            )
-                        }
-                    }
-                    in '1'..'9' -> {
+                    in '0'..'9' -> {
                         i++
                     }
                     else -> {
@@ -109,10 +88,7 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
                 }
 
                 when (string[seek + 1]) {
-                    '0' -> {
-                        seek == length - 2 || !string[seek + 2].isDigit()
-                    }
-                    in '1'..'9' -> {
+                    in '0'..'9' -> {
                         true
                     }
                     else -> false

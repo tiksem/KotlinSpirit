@@ -55,7 +55,7 @@ class UShortTest {
         Assert.assertEquals(r.matchesAtBeginning("+4"), true)
         Assert.assertEquals(r.matchesAtBeginning("-0"), true)
         Assert.assertEquals(r.matchesAtBeginning("0"), false)
-        Assert.assertEquals(r.matchesAtBeginning("0345"), true)
+        Assert.assertEquals(r.matchesAtBeginning("0345"), false)
         Assert.assertEquals(r.matchesAtBeginning("456"), false)
         Assert.assertEquals(r.matchesAtBeginning(""), true)
     }

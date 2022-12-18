@@ -9,28 +9,27 @@ object ParseCode {
     const val INVALID_ULONG = 5
     const val INVALID_SHORT = 6
     const val INVALID_USHORT = 7
-    const val INT_STARTED_FROM_ZERO = 8
-    const val INT_OUT_OF_BOUNDS = 9
-    const val UINT_OUT_OF_BOUNDS = 10
-    const val SHORT_OUT_OF_BOUNDS = 11
-    const val USHORT_OUT_OF_BOUNDS = 12
-    const val LONG_OUT_OF_BOUNDS = 13
-    const val ULONG_OUT_OF_BOUNDS = 14
-    const val DIFF_FAILED = 15
-    const val CHAR_PREDICATE_FAILED = 16
-    const val STRING_NOT_ENOUGH_DATA = 17
-    const val STRING_DOES_NOT_MATCH = 18
-    const val NO_FAILED = 19
-    const val INVALID_DOUBLE = 20
-    const val INVALID_FLOAT = 21
-    const val WHOLE_STRING_DOES_NOT_MATCH = 22
-    const val ONE_OF_STRING_NOT_FOUND = 23
-    const val FAIL_PREDICATE = 24
-    const val EXPECTATION_FAILED = 25
-    const val SPLIT_NOT_ENOUGH_DATA = 26
-    const val INVALID_BIG_INTEGER = 27
-    const val INVALID_BIG_DECIMAL = 28
-    const val BIG_DECIMAL_EXPONENT_OVERFLOW = 29
+    const val INT_OUT_OF_BOUNDS = 8
+    const val UINT_OUT_OF_BOUNDS = 9
+    const val SHORT_OUT_OF_BOUNDS = 10
+    const val USHORT_OUT_OF_BOUNDS = 11
+    const val LONG_OUT_OF_BOUNDS = 12
+    const val ULONG_OUT_OF_BOUNDS = 13
+    const val DIFF_FAILED = 14
+    const val CHAR_PREDICATE_FAILED = 15
+    const val STRING_NOT_ENOUGH_DATA = 16
+    const val STRING_DOES_NOT_MATCH = 17
+    const val NO_FAILED = 18
+    const val INVALID_DOUBLE = 19
+    const val INVALID_FLOAT = 20
+    const val WHOLE_STRING_DOES_NOT_MATCH = 21
+    const val ONE_OF_STRING_NOT_FOUND = 22
+    const val FAIL_PREDICATE = 23
+    const val EXPECTATION_FAILED = 24
+    const val SPLIT_NOT_ENOUGH_DATA = 25
+    const val INVALID_BIG_INTEGER = 26
+    const val INVALID_BIG_DECIMAL = 27
+    const val BIG_DECIMAL_EXPONENT_OVERFLOW = 28
 }
 
 internal inline fun Int.isError(): Boolean {
@@ -72,7 +71,6 @@ internal inline fun Int.parseCodeToString(): String {
         ParseCode.INVALID_UINT -> "INVALID_UINT"
         ParseCode.INVALID_LONG -> "INVALID_LONG"
         ParseCode.INVALID_ULONG -> "INVALID_ULONG"
-        ParseCode.INT_STARTED_FROM_ZERO -> "INT_STARTED_FROM_ZERO"
         ParseCode.INT_OUT_OF_BOUNDS -> "INT_OUT_OF_BOUNDS"
         ParseCode.LONG_OUT_OF_BOUNDS -> "LONG_OUT_OF_BOUNDS"
         ParseCode.UINT_OUT_OF_BOUNDS -> "UINT_OUT_OF_BOUNDS"
