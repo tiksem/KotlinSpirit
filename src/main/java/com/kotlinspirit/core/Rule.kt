@@ -95,6 +95,20 @@ abstract class Rule<T : Any>(name: String?) {
         return false
     }
 
+    internal inline fun findLastSuccessfulSeek(string: CharSequence, callback: (Int, Int) -> Unit): Boolean {
+        var seek = string.length - 1
+        do {
+            val result = parse(seek, string)
+            if (hasMatch(seek, string)) {
+                callback(seek, result.getSeek())
+                return true
+            }
+            --seek
+        } while (seek >= 0)
+
+        return false
+    }
+
     internal inline fun findFirstSuccessfulResult(string: CharSequence, callback: (Int, ParseResult<T>) -> Unit): Boolean {
         var seek = 0
         val length = string.length

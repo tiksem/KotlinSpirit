@@ -3,6 +3,7 @@ package com.kotlinspirit.core
 import com.kotlinspirit.char.*
 import com.kotlinspirit.char.CharPredicateData
 import com.kotlinspirit.char.CharPredicates
+import com.kotlinspirit.eof.EofRule
 import com.kotlinspirit.expressive.*
 import com.kotlinspirit.number.*
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
@@ -11,7 +12,6 @@ import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.str.StringCharPredicateRule
 import com.kotlinspirit.str.StringOneOrMoreCharPredicateRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
-import java.lang.IllegalArgumentException
 
 object Rules {
     fun <T : Any> lazy(ruleProvider: () -> Rule<T>): LazyRule<T> {
@@ -131,4 +131,6 @@ object Rules {
             OptionalRule(OneOfStringRule(withoutEmptyStrings))
         }
     }
+
+    val eof = EofRule()
 }

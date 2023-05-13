@@ -1,14 +1,8 @@
 package com.kotlinspirit.ext
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.core.getSeek
-import com.kotlinspirit.core.isNotError
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
-import kotlin.time.Duration.Companion.milliseconds
 
 fun String.quote(start: Char, end: Char): String {
     return "$start$this$end"
@@ -133,6 +127,35 @@ fun CharSequence.indexOf(rule: Rule<*>): Int? {
     return null
 }
 
+fun CharSequence.lastIndexOfShortestMatch(rule: Rule<*>): Int? {
+    rule.findLastSuccessfulSeek(this) { start, _ ->
+        return start
+    }
+
+    return null
+}
+
+fun CharSequence.lastIndexOfLongestMatch(rule: Rule<*>): Int? {
+    rule.findLastSuccessfulSeek(this) { start, end ->
+        var seek = start - 1
+        while (seek >= 0) {
+            val parseResult = rule.parse(seek, this)
+            if (parseResult.getParseCode().isError()) {
+                break
+            }
+            val endSeek = parseResult.getSeek()
+            if (endSeek < end) {
+                break
+            }
+            --seek
+        }
+
+        return seek + 1
+    }
+
+    return null
+}
+
 fun CharSequence.findFirstRange(rule: Rule<*>): ParseRange? {
     rule.findFirstSuccessfulSeek(this) { start, end ->
         return ParseRange(start, end)
@@ -248,6 +271,23 @@ fun <T : Any> CharSequence.replaceFirstOrNull(rule: Rule<T>, replacementProvider
 
 fun CharSequence.startsWith(rule: Rule<*>): Boolean {
     return rule.hasMatch(0, this)
+}
+
+fun CharSequence.endsWith(rule: Rule<*>): Boolean {
+    if (rule.hasMatch(length, this)) {
+        return true
+    }
+
+    var seek = length - 1
+    while (seek >= 0) {
+        val parseResult = rule.parse(seek, this)
+        if (parseResult.getParseCode().isNotError() && parseResult.getSeek() == length) {
+            return true
+        }
+        --seek
+    }
+
+    return false
 }
 
 fun <T : Any> CharSequence.parseWithResult(rule: Rule<T>): T? {

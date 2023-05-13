@@ -16,6 +16,9 @@ interface Parser<T : Any> {
     fun matchesAtBeginning(string: CharSequence): Boolean
 
     fun indexOf(string: CharSequence): Int?
+    fun lastIndexOfShortestMatch(string: CharSequence): Int?
+    fun lastIndexOfLongestMatch(string: CharSequence): Int?
+
     fun findFirstResult(string: CharSequence): ParseRangeResult<T>?
     fun findFirst(string: CharSequence): T?
     fun findFirstRange(string: CharSequence): ParseRange?
@@ -29,6 +32,9 @@ interface Parser<T : Any> {
 
     fun replaceFirstOrNull(source: CharSequence, replacement: CharSequence): CharSequence?
     fun replaceFirstOrNull(source: CharSequence, replacementProvider: (T) -> CharSequence): CharSequence?
+
+    fun startsWith(string: CharSequence): Boolean
+    fun endsWith(string: CharSequence): Boolean
 
     fun count(string: CharSequence): Int
 

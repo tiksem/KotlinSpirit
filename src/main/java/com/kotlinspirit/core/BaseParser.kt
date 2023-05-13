@@ -103,8 +103,24 @@ internal abstract class BaseParser<T : Any> : Parser<T> {
         return source.replaceFirstOrNull(getRule(source), replacementProvider)
     }
 
+    override fun startsWith(string: CharSequence): Boolean {
+        return string.startsWith(getRule(string))
+    }
+
+    override fun endsWith(string: CharSequence): Boolean {
+        return string.endsWith(getRule(string))
+    }
+
     override fun indexOf(string: CharSequence): Int? {
         return string.indexOf(getRule(string))
+    }
+
+    override fun lastIndexOfShortestMatch(string: CharSequence): Int? {
+        return string.lastIndexOfShortestMatch(getRule(string))
+    }
+
+    override fun lastIndexOfLongestMatch(string: CharSequence): Int? {
+        return string.lastIndexOfLongestMatch(getRule(string))
     }
 
     override fun findFirstResult(string: CharSequence): ParseRangeResult<T>? {
