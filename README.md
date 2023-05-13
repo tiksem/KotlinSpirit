@@ -19,7 +19,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.1.0"
+implementation "com.github.tiksem:KotlinSpirit:1.1.1"
 ```
 
 # Creating a simple parser
@@ -226,6 +226,17 @@ val names = (+name).asString()
 val namesString: CharSequence = names.compile.parseGetResultOrThrow("JhonIvanAbdula")
 ```
 In this example we get the list of names as a string. However if we don't use `asString()`, names will have List<CharSequence> result.
+
+## Eof rule
+Eof indicates the end of input. If the end of input is reached the rule is successful but fails otherwise.
+### Example:
+```Kotlin
+val intPrefixRule = int + !eof
+val parser = intPrefixRule.compile()
+parser.matches("123abc") // true
+parser.matches("123") // false
+parser.matches("123.34") // true
+```
 
 # Parser functions
 Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticeable.
