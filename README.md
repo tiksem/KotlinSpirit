@@ -286,6 +286,14 @@ Retrurns an index of the first match or null if the match is not found.
 ```Kotlin
 fun indexOf(string: CharSequence): Int?
 ```
+Retrurns an index of the shortest last match or null if the match is not found.
+```Kotlin
+fun lastIndexOfShortestMatch(string: CharSequence): Int?
+```
+Retrurns an index of the longest last match or null if the match is not found.
+```Kotlin
+fun lastIndexOfLongestMatch(string: CharSequence): Int?
+```
 Retrurns a result and a range of the first match or null if the match is not found.
 ```Kotlin
 fun findFirstResult(string: CharSequence): ParseRangeResult<T>?
