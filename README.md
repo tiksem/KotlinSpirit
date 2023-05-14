@@ -74,7 +74,7 @@ In our example above you may notice, that the name rule contains `+char('a'..'z'
 `+rule` is a repeat operator. We will discuss it later.
 
 ### OneOf string rule
-Matches one of the strings from a given list. The search is optimized by using `TernarySearchTree` for matching strings. 
+Matches one of the strings from a given list.
 ```Kotlin
 oneOf(vararg strings: CharSequence)
 ```
@@ -85,6 +85,9 @@ You can also use operator `or` for creating `oneOf` rule. So the example above c
 str("Jhon") or "Ivan" or "Bin"
 ```
 We will discuss `or` operator later.
+
+#### Performance note:
+The search is optimized by using `TernarySearchTree` for matching strings. To maximize the performance try to order the strings in oneOf to be NOT sorted, this will keep `TernarySearchTree` more balanced.
 
 # Operators
 
@@ -229,7 +232,7 @@ In this example we get the list of names as a string. However if we don't use `a
 
 ## Eof rule
 Eof indicates the end of input. If the end of input is reached the rule is successful but fails otherwise.
-### Example:
+#### Example:
 ```Kotlin
 val intPrefixRule = int + !eof
 val parser = intPrefixRule.compile()
