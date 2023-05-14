@@ -243,7 +243,9 @@ parser.matches("123.34") // true
 
 ## Dynamic string rule
 This rule is usually used to remember some token during the parsing process, the result of the rule is `CharSequence`
+
 The rule has the following syntax `dynamic { someToken }`
+
 As an example let's create a simple parser for html tag with body and without any nested tags and attributes
 ```Kotlin
 private data class Tag(
@@ -270,6 +272,7 @@ private val parser = object : Grammar<Tag>() {
 }.toRule().compile()
 ```
 Here we need to remeber the name of the tag during parsing, so we make sure that the closing tag matches the opening tag.
+
 Now let's test it:
 ```Kotlin
 parser.matchOrThrow("<a></a>")
