@@ -241,6 +241,44 @@ parser.matches("123") // false
 parser.matches("123.34") // true
 ```
 
+## Dynamic string rule
+This rule is usually used to remember some token during the parsing process, the result of the rule is `CharSequence`
+The rule has the following syntax `dynamic { someToken }`
+As an example let's create a simple parser for html tag with body and without any nested tags and attributes
+```Kotlin
+private data class Tag(
+    val body: String,
+    val name: String
+)
+
+private val parser = object : Grammar<Tag>() {
+    private var name = ""
+    private var body = ""
+
+    override val result: Tag
+        get() = Tag(body, name)
+
+    override fun defineRule(): Rule<*> {
+        return char('<') + (nonEmptyLatinStr {
+            name = it.toString()
+        }) + char('>') + ((char - '<').repeat()) {
+            body = it.toString()
+        } + "</" + dynamic {
+            name
+        } + '>'
+    }
+}.toRule().compile()
+```
+Here we need to remeber the name of the tag during parsing, so we make sure that the closing tag matches the opening tag.
+Now let's test it:
+```Kotlin
+parser.matchOrThrow("<a></a>")
+parser.matchOrThrow("<a>Hello!</a>")
+Assert.assertFalse(parser.matches("<a>Hello!</b>"))
+Assert.assertFalse(parser.matches("<b>Hello!</a>"))
+Assert.assertEquals(parser.parseGetResultOrThrow("<a>Hello!</a>"), Tag(body = "Hello!", name = "a"))
+```
+
 # Parser functions
 Each rule contains its result after parsing, when you parse without a result, just for matching, the runtime performance will be a little bit better, but the difference is usually not noticeable.
 
