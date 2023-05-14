@@ -1,10 +1,7 @@
 package com.kotlinspirit.str
 
-import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.core.ParseResult
-import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 open class StringCharPredicateRule(
@@ -62,6 +59,10 @@ open class StringCharPredicateRule(
 
     override fun isThreadSafe(): Boolean {
         return true
+    }
+
+    override fun isDynamic(): Boolean {
+        return false
     }
 
     override fun ignoreCallbacks(): StringCharPredicateRule {

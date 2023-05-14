@@ -57,6 +57,10 @@ class CharResultRule(
         return CharResultRule(rule.clone() as CharRule, callback, name)
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun name(name: String): CharResultRule {
         return CharResultRule(rule as CharRule, callback, name)
     }
@@ -190,6 +194,10 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
 
     override fun isThreadSafe(): Boolean {
         return true
+    }
+
+    override fun isDynamic(): Boolean {
+        return false
     }
 
     override fun ignoreCallbacks(): AnyCharRule {

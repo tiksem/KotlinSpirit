@@ -71,6 +71,10 @@ internal class DebugRule<T : Any>(
         return rule.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return rule.isDynamic()
+    }
+
     override fun name(name: String): Rule<T> {
         throw UnsupportedOperationException("Method is not supported by DebugRule")
     }

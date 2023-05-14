@@ -164,6 +164,10 @@ class LongRule(name: String? = null) : RuleWithDefaultRepeat<Long>(name) {
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun ignoreCallbacks(): LongRule {
         return this
     }

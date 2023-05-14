@@ -424,6 +424,7 @@ abstract class Rule<T : Any>(name: String?) {
     }
 
     abstract fun isThreadSafe(): Boolean
+    internal abstract fun isDynamic(): Boolean
 
     abstract fun name(name: String): Rule<T>
 

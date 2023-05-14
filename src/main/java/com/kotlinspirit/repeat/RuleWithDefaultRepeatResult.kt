@@ -1,14 +1,13 @@
 package com.kotlinspirit.repeat
 
-import com.beust.klaxon.Debug
 import com.kotlinspirit.char.CharPredicateRule
 import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.BaseRuleWithResult
-import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
-import com.kotlinspirit.rangeres.*
+import com.kotlinspirit.rangeres.ParseRange
+import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.callbacks.RangeResultCallbacksRuleDefaultRepeat
 import com.kotlinspirit.rangeres.callbacks.RangeResultCharCallbacksRule
 import com.kotlinspirit.rangeres.result.RangeResultCharCallbacksResultRule
@@ -65,6 +64,10 @@ open class RuleWithDefaultRepeatResult<T : Any>(
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
+    }
+
+    override fun isDynamic(): Boolean {
+        return rule.isDynamic()
     }
 
     override fun ignoreCallbacks(): RuleWithDefaultRepeat<T> {
@@ -148,6 +151,10 @@ open class CharPredicateResultRule private constructor(
 
     override fun ignoreCallbacks(): CharPredicateRule {
         return rule.ignoreCallbacks() as CharPredicateRule
+    }
+
+    override fun isDynamic(): Boolean {
+        return rule.isDynamic()
     }
 
     override fun getRange(out: ParseRange): CharRule {

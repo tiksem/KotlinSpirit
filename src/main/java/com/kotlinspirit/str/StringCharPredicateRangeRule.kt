@@ -97,6 +97,10 @@ open class StringCharPredicateRangeRule(
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun ignoreCallbacks(): StringCharPredicateRangeRule {
         return this
     }

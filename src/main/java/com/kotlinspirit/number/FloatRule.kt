@@ -741,4 +741,8 @@ class FloatRule(name: String? = null) : RuleWithDefaultRepeat<Float>(name) {
     override fun isThreadSafe(): Boolean {
         return true
     }
+
+    override fun isDynamic(): Boolean {
+        return false
+    }
 }

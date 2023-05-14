@@ -164,6 +164,10 @@ class IntRule(name: String? = null) : RuleWithDefaultRepeat<Int>(name) {
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun ignoreCallbacks(): IntRule {
         return this
     }

@@ -147,6 +147,10 @@ class SplitRule<T : Any>(
         return r.isThreadSafe() && divider.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return r.isDynamic() || divider.isDynamic()
+    }
+
     override fun name(name: String): SplitRule<T> {
         return SplitRule(r, divider, range, name)
     }

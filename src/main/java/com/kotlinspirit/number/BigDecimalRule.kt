@@ -55,6 +55,10 @@ class BigDecimalRule(name: String? = null) : RuleWithDefaultRepeat<BigDecimal>(n
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun clone(): BigDecimalRule {
         return this
     }

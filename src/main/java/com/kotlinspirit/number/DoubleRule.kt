@@ -499,4 +499,8 @@ class DoubleRule(name: String? = null) : RuleWithDefaultRepeat<Double>(name) {
     override fun isThreadSafe(): Boolean {
         return true
     }
+
+    override fun isDynamic(): Boolean {
+        return false
+    }
 }

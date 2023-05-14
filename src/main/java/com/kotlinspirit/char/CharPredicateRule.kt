@@ -173,6 +173,10 @@ open class CharPredicateRule : CharRule {
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun name(name: String): Rule<Char> {
         return CharPredicateRule(data, predicate, eofParseCode, name)
     }

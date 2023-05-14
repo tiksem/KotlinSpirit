@@ -116,6 +116,10 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun clone(): BigIntegerRule {
         return this
     }

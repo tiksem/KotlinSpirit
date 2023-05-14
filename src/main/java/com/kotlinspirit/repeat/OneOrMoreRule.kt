@@ -98,6 +98,10 @@ class OneOrMoreRule<T : Any>(
         return rule.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return rule.isDynamic()
+    }
+
     override fun ignoreCallbacks(): OneOrMoreRule<T> {
         return OneOrMoreRule(rule.ignoreCallbacks(), name)
     }

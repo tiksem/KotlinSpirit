@@ -40,6 +40,10 @@ internal abstract class BaseRangeResultDefaultRepeatRule<T : Any> internal const
         return false
     }
 
+    override fun isDynamic(): Boolean {
+        return core.rule.isDynamic()
+    }
+
     override fun getRange(out: ParseRange): RangeResultRuleDefaultRepeat<T> {
         throw IllegalStateException("Double getRange|getRangeResult call")
     }

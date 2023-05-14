@@ -78,6 +78,10 @@ class NoRule(
         return rule.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return rule.isDynamic()
+    }
+
     override fun ignoreCallbacks(): NoRule {
         return NoRule(rule.ignoreCallbacks())
     }

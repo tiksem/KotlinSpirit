@@ -84,6 +84,10 @@ class ZeroOrMoreRule<T : Any>(
         return rule.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return rule.isDynamic()
+    }
+
     override fun ignoreCallbacks(): ZeroOrMoreRule<T> {
         return ZeroOrMoreRule(rule.ignoreCallbacks())
     }

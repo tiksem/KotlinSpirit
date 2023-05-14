@@ -164,6 +164,10 @@ class ShortRule(name: String? = null) : RuleWithDefaultRepeat<Short>(name) {
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun ignoreCallbacks(): ShortRule {
         return this
     }

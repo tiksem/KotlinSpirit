@@ -71,6 +71,10 @@ class ExpectationRule<T : Any>(
         return a.isThreadSafe() && b.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return a.isDynamic() || b.isDynamic()
+    }
+
     override fun name(name: String): ExpectationRule<T> {
         return ExpectationRule(a, b, name)
     }

@@ -29,6 +29,10 @@ internal abstract class BaseRangeResultCharRule(
         return core.ignoreCallbacks()
     }
 
+    override fun isDynamic(): Boolean {
+        return core.rule.isDynamic()
+    }
+
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 

@@ -91,6 +91,10 @@ class DiffRuleWithDefaultRepeat<T : Any>(
         return main.isThreadSafe() && diff.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return main.isDynamic() || diff.isDynamic()
+    }
+
     override fun ignoreCallbacks(): DiffRuleWithDefaultRepeat<T> {
         return DiffRuleWithDefaultRepeat(main.ignoreCallbacks(), diff.ignoreCallbacks())
     }
@@ -136,6 +140,10 @@ class CharDiffRule(
 
     override fun isThreadSafe(): Boolean {
         return main.isThreadSafe() && diff.isThreadSafe()
+    }
+
+    override fun isDynamic(): Boolean {
+        return main.isDynamic() || diff.isDynamic()
     }
 
     override fun ignoreCallbacks(): CharDiffRule {

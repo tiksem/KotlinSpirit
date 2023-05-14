@@ -95,6 +95,10 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
         return false
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun ignoreCallbacks(): OneOfStringRule {
         return this
     }

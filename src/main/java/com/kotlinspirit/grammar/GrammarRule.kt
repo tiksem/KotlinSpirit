@@ -35,7 +35,13 @@ open class GrammarRule<T : Any>(
     private fun initRuleForParse(): Rule<*> {
         var r = ruleForParse
         if (r == null) {
-            r = grammar.initRule().ignoreCallbacks()
+            r = grammar.initRule().let {
+                if (it.isDynamic()) {
+                    it
+                } else {
+                    it.ignoreCallbacks()
+                }
+            }
             ruleForParse = r
         }
 
@@ -86,6 +92,10 @@ open class GrammarRule<T : Any>(
 
     override fun isThreadSafe(): Boolean {
         return false
+    }
+
+    override fun isDynamic(): Boolean {
+        return initRuleForParse().isDynamic()
     }
 
     override fun ignoreCallbacks(): GrammarRule<T> {

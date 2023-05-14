@@ -76,6 +76,10 @@ class EofRule(name: String? = null) : Rule<Unit>(name) {
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun name(name: String): EofRule {
         return EofRule(name);
     }

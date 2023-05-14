@@ -67,6 +67,10 @@ class QuotedRule<T : Any>(
         return main.isThreadSafe() && left.isThreadSafe() && right.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return main.isDynamic() || left.isDynamic() || right.isDynamic()
+    }
+
     override fun clone(): QuotedRule<T> {
         return QuotedRule(main.clone(), left.clone(), right.clone(), name)
     }

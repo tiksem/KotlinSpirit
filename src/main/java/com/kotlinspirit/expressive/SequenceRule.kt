@@ -67,6 +67,10 @@ class SequenceRule(
         return a.isThreadSafe() && b.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return a.isDynamic() || b.isDynamic()
+    }
+
     override fun ignoreCallbacks(): Rule<CharSequence> {
         return SequenceRule(a.ignoreCallbacks(), b.ignoreCallbacks())
     }

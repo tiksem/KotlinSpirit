@@ -70,6 +70,10 @@ open class OrRule<T : Any>(
         return a.isThreadSafe() && b.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return a.isDynamic() || b.isDynamic()
+    }
+
     override fun ignoreCallbacks(): OrRule<T> {
         return OrRule(a.ignoreCallbacks(), b.ignoreCallbacks(), name)
     }

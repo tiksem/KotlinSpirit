@@ -120,6 +120,10 @@ class RepeatRule<T : Any>(
         return rule.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return rule.isDynamic()
+    }
+
     override fun ignoreCallbacks(): RepeatRule<T> {
         return RepeatRule(rule.ignoreCallbacks(), range)
     }

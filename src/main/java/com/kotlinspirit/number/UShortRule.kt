@@ -122,6 +122,10 @@ class UShortRule(name: String? = null) : RuleWithDefaultRepeat<UShort>(name) {
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun ignoreCallbacks(): UShortRule {
         return this
     }

@@ -122,6 +122,10 @@ class ULongRule(name: String? = null) : RuleWithDefaultRepeat<ULong>(name) {
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun ignoreCallbacks(): ULongRule {
         return this
     }

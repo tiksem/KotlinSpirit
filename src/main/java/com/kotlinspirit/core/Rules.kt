@@ -3,6 +3,7 @@ package com.kotlinspirit.core
 import com.kotlinspirit.char.*
 import com.kotlinspirit.char.CharPredicateData
 import com.kotlinspirit.char.CharPredicates
+import com.kotlinspirit.dynamic.DynamicStringRule
 import com.kotlinspirit.eof.EofRule
 import com.kotlinspirit.expressive.*
 import com.kotlinspirit.number.*
@@ -117,6 +118,9 @@ object Rules {
     val latinStr
         get() = str('A'..'B', 'a'..'z')
 
+    val nonEmptyLatinStr
+        get() = nonEmptyStr('A'..'B', 'a'..'z')
+
     val double get() = DoubleRule()
     val float get() = FloatRule()
 
@@ -130,6 +134,10 @@ object Rules {
         } else {
             OptionalRule(OneOfStringRule(withoutEmptyStrings.shuffled()))
         }
+    }
+
+    fun dynamic(stringProvider: () -> CharSequence): DynamicStringRule {
+        return DynamicStringRule(stringProvider)
     }
 
     val eof = EofRule()

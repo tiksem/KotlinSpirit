@@ -45,6 +45,10 @@ class LazyRule<T : Any> internal constructor(
         return false
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override val defaultDebugName: String
         get() = "lazy"
 

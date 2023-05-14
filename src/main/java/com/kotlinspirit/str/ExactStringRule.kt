@@ -8,78 +8,94 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
 
+internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequence): Long {
+    if (seek >= string.length) {
+        return createStepResult(
+            seek = seek,
+            ParseCode.EOF
+        )
+    }
+
+    val tokenLength = token.length
+    if (seek + tokenLength > string.length) {
+        return createStepResult(
+            seek = seek,
+            parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
+        )
+    }
+
+    return if (string.regionMatches(
+            thisOffset = seek,
+            other = token,
+            otherOffset = 0,
+            length = tokenLength
+        )) {
+        createComplete(seek + tokenLength)
+    } else {
+        createStepResult(
+            seek = seek,
+            parseCode = ParseCode.STRING_DOES_NOT_MATCH
+        )
+    }
+}
+
+internal fun exactStringParseWithResult(
+    seek: Int,
+    string: CharSequence,
+    result: ParseResult<CharSequence>,
+    token: CharSequence
+) {
+    if (seek >= string.length) {
+        result.parseResult = createStepResult(
+            seek = seek,
+            ParseCode.EOF
+        )
+        return
+    }
+
+    val tokenLength = token.length
+    if (seek + tokenLength > string.length) {
+        result.parseResult = createStepResult(
+            seek = seek,
+            parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
+        )
+        return
+    }
+
+    if (string.regionMatches(
+            thisOffset = seek,
+            other = token,
+            otherOffset = 0,
+            length = tokenLength
+        )) {
+        result.parseResult = createComplete(seek + tokenLength)
+        result.data = token
+    } else {
+        result.parseResult = createStepResult(
+            seek = seek,
+            parseCode = ParseCode.STRING_DOES_NOT_MATCH
+        )
+        result.data = null
+    }
+}
+
 open class ExactStringRule(
-    internal val string: String,
+    internal val string: CharSequence,
     name: String? = null
 ) : RuleWithDefaultRepeat<CharSequence>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        if (seek >= string.length) {
-            return createStepResult(
-                seek = seek,
-                ParseCode.EOF
-            )
-        }
-
-        val self = this.string
-        val selfLength = self.length
-        if (seek + selfLength > string.length) {
-            return createStepResult(
-                seek = seek,
-                parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
-            )
-        }
-
-        return if (string.regionMatches(
-                thisOffset = seek,
-                other = self,
-                otherOffset = 0,
-                length = selfLength
-            )) {
-            createComplete(seek + selfLength)
-        } else {
-            createStepResult(
-                seek = seek,
-                parseCode = ParseCode.STRING_DOES_NOT_MATCH
-            )
-        }
+        return exactStringParse(seek, string, this.string)
     }
 
     override fun parseWithResult(
         seek: Int, string: CharSequence, result: ParseResult<CharSequence>
     ) {
-        if (seek >= string.length) {
-            result.parseResult = createStepResult(
-                seek = seek,
-                ParseCode.EOF
-            )
-            return
-        }
-
-        val self = this.string
-        val selfLength = self.length
-        if (seek + selfLength > string.length) {
-            result.parseResult = createStepResult(
-                seek = seek,
-                parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
-            )
-            return
-        }
-
-        if (string.regionMatches(
-                thisOffset = seek,
-                other = self,
-                otherOffset = 0,
-                length = selfLength
-            )) {
-            result.parseResult = createComplete(seek + selfLength)
-            result.data = this.string
-        } else {
-            result.parseResult = createStepResult(
-                seek = seek,
-                parseCode = ParseCode.STRING_DOES_NOT_MATCH
-            )
-            result.data = null
-        }
+        exactStringParseWithResult(
+            seek = seek,
+            string = string,
+            token = this.string,
+            result = result
+        )
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -115,6 +131,10 @@ open class ExactStringRule(
 
     override fun isThreadSafe(): Boolean {
         return true
+    }
+
+    override fun isDynamic(): Boolean {
+        return false
     }
 
     override fun ignoreCallbacks(): ExactStringRule {

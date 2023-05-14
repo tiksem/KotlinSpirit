@@ -122,6 +122,10 @@ class UIntRule(name: String? = null) : RuleWithDefaultRepeat<UInt>(name) {
         return true
     }
 
+    override fun isDynamic(): Boolean {
+        return false
+    }
+
     override fun ignoreCallbacks(): UIntRule {
         return this
     }

@@ -64,6 +64,10 @@ class OptionalRule<T : Any>(
         return rule.isThreadSafe()
     }
 
+    override fun isDynamic(): Boolean {
+        return rule.isDynamic()
+    }
+
     override fun name(name: String): OptionalRule<T> {
         return OptionalRule(rule, name)
     }
