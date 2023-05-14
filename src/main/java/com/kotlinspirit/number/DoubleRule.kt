@@ -40,92 +40,168 @@ class DoubleRule(name: String? = null) : RuleWithDefaultRepeat<Double>(name) {
         var integerPart = 0.0
         var fractionPart = 0.0
         val minus = c == '-'
-        if (minus || c == '+' || c == '.') {
-            i++
-            if (i >= length) {
+        when (c) {
+            '-', '+', '.' -> {
+                i++
+                if (i >= length) {
+                    result.parseResult = createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_DOUBLE
+                    )
+                    return
+                }
+
+                // Check for infinity
+                val after = string[i]
+                if (c != '.' && (after == 'i' || after == 'I')) {
+                    i++
+                    if (string.startsWith("nf", i)) {
+                        result.parseResult = createComplete(
+                            seek = if (string.startsWith("inity", i + 2)) {
+                                i + 2 + 5
+                            } else {
+                                i + 2
+                            }
+                        )
+                        result.data = if (minus) {
+                            Double.NEGATIVE_INFINITY
+                        } else {
+                            Double.POSITIVE_INFINITY
+                        }
+                    } else {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_DOUBLE
+                        )
+                        result.data = null
+                    }
+                    return
+                }
+
+                noMoreDots = c == '.'
+                if (!noMoreDots && after == '.') {
+                    if (++i >= length) {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_DOUBLE
+                        )
+                        return
+                    }
+                    noMoreDots = true
+                }
+
+                c = string[i]
+                if (noMoreDots) {
+                    var e = 10.0
+                    if (c.isDigit()) {
+                        fractionPart = (c - '0').toDouble() / e
+                        i++
+                        while (i < length) {
+                            c = string[i]
+                            if (c.isDigit()) {
+                                e *= 10
+                                fractionPart += (c - '0').toDouble() / e
+                                i++
+                            } else {
+                                break
+                            }
+                        }
+                    } else {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_DOUBLE
+                        )
+                        return
+                    }
+                } else {
+                    if (c.isDigit()) {
+                        integerPart = (c - '0').toDouble()
+                        i++
+                        while (i < length) {
+                            c = string[i]
+                            if (c.isDigit()) {
+                                integerPart *= 10
+                                integerPart += c - '0'
+                                i++
+                            } else {
+                                break
+                            }
+                        }
+                    } else {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_DOUBLE
+                        )
+                        return
+                    }
+                }
+            }
+            in '0'..'9' -> {
+                integerPart = (c - '0').toDouble()
+                i++
+                while (i < length) {
+                    c = string[i]
+                    if (c.isDigit()) {
+                        integerPart *= 10
+                        integerPart += c - '0'
+                        i++
+                    } else {
+                        break
+                    }
+                }
+            }
+            'I', 'i' -> {
+                // Check for positive infinity
+                if (++i >= length) {
+                    result.parseResult = createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_DOUBLE
+                    )
+                    result.data = null
+                    return
+                }
+
+                val after = string[i]
+                if (after == 'n') {
+                    if (++i < length && string[i] == 'f') {
+                        i++
+                        result.parseResult = createComplete(
+                            seek = if (string.startsWith("inity", i)) {
+                                i + 5
+                            } else {
+                                i
+                            }
+                        )
+                        result.data = Double.POSITIVE_INFINITY
+                    } else {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_DOUBLE
+                        )
+                        result.data = null
+                    }
+                    return
+                }
+            }
+            'N' -> {
+                if (i + 2 < length && string[++i] == 'a' && string[++i] == 'N') {
+                    result.parseResult = createComplete(seek = i + 1)
+                    result.data = Double.NaN
+                } else {
+                    result.parseResult = createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_DOUBLE
+                    )
+                }
+                return
+            }
+            else -> {
                 result.parseResult = createStepResult(
                     seek = seek,
                     parseCode = ParseCode.INVALID_DOUBLE
                 )
                 return
             }
-
-            noMoreDots = c == '.'
-            if (!noMoreDots && string[i] == '.') {
-                if (++i >= length) {
-                    result.parseResult = createStepResult(
-                        seek = seek,
-                        parseCode = ParseCode.INVALID_DOUBLE
-                    )
-                    return
-                }
-                noMoreDots = true
-            }
-
-            c = string[i]
-            if (noMoreDots) {
-                var e = 10.0
-                if (c.isDigit()) {
-                    fractionPart = (c - '0').toDouble() / e
-                    i++
-                    while (i < length) {
-                        c = string[i]
-                        if (c.isDigit()) {
-                            e *= 10
-                            fractionPart += (c - '0').toDouble() / e
-                            i++
-                        } else {
-                            break
-                        }
-                    }
-                } else {
-                    result.parseResult = createStepResult(
-                        seek = seek,
-                        parseCode = ParseCode.INVALID_DOUBLE
-                    )
-                    return
-                }
-            } else {
-                if (c.isDigit()) {
-                    integerPart = (c - '0').toDouble()
-                    i++
-                    while (i < length) {
-                        c = string[i]
-                        if (c.isDigit()) {
-                            integerPart *= 10
-                            integerPart += c - '0'
-                            i++
-                        } else {
-                            break
-                        }
-                    }
-                } else {
-                    result.parseResult = createStepResult(
-                        seek = seek,
-                        parseCode = ParseCode.INVALID_DOUBLE
-                    )
-                    return
-                }
-            }
-        } else if(c.isDigit()) {
-            integerPart = (c - '0').toDouble()
-            i++
-            while (i < length) {
-                c = string[i]
-                if (c.isDigit()) {
-                    integerPart *= 10
-                    integerPart += c - '0'
-                    i++
-                } else {
-                    break
-                }
-            }
-        } else {
-            result.parseResult = createStepResult(
-                seek = seek,
-                parseCode = ParseCode.INVALID_DOUBLE
-            )
-            return
         }
 
         if (i >= length) {

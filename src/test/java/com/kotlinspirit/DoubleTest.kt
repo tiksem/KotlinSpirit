@@ -1,10 +1,7 @@
 package com.kotlinspirit
 
-import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.*
 import com.kotlinspirit.core.Rules.double
-import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.core.getParseCode
 import org.junit.Assert
 import org.junit.Test
 
@@ -229,6 +226,55 @@ class DoubleTest {
                 parseCode = ParseCode.COMPLETE
             )
         )
+    }
+
+    private fun testFullInfMatch(strings: List<String>, expectedValue: Double) {
+        val r = ParseResult<Double>()
+        for (str in strings) {
+            double.parseWithResult(0, str, r)
+            Assert.assertEquals(expectedValue, r.data)
+            Assert.assertEquals(r.parseResult.getSeek(), str.length)
+        }
+    }
+
+    private fun testInfError(strings: List<String>) {
+        val r = ParseResult<Double>()
+        for (str in strings) {
+            double.parseWithResult(0, str, r)
+            Assert.assertEquals(r.parseResult.getParseCode(), ParseCode.INVALID_DOUBLE)
+        }
+    }
+
+    @Test
+    fun testPositiveInf() {
+        testFullInfMatch(
+            strings = listOf("inf", "+inf", "Inf", "+Inf", "infinity", "+infinity", "Infinity", "+Infinity"),
+            expectedValue = Double.POSITIVE_INFINITY
+        )
+    }
+
+    @Test
+    fun testNegativeInf() {
+        testFullInfMatch(
+            strings = listOf("-inf", "-Inf", "-infinity", "-Infinity"),
+            expectedValue = Double.NEGATIVE_INFINITY
+        )
+    }
+
+    @Test
+    fun testInfError() {
+        testInfError(
+            strings = listOf("in", "In", "i", "ina", "Ina", "-in", "+in", "+in3434")
+        )
+    }
+
+    @Test
+    fun testNan() {
+        val r = ParseResult<Double>()
+        val str = "NaN"
+        double.parseWithResult(0, str, r)
+        Assert.assertEquals("NaN".length, r.parseResult.getSeek())
+        Assert.assertTrue(r.data?.isNaN() == true)
     }
 
     @Test

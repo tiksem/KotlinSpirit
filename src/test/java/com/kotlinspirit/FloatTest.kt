@@ -2,6 +2,7 @@ package com.kotlinspirit
 
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.Rules.float
+import junit.framework.AssertionFailedError
 import org.junit.Assert
 import org.junit.Test
 
@@ -204,6 +205,58 @@ class FloatTest {
                 parseCode = ParseCode.COMPLETE
             )
         )
+    }
+
+
+    private fun testFullInfMatch(strings: List<String>, expectedValue: Float) {
+        val r = ParseResult<Float>()
+        for (str in strings) {
+            float.parseWithResult(0, str, r)
+            if (expectedValue != r.data) {
+                throw AssertionFailedError("$str parse failed, $expectedValue != ${r.data}")
+            }
+            Assert.assertEquals(r.parseResult.getSeek(), str.length)
+        }
+    }
+
+    private fun testInfError(strings: List<String>) {
+        val r = ParseResult<Float>()
+        for (str in strings) {
+            float.parseWithResult(0, str, r)
+            Assert.assertEquals(r.parseResult.getParseCode(), ParseCode.INVALID_FLOAT)
+        }
+    }
+
+    @Test
+    fun testPositiveInf() {
+        testFullInfMatch(
+            strings = listOf("inf", "+inf", "Inf", "+Inf", "infinity", "+infinity", "Infinity", "+Infinity"),
+            expectedValue = Float.POSITIVE_INFINITY
+        )
+    }
+
+    @Test
+    fun testNegativeInf() {
+        testFullInfMatch(
+            strings = listOf("-inf", "-Inf", "-infinity", "-Infinity"),
+            expectedValue = Float.NEGATIVE_INFINITY
+        )
+    }
+
+    @Test
+    fun testInfError() {
+        testInfError(
+            strings = listOf("in", "In", "i", "ina", "Ina", "-in", "+in", "+in3434")
+        )
+    }
+
+    @Test
+    fun testNan() {
+        val r = ParseResult<Float>()
+        val str = "NaN"
+        float.parseWithResult(0, str, r)
+        Assert.assertEquals("NaN".length, r.parseResult.getSeek())
+        Assert.assertTrue(r.data?.isNaN() == true)
     }
 
     @Test

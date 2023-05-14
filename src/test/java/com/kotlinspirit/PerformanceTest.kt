@@ -1,6 +1,5 @@
 package com.kotlinspirit
 
-import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.digit
 import com.kotlinspirit.core.Rules.double
@@ -11,6 +10,8 @@ import kotlin.random.Random
 class PerformanceTest {
     @Test
     fun test1() {
+        double
+
         val pattern = Regex("^(?:Ivan|Vasil|Eblan|[A-Z]+)+@[0-9]+$")
         val parser = (
                 (oneOf("Ivan", "Vasil", "Eblan") or char('A'..'Z'))

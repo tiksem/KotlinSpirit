@@ -128,7 +128,7 @@ object Rules {
         return if (withoutEmptyStrings.size == strings.size) {
             OneOfStringRule(withoutEmptyStrings)
         } else {
-            OptionalRule(OneOfStringRule(withoutEmptyStrings))
+            OptionalRule(OneOfStringRule(withoutEmptyStrings.shuffled()))
         }
     }
 

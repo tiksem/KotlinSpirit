@@ -3,8 +3,6 @@ package com.kotlinspirit.number
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 private inline fun getPowerOf10(exp: Int): Float {
@@ -27,47 +25,108 @@ internal fun parseFloatingNumber(seek: Int, string: CharSequence, invalidFloatEr
     var i = seek
     val c = string[i]
     var noMoreDots = false
-    if (c == '-' || c == '+' || c == '.') {
-        i++
-        if (i >= length) {
-            return createStepResult(
-                seek = seek,
-                parseCode = invalidFloatErrorCode
-            )
-        }
 
-        noMoreDots = c == '.'
-        if (!noMoreDots && string[i] == '.') {
+    when (c) {
+        '-', '+', '.' -> {
+            i++
+            if (i >= length) {
+                return createStepResult(
+                    seek = seek,
+                    parseCode = invalidFloatErrorCode
+                )
+            }
+
+            // Check for infinity
+            val after = string[i]
+            if (c != '.' && (after == 'i' || after == 'I')) {
+                return if (string.startsWith("nf", i)) {
+                    createComplete(
+                        seek = if (string.startsWith("inity", i + 2)) {
+                            i + 2 + 5
+                        } else {
+                            i + 2
+                        }
+                    )
+                } else {
+                    createStepResult(
+                        seek = seek,
+                        parseCode = invalidFloatErrorCode
+                    )
+                }
+            }
+
+            noMoreDots = c == '.'
+            if (!noMoreDots && after == '.') {
+                if (++i >= length) {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = invalidFloatErrorCode
+                    )
+                }
+                noMoreDots = true
+            }
+
+            if (string[i].isDigit()) {
+                i++
+                while (i < length && string[i].isDigit()) {
+                    i++
+                }
+            } else {
+                return createStepResult(
+                    seek = seek,
+                    parseCode = invalidFloatErrorCode
+                )
+            }
+        }
+        in '0'..'9' -> {
+            i++
+            while (i < length && string[i].isDigit()) {
+                i++
+            }
+        }
+        'I', 'i' -> {
+            // Check for positive infinity
             if (++i >= length) {
                 return createStepResult(
                     seek = seek,
                     parseCode = invalidFloatErrorCode
                 )
             }
-            noMoreDots = true
-        }
 
-        if (string[i].isDigit()) {
-            i++
-            while (i < length && string[i].isDigit()) {
-                i++
+            val after = string[i]
+            if (after == 'i' || after == 'I') {
+                return if (string.startsWith("nf", i)) {
+                    createComplete(
+                        seek = if (string.startsWith("inity", i + 2)) {
+                            i + 2 + 5
+                        } else {
+                            i + 2
+                        }
+                    )
+                } else {
+                    createStepResult(
+                        seek = seek,
+                        parseCode = invalidFloatErrorCode
+                    )
+                }
             }
-        } else {
+        }
+        'N' -> {
+            return if (i + 2 < length && string[++i] == 'a' && string[++i] == 'N') {
+                createComplete(i + 1)
+            } else {
+                createStepResult(
+                    seek = seek,
+                    parseCode = invalidFloatErrorCode
+                )
+            }
+        }
+        else -> {
             return createStepResult(
                 seek = seek,
                 parseCode = invalidFloatErrorCode
             )
         }
-    } else if(c.isDigit()) {
-        i++
-        while (i < length && string[i].isDigit()) {
-            i++
-        }
-    } else {
-        return createStepResult(
-            seek = seek,
-            parseCode = invalidFloatErrorCode
-        )
     }
 
     if (i >= length) {
@@ -189,10 +248,10 @@ internal fun floatingNumberHasMatch(seek: Int, string: CharSequence): Boolean {
                     false
                 }
             } else {
-                false
+                string.startsWith("inf", seek + 1) || string.startsWith("Inf", seek + 1)
             }
         }
-        else -> false
+        else -> string.startsWith("inf") || string.startsWith("Inf")
     }
 }
 
@@ -212,6 +271,7 @@ class FloatRule(name: String? = null) : RuleWithDefaultRepeat<Float>(name) {
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
+            result.data = null
             return
         }
 
@@ -222,92 +282,168 @@ class FloatRule(name: String? = null) : RuleWithDefaultRepeat<Float>(name) {
         var integerPart = 0.0f
         var fractionPart = 0.0f
         val minus = c == '-'
-        if (minus || c == '+' || c == '.') {
-            i++
-            if (i >= length) {
+        when (c) {
+            '-', '+', '.' -> {
+                i++
+                if (i >= length) {
+                    result.parseResult = createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_FLOAT
+                    )
+                    return
+                }
+
+                // Check for infinity
+                val after = string[i]
+                if (c != '.' && (after == 'i' || after == 'I')) {
+                    i++
+                    if (string.startsWith("nf", i)) {
+                        result.parseResult = createComplete(
+                            seek = if (string.startsWith("inity", i + 2)) {
+                                i + 2 + 5
+                            } else {
+                                i + 2
+                            }
+                        )
+                        result.data = if (minus) {
+                            Float.NEGATIVE_INFINITY
+                        } else {
+                            Float.POSITIVE_INFINITY
+                        }
+                    } else {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_FLOAT
+                        )
+                        result.data = null
+                    }
+                    return
+                }
+
+                noMoreDots = c == '.'
+                if (!noMoreDots && after == '.') {
+                    if (++i >= length) {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_FLOAT
+                        )
+                        return
+                    }
+                    noMoreDots = true
+                }
+
+                c = string[i]
+                if (noMoreDots) {
+                    var e = 10.0f
+                    if (c.isDigit()) {
+                        fractionPart = (c - '0').toFloat() / e
+                        i++
+                        while (i < length) {
+                            c = string[i]
+                            if (c.isDigit()) {
+                                e *= 10
+                                fractionPart += (c - '0').toFloat() / e
+                                i++
+                            } else {
+                                break
+                            }
+                        }
+                    } else {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_FLOAT
+                        )
+                        return
+                    }
+                } else {
+                    if (c.isDigit()) {
+                        integerPart = (c - '0').toFloat()
+                        i++
+                        while (i < length) {
+                            c = string[i]
+                            if (c.isDigit()) {
+                                integerPart *= 10
+                                integerPart += c - '0'
+                                i++
+                            } else {
+                                break
+                            }
+                        }
+                    } else {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_FLOAT
+                        )
+                        return
+                    }
+                }
+            }
+            in '0'..'9' -> {
+                integerPart = (c - '0').toFloat()
+                i++
+                while (i < length) {
+                    c = string[i]
+                    if (c.isDigit()) {
+                        integerPart *= 10
+                        integerPart += c - '0'
+                        i++
+                    } else {
+                        break
+                    }
+                }
+            }
+            'I', 'i' -> {
+                // Check for positive infinity
+                if (++i >= length) {
+                    result.parseResult = createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_FLOAT
+                    )
+                    result.data = null
+                    return
+                }
+
+                val after = string[i]
+                if (after == 'n') {
+                    if (++i < length && string[i] == 'f') {
+                        i++
+                        result.parseResult = createComplete(
+                            seek = if (string.startsWith("inity", i)) {
+                                i + 5
+                            } else {
+                                i
+                            }
+                        )
+                        result.data = Float.POSITIVE_INFINITY
+                    } else {
+                        result.parseResult = createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_FLOAT
+                        )
+                        result.data = null
+                    }
+                    return
+                }
+            }
+            'N' -> {
+                if (i + 2 < length && string[++i] == 'a' && string[++i] == 'N') {
+                    result.parseResult = createComplete(seek = i + 1)
+                    result.data = Float.NaN
+                } else {
+                    result.parseResult = createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_FLOAT
+                    )
+                }
+                return
+            }
+            else -> {
                 result.parseResult = createStepResult(
                     seek = seek,
                     parseCode = ParseCode.INVALID_FLOAT
                 )
                 return
             }
-
-            noMoreDots = c == '.'
-            if (!noMoreDots && string[i] == '.') {
-                if (++i >= length) {
-                    result.parseResult = createStepResult(
-                        seek = seek,
-                        parseCode = ParseCode.INVALID_FLOAT
-                    )
-                    return
-                }
-                noMoreDots = true
-            }
-
-            c = string[i]
-            if (noMoreDots) {
-                var e = 10.0f
-                if (c.isDigit()) {
-                    fractionPart = (c - '0').toFloat() / e
-                    i++
-                    while (i < length) {
-                        c = string[i]
-                        if (c.isDigit()) {
-                            e *= 10
-                            fractionPart += (c - '0').toFloat() / e
-                            i++
-                        } else {
-                            break
-                        }
-                    }
-                } else {
-                    result.parseResult = createStepResult(
-                        seek = seek,
-                        parseCode = ParseCode.INVALID_FLOAT
-                    )
-                    return
-                }
-            } else {
-                if (c.isDigit()) {
-                    integerPart = (c - '0').toFloat()
-                    i++
-                    while (i < length) {
-                        c = string[i]
-                        if (c.isDigit()) {
-                            integerPart *= 10
-                            integerPart += c - '0'
-                            i++
-                        } else {
-                            break
-                        }
-                    }
-                } else {
-                    result.parseResult = createStepResult(
-                        seek = seek,
-                        parseCode = ParseCode.INVALID_FLOAT
-                    )
-                    return
-                }
-            }
-        } else if(c.isDigit()) {
-            integerPart = (c - '0').toFloat()
-            i++
-            while (i < length) {
-                c = string[i]
-                if (c.isDigit()) {
-                    integerPart *= 10
-                    integerPart += c - '0'
-                    i++
-                } else {
-                    break
-                }
-            }
-        } else {
-            result.parseResult = createStepResult(
-                seek = seek,
-                parseCode = ParseCode.INVALID_FLOAT
-            )
-            return
         }
 
         if (i >= length) {
