@@ -78,11 +78,11 @@ class FailIfRule<T : Any>(
         return rule.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
-    }
-
     override fun ignoreCallbacks(): FailIfRule<T> {
         return FailIfRule(rule.ignoreCallbacks(), failPredicate)
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return rule.getPrefixMaxLength()
     }
 }

@@ -67,10 +67,6 @@ class QuotedRule<T : Any>(
         return main.isThreadSafe() && left.isThreadSafe() && right.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return main.isDynamic() || left.isDynamic() || right.isDynamic()
-    }
-
     override fun clone(): QuotedRule<T> {
         return QuotedRule(main.clone(), left.clone(), right.clone(), name)
     }
@@ -88,4 +84,16 @@ class QuotedRule<T : Any>(
 
     override val defaultDebugName: String
         get() = "${main.wrappedName}.quoted(${left.debugName}, ${right.debugName})"
+
+    override fun getPrefixMaxLength(): Int {
+        return (
+                left.getPrefixMaxLength().toLong() +
+                        right.getPrefixMaxLength() +
+                        main.getPrefixMaxLength()
+                ).coerceAtMost(MAX_PREFIX_LENGTH.toLong()).toInt()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return left.isPrefixFixedLength() && right.isPrefixFixedLength() && main.isPrefixFixedLength()
+    }
 }

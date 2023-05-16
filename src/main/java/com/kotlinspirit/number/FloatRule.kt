@@ -742,7 +742,15 @@ class FloatRule(name: String? = null) : RuleWithDefaultRepeat<Float>(name) {
         return true
     }
 
-    override fun isDynamic(): Boolean {
+    override fun getPrefixMaxLength(): Int {
+        return MAX_FLOAT_PREFIX_LENGTH
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
         return false
+    }
+
+    companion object {
+        internal const val MAX_FLOAT_PREFIX_LENGTH = "-infinity".length
     }
 }

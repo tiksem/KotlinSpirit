@@ -45,10 +45,6 @@ class LazyRule<T : Any> internal constructor(
         return false
     }
 
-    override fun isDynamic(): Boolean {
-        return false
-    }
-
     override val defaultDebugName: String
         get() = "lazy"
 
@@ -95,4 +91,5 @@ class LazyRule<T : Any> internal constructor(
     override fun getRangeResult(callback: (ParseRangeResult<T>) -> Unit): RuleWithDefaultRepeat<T> {
         return RangeResultRuleCallbacksResultDefaultRepeat(this, callback)
     }
+
 }

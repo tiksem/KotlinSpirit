@@ -2,7 +2,6 @@ package com.kotlinspirit.char
 
 import com.kotlinspirit.core.*
 import com.kotlinspirit.expressive.CharDiffRule
-import com.kotlinspirit.expressive.OptionalRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.callbacks.RangeResultCharCallbacksRule
@@ -55,10 +54,6 @@ class CharResultRule(
 
     override fun clone(): CharResultRule {
         return CharResultRule(rule.clone() as CharRule, callback, name)
-    }
-
-    override fun isDynamic(): Boolean {
-        return false
     }
 
     override fun name(name: String): CharResultRule {
@@ -119,6 +114,14 @@ abstract class CharRule(name: String?) : Rule<Char>(name) {
 
     override fun unaryPlus(): Rule<CharSequence> {
         return OneOrMoreRule(this).asString()
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return 1
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return true
     }
 
     abstract override fun clone(): CharRule
@@ -194,10 +197,6 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-
-    override fun isDynamic(): Boolean {
-        return false
     }
 
     override fun ignoreCallbacks(): AnyCharRule {

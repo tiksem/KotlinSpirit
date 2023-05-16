@@ -3,8 +3,6 @@ package com.kotlinspirit.str
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.ext.debugString
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import kotlin.math.min
@@ -97,11 +95,15 @@ open class StringCharPredicateRangeRule(
         return true
     }
 
-    override fun isDynamic(): Boolean {
-        return false
-    }
-
     override fun ignoreCallbacks(): StringCharPredicateRangeRule {
         return this
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return range.first
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return true
     }
 }

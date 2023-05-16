@@ -12,7 +12,6 @@ open class GrammarRule<T : Any>(
     private val grammar: Grammar<T>,
     name: String?
 ): RuleWithDefaultRepeat<T>(name) {
-    private var ruleForParse: Rule<*>? = null
     private val stack = arrayListOf(grammar)
     private var stackSeek = 0
 
@@ -32,24 +31,13 @@ open class GrammarRule<T : Any>(
         stackSeek--
     }
 
-    private fun initRuleForParse(): Rule<*> {
-        var r = ruleForParse
-        if (r == null) {
-            r = grammar.initRule().let {
-                if (it.isDynamic()) {
-                    it
-                } else {
-                    it.ignoreCallbacks()
-                }
-            }
-            ruleForParse = r
-        }
-
-        return r
-    }
-
     override fun parse(seek: Int, string: CharSequence): Long {
-        return initRuleForParse().parse(seek, string)
+        val grammar = pullGrammar()
+        try {
+            return grammar.initRule().parse(seek, string)
+        } finally {
+            returnGrammar(grammar)
+        }
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
@@ -66,7 +54,7 @@ open class GrammarRule<T : Any>(
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return initRuleForParse().hasMatch(seek, string)
+        return pullGrammar().initRule().hasMatch(seek, string)
     }
 
     override val debugNameShouldBeWrapped: Boolean
@@ -92,10 +80,6 @@ open class GrammarRule<T : Any>(
 
     override fun isThreadSafe(): Boolean {
         return false
-    }
-
-    override fun isDynamic(): Boolean {
-        return initRuleForParse().isDynamic()
     }
 
     override fun ignoreCallbacks(): GrammarRule<T> {

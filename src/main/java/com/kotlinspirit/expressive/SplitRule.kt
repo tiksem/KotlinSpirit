@@ -147,8 +147,23 @@ class SplitRule<T : Any>(
         return r.isThreadSafe() && divider.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return r.isDynamic() || divider.isDynamic()
+    override fun getPrefixMaxLength(): Int {
+        val rangeLength = range.last - range.first
+        var sum = r.getPrefixMaxLength() * rangeLength.toLong()
+        val dividersMaxCount = rangeLength - 1
+        if (dividersMaxCount >= 0) {
+            sum += divider.getPrefixMaxLength() * dividersMaxCount.toLong()
+        }
+
+        return sum.coerceAtMost(MAX_PREFIX_LENGTH.toLong()).toInt()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return when (range.last - range.first) {
+            0 -> true
+            1 -> r.isPrefixFixedLength()
+            else -> false
+        }
     }
 
     override fun name(name: String): SplitRule<T> {

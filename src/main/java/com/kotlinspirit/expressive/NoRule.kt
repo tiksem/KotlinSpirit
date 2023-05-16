@@ -78,8 +78,12 @@ class NoRule(
         return rule.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
+    override fun getPrefixMaxLength(): Int {
+        return rule.getPrefixMaxLength()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return rule.isPrefixFixedLength()
     }
 
     override fun ignoreCallbacks(): NoRule {

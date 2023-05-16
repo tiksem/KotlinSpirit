@@ -96,7 +96,11 @@ class StringOneOrMoreCharPredicateRule(
         return true
     }
 
-    override fun isDynamic(): Boolean {
-        return false
+    override fun getPrefixMaxLength(): Int {
+        return 1
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return true
     }
 }

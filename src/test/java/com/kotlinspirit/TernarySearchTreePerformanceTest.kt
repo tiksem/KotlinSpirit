@@ -24,8 +24,6 @@ class TernarySearchTreePerformanceTest {
         strs.forEach {
             tree.parse(0, it)
         }
-        println("large")
-        println("tree=" + (System.currentTimeMillis() - time))
         time = System.currentTimeMillis()
         strs.forEach {
             (1..it.length).forEach { end ->
@@ -34,7 +32,6 @@ class TernarySearchTreePerformanceTest {
                 }
             }
         }
-        println("set=" + (System.currentTimeMillis() - time))
     }
 
     @Test
@@ -57,8 +54,6 @@ class TernarySearchTreePerformanceTest {
                 tree.parse(0, it)
             }
         }
-        println("small")
-        println("tree=" + (System.currentTimeMillis() - time))
         time = System.currentTimeMillis()
         repeat(1000) {
             strs.forEach {
@@ -69,7 +64,6 @@ class TernarySearchTreePerformanceTest {
                 }
             }
         }
-        println("set=" + (System.currentTimeMillis() - time))
         time = System.currentTimeMillis()
         repeat(1000) {
             strs.forEach {
@@ -78,7 +72,6 @@ class TernarySearchTreePerformanceTest {
                 }
             }
         }
-        println("array=" + (System.currentTimeMillis() - time))
     }
 
     @Test
@@ -101,8 +94,6 @@ class TernarySearchTreePerformanceTest {
                 tree.parse(0, it)
             }
         }
-        println("only2")
-        println("tree=" + (System.currentTimeMillis() - time))
         time = System.currentTimeMillis()
         repeat(10000) {
             strs.forEach {
@@ -113,7 +104,6 @@ class TernarySearchTreePerformanceTest {
                 }
             }
         }
-        println("set=" + (System.currentTimeMillis() - time))
         time = System.currentTimeMillis()
         repeat(10000) {
             strs.forEach {
@@ -122,6 +112,5 @@ class TernarySearchTreePerformanceTest {
                 }
             }
         }
-        println("array=" + (System.currentTimeMillis() - time))
     }
 }

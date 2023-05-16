@@ -6,7 +6,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class ExpectationRule<T : Any>(
+class SuffixExpectationRule<T : Any>(
     private val a: Rule<T>,
     private val b: Rule<*>,
     name: String? = null
@@ -22,7 +22,7 @@ class ExpectationRule<T : Any>(
         return if (parseCode.isError()) {
             createStepResult(
                 seek = seek,
-                parseCode = ParseCode.EXPECTATION_FAILED
+                parseCode = ParseCode.SUFFIX_EXPECTATION_FAILED
             )
         } else {
             aResult
@@ -43,7 +43,7 @@ class ExpectationRule<T : Any>(
         if (bResult.getParseCode().isError()) {
             result.parseResult = createStepResult(
                 seek = seek,
-                parseCode = ParseCode.EXPECTATION_FAILED
+                parseCode = ParseCode.SUFFIX_EXPECTATION_FAILED
             )
         }
     }
@@ -57,8 +57,8 @@ class ExpectationRule<T : Any>(
         return b.hasMatch(aResult.getSeek(), string)
     }
 
-    override fun clone(): ExpectationRule<T> {
-        return ExpectationRule(a.clone(), b.clone(), name)
+    override fun clone(): SuffixExpectationRule<T> {
+        return SuffixExpectationRule(a.clone(), b.clone(), name)
     }
 
     override val debugNameShouldBeWrapped: Boolean
@@ -71,22 +71,26 @@ class ExpectationRule<T : Any>(
         return a.isThreadSafe() && b.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return a.isDynamic() || b.isDynamic()
-    }
-
-    override fun name(name: String): ExpectationRule<T> {
-        return ExpectationRule(a, b, name)
+    override fun name(name: String): SuffixExpectationRule<T> {
+        return SuffixExpectationRule(a, b, name)
     }
 
     override fun debug(engine: DebugEngine): DebugRule<T> {
         return DebugRule(
-            rule = ExpectationRule(a.debug(engine), b.debug(engine), name),
+            rule = SuffixExpectationRule(a.debug(engine), b.debug(engine), name),
             engine = engine
         )
     }
 
-    override fun ignoreCallbacks(): ExpectationRule<T> {
-        return ExpectationRule(a.ignoreCallbacks(), b.ignoreCallbacks())
+    override fun ignoreCallbacks(): SuffixExpectationRule<T> {
+        return SuffixExpectationRule(a.ignoreCallbacks(), b.ignoreCallbacks())
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return a.getPrefixMaxLength()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return a.isPrefixFixedLength()
     }
 }

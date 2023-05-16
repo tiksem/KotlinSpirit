@@ -8,6 +8,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.repeat.ZeroOrMoreRule
+import kotlin.math.max
 
 open class OrRule<T : Any>(
     protected val a: Rule<T>,
@@ -70,12 +71,16 @@ open class OrRule<T : Any>(
         return a.isThreadSafe() && b.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return a.isDynamic() || b.isDynamic()
-    }
-
     override fun ignoreCallbacks(): OrRule<T> {
         return OrRule(a.ignoreCallbacks(), b.ignoreCallbacks(), name)
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return max(a.getPrefixMaxLength(), b.getPrefixMaxLength())
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return a.isPrefixFixedLength() && b.isPrefixFixedLength() && a.getPrefixMaxLength() == b.getPrefixMaxLength()
     }
 }
 

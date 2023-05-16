@@ -84,11 +84,15 @@ class ZeroOrMoreRule<T : Any>(
         return rule.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
-    }
-
     override fun ignoreCallbacks(): ZeroOrMoreRule<T> {
         return ZeroOrMoreRule(rule.ignoreCallbacks())
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return 0
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return true
     }
 }

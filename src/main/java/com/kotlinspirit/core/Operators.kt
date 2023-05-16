@@ -25,8 +25,12 @@ infix fun Char.or(rule: CharPredicateRule): CharPredicateRule {
     return char(this) or rule
 }
 
-fun Char.expect(rule: Rule<*>): ExpectationRule<Char> {
-    return ExpectationRule(ExactCharRule(this), rule)
+fun Char.expectsSuffix(rule: Rule<*>): SuffixExpectationRule<Char> {
+    return SuffixExpectationRule(ExactCharRule(this), rule)
+}
+
+fun Char.requiresPrefix(rule: Rule<*>): RequiresPrefixRule<Char> {
+    return RequiresPrefixRule(bodyRule = ExactCharRule(this), prefixRule = rule)
 }
 
 infix fun String.or(rule: ExactStringRule): OneOfStringRule {
@@ -41,6 +45,10 @@ infix fun String.or(rule: Rule<*>): AnyOrRule {
     return ExactStringRule(this) or rule
 }
 
-fun String.expect(rule: Rule<*>): ExpectationRule<CharSequence> {
-    return ExpectationRule(ExactStringRule(this), rule)
+fun String.expectsSuffix(rule: Rule<*>): SuffixExpectationRule<CharSequence> {
+    return SuffixExpectationRule(ExactStringRule(this), rule)
+}
+
+fun String.requiresPrefix(rule: Rule<*>): RequiresPrefixRule<CharSequence> {
+    return RequiresPrefixRule(bodyRule = ExactStringRule(this), prefixRule = rule)
 }

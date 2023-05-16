@@ -4,8 +4,6 @@ import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
 
 internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequence): Long {
@@ -133,8 +131,12 @@ open class ExactStringRule(
         return true
     }
 
-    override fun isDynamic(): Boolean {
-        return false
+    override fun getPrefixMaxLength(): Int {
+        return string.length
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return true
     }
 
     override fun ignoreCallbacks(): ExactStringRule {

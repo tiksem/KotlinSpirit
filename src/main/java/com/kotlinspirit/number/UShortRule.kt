@@ -3,8 +3,6 @@ package com.kotlinspirit.number
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class UShortRule(name: String? = null) : RuleWithDefaultRepeat<UShort>(name) {
@@ -122,11 +120,15 @@ class UShortRule(name: String? = null) : RuleWithDefaultRepeat<UShort>(name) {
         return true
     }
 
-    override fun isDynamic(): Boolean {
-        return false
-    }
-
     override fun ignoreCallbacks(): UShortRule {
         return this
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return 1
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return true
     }
 }

@@ -3,8 +3,6 @@ package com.kotlinspirit.number
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class IntRule(name: String? = null) : RuleWithDefaultRepeat<Int>(name) {
@@ -164,11 +162,15 @@ class IntRule(name: String? = null) : RuleWithDefaultRepeat<Int>(name) {
         return true
     }
 
-    override fun isDynamic(): Boolean {
-        return false
-    }
-
     override fun ignoreCallbacks(): IntRule {
         return this
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return 2
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return false
     }
 }

@@ -2,8 +2,6 @@ package com.kotlinspirit.rangeres.base
 
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
@@ -40,8 +38,12 @@ internal abstract class BaseRangeResultDefaultRepeatRule<T : Any> internal const
         return false
     }
 
-    override fun isDynamic(): Boolean {
-        return core.rule.isDynamic()
+    override fun getPrefixMaxLength(): Int {
+        return core.rule.getPrefixMaxLength()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return core.rule.isPrefixFixedLength()
     }
 
     override fun getRange(out: ParseRange): RangeResultRuleDefaultRepeat<T> {

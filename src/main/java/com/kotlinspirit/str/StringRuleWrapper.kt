@@ -62,11 +62,15 @@ class StringRuleWrapper(
         return rule.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
-    }
-
     override fun ignoreCallbacks(): StringRuleWrapper {
         return StringRuleWrapper(rule.ignoreCallbacks())
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return rule.getPrefixMaxLength()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return rule.isPrefixFixedLength()
     }
 }

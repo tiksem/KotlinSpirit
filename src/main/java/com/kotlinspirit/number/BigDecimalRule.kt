@@ -2,8 +2,6 @@ package com.kotlinspirit.number
 
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import java.math.BigDecimal
 
@@ -53,10 +51,6 @@ class BigDecimalRule(name: String? = null) : RuleWithDefaultRepeat<BigDecimal>(n
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-
-    override fun isDynamic(): Boolean {
-        return false
     }
 
     override fun clone(): BigDecimalRule {

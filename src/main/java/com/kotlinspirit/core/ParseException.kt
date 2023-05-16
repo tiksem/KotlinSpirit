@@ -1,7 +1,5 @@
 package com.kotlinspirit.core
 
-import com.kotlinspirit.debug.RuleDebugTreeNode
-
 class ParseException(
     private val result: Long,
     private val string: CharSequence

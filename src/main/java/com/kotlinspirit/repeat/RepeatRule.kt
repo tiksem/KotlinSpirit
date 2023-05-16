@@ -120,11 +120,21 @@ class RepeatRule<T : Any>(
         return rule.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
-    }
-
     override fun ignoreCallbacks(): RepeatRule<T> {
         return RepeatRule(rule.ignoreCallbacks(), range)
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return rule.getPrefixMaxLength() * (range.last - range.first).toLong().coerceAtMost(
+            MAX_PREFIX_LENGTH.toLong()
+        ).toInt()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return when (range.last - range.first) {
+            0 -> true
+            1 -> rule.isPrefixFixedLength()
+            else -> false
+        }
     }
 }

@@ -67,11 +67,19 @@ class SequenceRule(
         return a.isThreadSafe() && b.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return a.isDynamic() || b.isDynamic()
-    }
-
     override fun ignoreCallbacks(): Rule<CharSequence> {
         return SequenceRule(a.ignoreCallbacks(), b.ignoreCallbacks())
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return a.getPrefixMaxLength() + b.getPrefixMaxLength()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return a.isPrefixFixedLength() && b.isPrefixFixedLength()
+    }
+
+    override fun repeat(): Rule<List<CharSequence>> {
+        return super.repeat()
     }
 }

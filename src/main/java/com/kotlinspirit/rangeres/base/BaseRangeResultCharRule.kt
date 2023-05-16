@@ -3,8 +3,6 @@ package com.kotlinspirit.rangeres.base
 import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rule
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.core.RangeResultRuleCore
@@ -27,10 +25,6 @@ internal abstract class BaseRangeResultCharRule(
 
     override fun ignoreCallbacks(): Rule<Char> {
         return core.ignoreCallbacks()
-    }
-
-    override fun isDynamic(): Boolean {
-        return core.rule.isDynamic()
     }
 
     override val debugNameShouldBeWrapped: Boolean

@@ -44,10 +44,6 @@ class DynamicStringRule(
         return false
     }
 
-    override fun isDynamic(): Boolean {
-        return true
-    }
-
     override fun name(name: String): DynamicStringRule {
         return DynamicStringRule(stringProvider, name)
     }

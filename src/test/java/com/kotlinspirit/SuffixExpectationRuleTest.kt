@@ -3,14 +3,14 @@ package com.kotlinspirit
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.digit
 import com.kotlinspirit.core.Rules.int
-import com.kotlinspirit.core.expect
+import com.kotlinspirit.core.expectsSuffix
 import org.junit.Assert
 import org.junit.Test
 
-class ExpectationRuleTest {
+class SuffixExpectationRuleTest {
     @Test
     fun number() {
-        val rule = '0'.expect(!digit) or (char('1'..'9') + digit.repeat())
+        val rule = '0'.expectsSuffix(!digit) or (char('1'..'9') + digit.repeat())
         val parser = rule.compile()
         parser.matchOrThrow("0")
         parser.matchOrThrow("43434334")
@@ -21,7 +21,7 @@ class ExpectationRuleTest {
 
     @Test
     fun intButNotDouble() {
-        val rule = int.expect(!char('.'))
+        val rule = int.expectsSuffix(!char('.'))
         val parser = rule.compile()
         parser.matchOrThrow("0")
         parser.matchOrThrow("43434334")

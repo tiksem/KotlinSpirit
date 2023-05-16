@@ -3,8 +3,6 @@ package com.kotlinspirit.number
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 private inline fun getPowerOf10(exp: Int): Double {
@@ -500,7 +498,11 @@ class DoubleRule(name: String? = null) : RuleWithDefaultRepeat<Double>(name) {
         return true
     }
 
-    override fun isDynamic(): Boolean {
+    override fun getPrefixMaxLength(): Int {
+        return FloatRule.MAX_FLOAT_PREFIX_LENGTH
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
         return false
     }
 }

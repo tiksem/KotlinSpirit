@@ -3,8 +3,6 @@ package com.kotlinspirit.char
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.CharPredicateResultRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
@@ -171,10 +169,6 @@ open class CharPredicateRule : CharRule {
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-
-    override fun isDynamic(): Boolean {
-        return false
     }
 
     override fun name(name: String): Rule<Char> {

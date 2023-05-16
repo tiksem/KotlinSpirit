@@ -64,15 +64,15 @@ class OptionalRule<T : Any>(
         return rule.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
-    }
-
     override fun name(name: String): OptionalRule<T> {
         return OptionalRule(rule, name)
     }
 
     override fun ignoreCallbacks(): OptionalRule<T> {
         return OptionalRule(rule.ignoreCallbacks())
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return rule.getPrefixMaxLength()
     }
 }

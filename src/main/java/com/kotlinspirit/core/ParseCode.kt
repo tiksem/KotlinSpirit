@@ -25,12 +25,13 @@ object ParseCode {
     const val WHOLE_STRING_DOES_NOT_MATCH = 21
     const val ONE_OF_STRING_NOT_FOUND = 22
     const val FAIL_PREDICATE = 23
-    const val EXPECTATION_FAILED = 24
+    const val SUFFIX_EXPECTATION_FAILED = 24
     const val SPLIT_NOT_ENOUGH_DATA = 25
     const val INVALID_BIG_INTEGER = 26
     const val INVALID_BIG_DECIMAL = 27
     const val BIG_DECIMAL_EXPONENT_OVERFLOW = 28
     const val NO_EOF = 29
+    const val PREFIX_NOT_SATISFIED = 30
 }
 
 internal inline fun Int.isError(): Boolean {
@@ -86,9 +87,12 @@ internal inline fun Int.parseCodeToString(): String {
         ParseCode.WHOLE_STRING_DOES_NOT_MATCH -> "WHOLE_STRING_DOES_NOT_MATCH"
         ParseCode.ONE_OF_STRING_NOT_FOUND -> "ONE_OF_STRING_NOT_FOUND"
         ParseCode.FAIL_PREDICATE -> "FAIL_PREDICATE"
-        ParseCode.EXPECTATION_FAILED -> "EXPECTATION_FAILED"
+        ParseCode.SUFFIX_EXPECTATION_FAILED -> "SUFFIX_EXPECTATION_FAILED"
         ParseCode.INVALID_BIG_INTEGER -> "INVALID_BIG_INTEGER"
         ParseCode.INVALID_BIG_DECIMAL -> "INVALID_BIG_DECIMAL"
+        ParseCode.BIG_DECIMAL_EXPONENT_OVERFLOW -> "BIG_DECIMAL_EXPONENT_OVERFLOW"
+        ParseCode.NO_EOF -> "NO_EOF"
+        ParseCode.PREFIX_NOT_SATISFIED -> "PREFIX_NOT_SATISFIED"
         else -> "UNKNOWN"
     }
 }

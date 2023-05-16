@@ -98,11 +98,15 @@ class OneOrMoreRule<T : Any>(
         return rule.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
-    }
-
     override fun ignoreCallbacks(): OneOrMoreRule<T> {
         return OneOrMoreRule(rule.ignoreCallbacks(), name)
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return rule.getPrefixMaxLength()
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return rule.isPrefixFixedLength()
     }
 }

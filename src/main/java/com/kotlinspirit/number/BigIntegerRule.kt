@@ -3,8 +3,6 @@ package com.kotlinspirit.number
 import com.kotlinspirit.core.*
 import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.debug.DebugEngine
-import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import java.math.BigInteger
 
@@ -114,10 +112,6 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-
-    override fun isDynamic(): Boolean {
-        return false
     }
 
     override fun clone(): BigIntegerRule {

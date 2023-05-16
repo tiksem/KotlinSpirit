@@ -46,7 +46,7 @@ class DiffRuleTest {
     @Test
     fun wordsButNot2OreMoreNumbers() {
         val main = +(char - space) % space
-        val diff = ('0'.expect(!digit) or (char('1'..'9') + digit.repeat()))
+        val diff = ('0'.expectsSuffix(!digit) or (char('1'..'9') + digit.repeat()))
             .split(' ',2..Int.MAX_VALUE)
         val rule = +(main - diff)
 

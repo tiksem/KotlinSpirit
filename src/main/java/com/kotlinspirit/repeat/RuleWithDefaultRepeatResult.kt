@@ -66,10 +66,6 @@ open class RuleWithDefaultRepeatResult<T : Any>(
         return rule.isThreadSafe()
     }
 
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
-    }
-
     override fun ignoreCallbacks(): RuleWithDefaultRepeat<T> {
         return rule.ignoreCallbacks() as RuleWithDefaultRepeat<T>
     }
@@ -151,10 +147,6 @@ open class CharPredicateResultRule private constructor(
 
     override fun ignoreCallbacks(): CharPredicateRule {
         return rule.ignoreCallbacks() as CharPredicateRule
-    }
-
-    override fun isDynamic(): Boolean {
-        return rule.isDynamic()
     }
 
     override fun getRange(out: ParseRange): CharRule {

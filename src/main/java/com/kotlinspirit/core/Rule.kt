@@ -6,15 +6,12 @@ import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.char.ExactCharRule
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
-import com.kotlinspirit.ext.containsAny
-import com.kotlinspirit.ext.quoteIf
 import com.kotlinspirit.expressive.*
 import com.kotlinspirit.ext.quote
 import com.kotlinspirit.quoted.QuotedRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.str.ExactStringRule
-import java.lang.RuntimeException
 
 private val DEFAULT_STEP_RESULT = createStepResult(
     seek = 0,
@@ -256,8 +253,8 @@ abstract class Rule<T : Any>(name: String?) {
      * Matches this rule, only when the other rule goes after this rule
      * Sets the seek after this rule's match at the end of the parsing process
      */
-    fun expect(other: Rule<*>): ExpectationRule<T> {
-        return ExpectationRule(this, other)
+    fun expectsSuffix(other: Rule<*>): SuffixExpectationRule<T> {
+        return SuffixExpectationRule(this, other)
     }
 
     /**
@@ -265,8 +262,8 @@ abstract class Rule<T : Any>(name: String?) {
      * Matches this rule, only when the string goes after this rule
      * Sets the seek after this rule's match at the end of the parsing process
      */
-    fun expect(string: String): ExpectationRule<T> {
-        return ExpectationRule(this, str(string))
+    fun expectsSuffix(string: String): SuffixExpectationRule<T> {
+        return SuffixExpectationRule(this, str(string))
     }
 
     /**
@@ -274,8 +271,35 @@ abstract class Rule<T : Any>(name: String?) {
      * Matches this rule, only when the char goes after this rule
      * Sets the seek after this rule's match at the end of the parsing process
      */
-    fun expect(char: Char): ExpectationRule<T> {
-        return ExpectationRule(this, ExactCharRule(char))
+    fun expectsSuffix(char: Char): SuffixExpectationRule<T> {
+        return SuffixExpectationRule(this, ExactCharRule(char))
+    }
+
+    /**
+     * Returns a rule, that
+     * Matches this rule, only when the other rule goes before this rule
+     * Sets the seek after this rule's match at the end of the parsing process
+     */
+    fun requiresPrefix(other: Rule<*>): RequiresPrefixRule<T> {
+        return RequiresPrefixRule(prefixRule = other, bodyRule = this)
+    }
+
+    /**
+     * Returns a rule, that
+     * Matches this rule, only when the string goes before this rule
+     * Sets the seek after this rule's match at the end of the parsing process
+     */
+    fun requiresPrefix(string: String): RequiresPrefixRule<T> {
+        return RequiresPrefixRule(prefixRule = str(string), bodyRule = this)
+    }
+
+    /**
+     * Returns a rule, that
+     * Matches this rule, only when the char goes before this rule
+     * Sets the seek after this rule's match at the end of the parsing process
+     */
+    fun requiresPrefix(char: Char): RequiresPrefixRule<T> {
+        return RequiresPrefixRule(prefixRule = char(char), bodyRule = this)
     }
 
     /**
@@ -424,7 +448,12 @@ abstract class Rule<T : Any>(name: String?) {
     }
 
     abstract fun isThreadSafe(): Boolean
-    internal abstract fun isDynamic(): Boolean
+    internal open fun getPrefixMaxLength(): Int {
+        return MAX_PREFIX_LENGTH
+    }
+    internal open fun isPrefixFixedLength(): Boolean {
+        return false
+    }
 
     abstract fun name(name: String): Rule<T>
 
@@ -446,4 +475,8 @@ abstract class Rule<T : Any>(name: String?) {
     
     val debugName: String
         get() = name ?: defaultDebugName
+
+    companion object {
+        internal const val MAX_PREFIX_LENGTH = Int.MAX_VALUE / 2
+    }
 }

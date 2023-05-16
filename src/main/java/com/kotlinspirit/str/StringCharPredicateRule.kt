@@ -61,11 +61,15 @@ open class StringCharPredicateRule(
         return true
     }
 
-    override fun isDynamic(): Boolean {
-        return false
-    }
-
     override fun ignoreCallbacks(): StringCharPredicateRule {
         return this
+    }
+
+    override fun getPrefixMaxLength(): Int {
+        return 0
+    }
+
+    override fun isPrefixFixedLength(): Boolean {
+        return true
     }
 }
