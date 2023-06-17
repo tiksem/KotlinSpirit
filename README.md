@@ -3,8 +3,7 @@
 Lightweight library for creating parsers, inspired by C++ boost spirit library.
 
 # Introduction
-There are no good libraries or frameworks to parse text easily in Kotlin. Yeah, we have regular expressions. But they are hard to debug, hard to read, don't support 
-recursive expressions and they perform poorly. One time I got StackOverflow error easily while parsing a large text. So the idea was to create a simple library with compile-time 
+There are no good libraries or frameworks to parse text easily in Kotlin. Yeah, we have regular expressions. But they are hard to debug, hard to read, hard to reuse and they perform poorly. One time I got StackOverflow error easily while parsing a large text. So the idea was to create a simple library with compile-time 
 expressions checking.
 
 # Gradle installation
@@ -200,22 +199,6 @@ val quotedStr = (char - '"').repeat().quoted('"').compile()
 val result = quotedStr.parseGetResultOrThrow("\"Hello, world!\"")
 ```
 In the example `result` will be `Hello, world!`. But not `"Hello world!"`
-
-## Expectation rule
-The resultType of the rule is the same is the resultType of rule `a`
-
-`val exp = a.expect(b)` Matches rule `a`, only if rule `b` matches after rule `a`
-
-The rule is similar to `a + b`. However it has the resultType of rule `a` and it sets the seek to the end of `a` after parsing is finished.
-
-Let's consider we want to parse `int` followed by a string with 3 characters and this int cannot be decimal
-```Kotlin
-val exp = int.expect(!char('.')) + char.repeat(3..3)
-val parser = exp.compile()
-parser.matches("123abc") // true
-parser.matches("123.bc") // false
-parser.matches("123.34") // false
-```
 
 ## String wrapper rule
 Converts any rule to a rule with CharSequence result, reperesenting the match's substring.
