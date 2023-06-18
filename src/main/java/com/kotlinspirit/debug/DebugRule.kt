@@ -11,14 +11,14 @@ internal class DebugRule<T : Any>(
     private val engine: DebugEngine
 ) : Rule<T>(rule.debugName) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        engine.ruleParseStarted(rule = this, startSeek = seek)
+        engine.ruleParseStarted(rule = this, startSeek = seek, isReverse = false)
         return rule.parse(seek, string).also {
             engine.ruleParseEnded(rule = this, result = it)
         }
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        engine.ruleParseStarted(rule = this, startSeek = seek)
+        engine.ruleParseStarted(rule = this, startSeek = seek, isReverse = false)
         rule.parseWithResult(seek, string, result)
         engine.ruleParseEnded(rule = this, result = result.parseResult, data = result.data)
     }
@@ -27,7 +27,28 @@ internal class DebugRule<T : Any>(
         return rule.hasMatch(seek, string)
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        engine.ruleParseStarted(rule = this, startSeek = seek, isReverse = true)
+        return rule.reverseParse(seek, string).also {
+            engine.ruleParseEnded(rule = this, result = it)
+        }
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        engine.ruleParseStarted(rule = this, startSeek = seek, isReverse = true)
+        rule.reverseParseWithResult(seek, string, result)
+        engine.ruleParseEnded(rule = this, result = result.parseResult, data = result.data)
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return rule.reverseHasMatch(seek, string)
+    }
+
     override fun repeat(): Rule<*> {
+        throw UnsupportedOperationException("Method is not supported by DebugRule")
+    }
+
+    override fun repeat(count: Int): Rule<*> {
         throw UnsupportedOperationException("Method is not supported by DebugRule")
     }
 

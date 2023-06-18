@@ -5,30 +5,30 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class UIntRule(name: String? = null) : RuleWithDefaultRepeat<UInt>(name) {
+class UByteRule(name: String? = null) : RuleWithDefaultRepeat<UByte>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return UIntParsers.parse(
             seek = seek,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_UINT,
-            outOfBoundsParseCode = ParseCode.UINT_OUT_OF_BOUNDS,
+            invalidIntParseCode = ParseCode.INVALID_UBYTE,
+            outOfBoundsParseCode = ParseCode.UBYTE_OUT_OF_BOUNDS,
             checkOutOfBounds = { before, after ->
-                after > UInt.MAX_VALUE
+                after > UByte.MAX_VALUE
             }
         )
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<UInt>) {
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<UByte>) {
         UIntParsers.parseWithResult(
             seek = seek,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_UINT,
-            outOfBoundsParseCode = ParseCode.UINT_OUT_OF_BOUNDS,
+            invalidIntParseCode = ParseCode.INVALID_UBYTE,
+            outOfBoundsParseCode = ParseCode.UBYTE_OUT_OF_BOUNDS,
             checkOutOfBounds = { before, after ->
-                after > UInt.MAX_VALUE
+                after > UByte.MAX_VALUE
             }
         ) { value, parseResult ->
-            r.data = value?.toUInt()
+            r.data = value?.toUByte()
             r.parseResult = parseResult
         }
     }
@@ -41,25 +41,25 @@ class UIntRule(name: String? = null) : RuleWithDefaultRepeat<UInt>(name) {
         return UIntParsers.reverseParse(
             seek = seek,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_UINT,
-            outOfBoundsParseCode = ParseCode.UINT_OUT_OF_BOUNDS,
+            invalidIntParseCode = ParseCode.INVALID_UBYTE,
+            outOfBoundsParseCode = ParseCode.UBYTE_OUT_OF_BOUNDS,
             checkOutOfBounds = { before, after ->
-                after > UInt.MAX_VALUE
+                after > UByte.MAX_VALUE
             }
         )
     }
 
-    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<UInt>) {
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<UByte>) {
         UIntParsers.reverseParseWithResult(
             seek = seek,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_UINT,
-            outOfBoundsParseCode = ParseCode.UINT_OUT_OF_BOUNDS,
+            invalidIntParseCode = ParseCode.INVALID_UBYTE,
+            outOfBoundsParseCode = ParseCode.UBYTE_OUT_OF_BOUNDS,
             checkOutOfBounds = { before, after ->
-                after > UInt.MAX_VALUE
+                after > UByte.MAX_VALUE
             }
         ) { value, parseResult ->
-            result.data = value?.toUInt()
+            result.data = value?.toUByte()
             result.parseResult = parseResult
         }
     }
@@ -68,25 +68,25 @@ class UIntRule(name: String? = null) : RuleWithDefaultRepeat<UInt>(name) {
         return reverseParse(seek, string).getParseCode() == ParseCode.COMPLETE
     }
 
-    override fun clone(): UIntRule {
+    override fun clone(): UByteRule {
         return this
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun name(name: String): UIntRule {
-        return UIntRule(name)
+    override fun name(name: String): UByteRule {
+        return UByteRule(name)
     }
 
     override val defaultDebugName: String
-        get() = "uint"
+        get() = "ubyte"
 
     override fun isThreadSafe(): Boolean {
         return true
     }
 
-    override fun ignoreCallbacks(): UIntRule {
+    override fun ignoreCallbacks(): UByteRule {
         return this
     }
 }

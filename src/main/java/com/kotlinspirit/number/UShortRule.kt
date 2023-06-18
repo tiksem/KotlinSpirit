@@ -7,99 +7,65 @@ import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class UShortRule(name: String? = null) : RuleWithDefaultRepeat<UShort>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        val length = string.length
-        if (seek >= length) {
-            return createStepResult(
-                seek = seek,
-                parseCode = ParseCode.EOF
-            )
-        }
-
-        var i = seek
-        var result = 0.toUShort()
-        var successFlag = false
-        do {
-            val char = string[i++]
-            when {
-                char in '0'..'9' -> {
-                    val resultBefore = result
-                    successFlag = true
-                    result = (result * 10u).toUShort()
-                    result = (result + (char - '0').toUShort()).toUShort()
-                    // check int bounds
-                    if (result < resultBefore) {
-                        return createStepResult(
-                            seek = i,
-                            parseCode = ParseCode.USHORT_OUT_OF_BOUNDS
-                        )
-                    }
-                }
-                successFlag -> {
-                    return createComplete(i - 1)
-                }
-                else -> {
-                    return createStepResult(
-                        seek = i,
-                        parseCode = ParseCode.INVALID_USHORT
-                    )
-                }
+        return UIntParsers.parse(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_USHORT,
+            outOfBoundsParseCode = ParseCode.USHORT_OUT_OF_BOUNDS,
+            checkOutOfBounds = { before, after ->
+                after > UShort.MAX_VALUE
             }
-        } while (i < length)
-
-        return createComplete(i)
+        )
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<UShort>) {
-        val length = string.length
-        if (seek >= length) {
-            r.parseResult = createStepResult(
-                seek = seek,
-                parseCode = ParseCode.EOF
-            )
-            return
-        }
-
-        var i = seek
-        var result = 0.toUShort()
-        var successFlag = false
-        do {
-            val char = string[i++]
-            when {
-                char in '0'..'9' -> {
-                    val resultBefore = result
-                    successFlag = true
-                    result = (result * 10u).toUShort()
-                    result = (result + (char - '0').toUShort()).toUShort()
-                    // check int bounds
-                    if (result < resultBefore) {
-                        r.parseResult = createStepResult(
-                            seek = i,
-                            parseCode = ParseCode.USHORT_OUT_OF_BOUNDS
-                        )
-                        return
-                    }
-                }
-                successFlag -> {
-                    r.data = result
-                    r.parseResult = createComplete(i - 1)
-                    return
-                }
-                else -> {
-                    r.parseResult = createStepResult(
-                        seek = i,
-                        parseCode = ParseCode.INVALID_USHORT
-                    )
-                    return
-                }
+        UIntParsers.parseWithResult(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_USHORT,
+            outOfBoundsParseCode = ParseCode.USHORT_OUT_OF_BOUNDS,
+            checkOutOfBounds = { before, after ->
+                after > UShort.MAX_VALUE
             }
-        } while (i < length)
-
-        r.parseResult = createComplete(i)
-        r.data = result
+        ) { value, parseResult ->
+            r.data = value?.toUShort()
+            r.parseResult = parseResult
+        }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return parse(seek, string).getParseCode() == ParseCode.COMPLETE
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return UIntParsers.reverseParse(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_USHORT,
+            outOfBoundsParseCode = ParseCode.USHORT_OUT_OF_BOUNDS,
+            checkOutOfBounds = { before, after ->
+                after > UShort.MAX_VALUE
+            }
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<UShort>) {
+        UIntParsers.reverseParseWithResult(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_USHORT,
+            outOfBoundsParseCode = ParseCode.USHORT_OUT_OF_BOUNDS,
+            checkOutOfBounds = { before, after ->
+                after > UShort.MAX_VALUE
+            }
+        ) { value, parseResult ->
+            result.data = value?.toUShort()
+            result.parseResult = parseResult
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return reverseParse(seek, string).getParseCode() == ParseCode.COMPLETE
     }
 
     override fun clone(): UShortRule {
@@ -122,13 +88,5 @@ class UShortRule(name: String? = null) : RuleWithDefaultRepeat<UShort>(name) {
 
     override fun ignoreCallbacks(): UShortRule {
         return this
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return 1
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return true
     }
 }

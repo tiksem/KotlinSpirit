@@ -13,58 +13,21 @@ class RequiresPrefixRule<T : Any>(
     private val bodyRule: Rule<T>,
     name: String? = null
 ) : RuleWithDefaultRepeat<T>(name) {
-    override fun clone(): RequiresPrefixRule<T> {
-        return RequiresPrefixRule(prefixRule.clone(), bodyRule.clone(), name)
-    }
-
-    private fun checkPrefix(seek: Int, string: CharSequence): Boolean {
-        if (prefixRule.isPrefixFixedLength()) {
-            val length = prefixRule.getPrefixMaxLength()
-            val prefixSearchBeginSeek = seek - length
-            return prefixSearchBeginSeek >= 0 && prefixRule.hasMatch(prefixSearchBeginSeek, string)
-        }
-
-        var prefixSearchBeginSeek = seek - prefixRule.getPrefixMaxLength()
-        if (prefixSearchBeginSeek < 0) {
-            prefixSearchBeginSeek = 0
-        }
-
-        var i = seek
-        do {
-            val prefixParseResult = prefixRule.parse(i, string)
-            if (prefixParseResult.getParseCode().isNotError()) {
-                if (prefixParseResult.getSeek() == seek) {
-                    return true
-                }
-            }
-            i--
-        } while (i >= prefixSearchBeginSeek)
-
-        return false
-    }
-
     override fun parse(seek: Int, string: CharSequence): Long {
-        val bodyResult = bodyRule.parse(seek, string)
-        if (bodyResult.getParseCode().isError()) {
-            return bodyResult
+        val bodyParseResult = bodyRule.parse(seek, string)
+        if (bodyParseResult.getParseCode().isError()) {
+            return bodyParseResult
         }
 
-        return if (checkPrefix(seek, string)) {
-            bodyResult
-        } else {
-            createStepResult(
-                seek = seek,
-                parseCode = ParseCode.PREFIX_NOT_SATISFIED
-            )
-        }
-    }
-
-    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        if (!bodyRule.hasMatch(seek, string)) {
-            return false
+        val reverseParseResult = prefixRule.reverseParse(seek - 1, string)
+        if (reverseParseResult.getParseCode().isNotError()) {
+            return bodyParseResult
         }
 
-        return checkPrefix(seek, string)
+        return createStepResult(
+            seek = seek,
+            parseCode = ParseCode.PREFIX_NOT_SATISFIED + reverseParseResult.getParseCode()
+        )
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
@@ -73,13 +36,69 @@ class RequiresPrefixRule<T : Any>(
             return
         }
 
-        if (!checkPrefix(seek, string)) {
-            result.parseResult = createStepResult(
-                seek = seek,
-                parseCode = ParseCode.PREFIX_NOT_SATISFIED
-            )
-            result.data = null
+        val prefixParseResult = prefixRule.reverseParse(seek - 1, string)
+        if (prefixParseResult.getParseCode().isNotError()) {
+            return
         }
+
+        result.parseResult = createStepResult(
+            seek = seek,
+            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.getParseCode()
+        )
+        result.data = null
+    }
+
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        return bodyRule.hasMatch(seek, string) && prefixRule.reverseHasMatch(seek - 1, string)
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        val bodyParseResult = bodyRule.reverseParse(seek, string)
+        if (bodyParseResult.getParseCode().isError()) {
+            return bodyParseResult
+        }
+
+        val prefixParseResult = prefixRule.reverseParse(bodyParseResult.getSeek(), string)
+        if (prefixParseResult.getParseCode().isNotError()) {
+            return bodyParseResult
+        }
+
+        return createStepResult(
+            seek = seek,
+            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.getParseCode()
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        bodyRule.reverseParseWithResult(seek, string, result)
+        if (result.isError) {
+            return
+        }
+
+        val prefixParseResult = prefixRule.reverseParse(result.endSeek, string)
+        if (prefixParseResult.getParseCode().isNotError()) {
+            return
+        }
+
+        result.parseResult = createStepResult(
+            seek = seek,
+            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.getParseCode()
+        )
+        result.data = null
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return bodyRule.reverseParse(seek, string).let {
+            if (it.getParseCode().isError()) {
+                false
+            } else {
+                prefixRule.reverseHasMatch(seek = it.getSeek(), string = string)
+            }
+        }
+    }
+
+    override fun clone(): RequiresPrefixRule<T> {
+        return RequiresPrefixRule(prefixRule.clone(), bodyRule.clone(), name)
     }
 
     override fun ignoreCallbacks(): RequiresPrefixRule<T> {
@@ -108,5 +127,5 @@ class RequiresPrefixRule<T : Any>(
     override val debugNameShouldBeWrapped: Boolean
         get() = false
     override val defaultDebugName: String
-        get() = "${bodyRule.wrappedName}.withPrefix(${prefixRule.wrappedName})"
+        get() = "${bodyRule.wrappedName}.requiresPrefix(${prefixRule.wrappedName})"
 }

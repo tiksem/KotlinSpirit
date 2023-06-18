@@ -10,8 +10,8 @@ import com.kotlinspirit.number.*
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.str.EmptyStringRule
 import com.kotlinspirit.str.ExactStringRule
+import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
-import com.kotlinspirit.str.StringOneOrMoreCharPredicateRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
 
 object Rules {
@@ -27,6 +27,8 @@ object Rules {
     val ushort = UShortRule()
     val bigint = BigIntegerRule()
     val bigDecimal = BigDecimalRule()
+    val byte = ByteRule()
+    val ubyte = UByteRule()
 
     val char = AnyCharRule()
     val digit = char('0'..'9')
@@ -63,23 +65,26 @@ object Rules {
         return CharPredicateRule(predicate)
     }
 
-    fun nonEmptyStr(vararg chars: Char): StringOneOrMoreCharPredicateRule {
-        return StringOneOrMoreCharPredicateRule(
-            CharPredicates.from(*chars)
+    fun nonEmptyStr(vararg chars: Char): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(
+            CharPredicates.from(*chars),
+            range = 1..Int.MAX_VALUE
         )
     }
 
-    fun nonEmptyStr(vararg range: CharRange): StringOneOrMoreCharPredicateRule {
-        return StringOneOrMoreCharPredicateRule(
-            CharPredicates.from(*range)
+    fun nonEmptyStr(vararg range: CharRange): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(
+            CharPredicates.from(*range),
+            range = 1..Int.MAX_VALUE
         )
     }
 
-    fun nonEmptyStr(chars: CharArray, ranges: Array<CharRange>): StringOneOrMoreCharPredicateRule {
-        return StringOneOrMoreCharPredicateRule(
+    fun nonEmptyStr(chars: CharArray, ranges: Array<CharRange>): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(
             CharPredicates.from(
                 ranges, chars
-            )
+            ),
+            range = 1..Int.MAX_VALUE
         )
     }
 

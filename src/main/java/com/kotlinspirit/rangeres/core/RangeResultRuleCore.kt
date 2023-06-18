@@ -8,10 +8,17 @@ internal abstract class RangeResultRuleCore<T : Any>(
 ) {
     internal abstract fun parse(seek: Int, string: CharSequence): Long
     internal abstract fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
+    internal abstract fun reverseParse(seek: Int, string: CharSequence): Long
+    internal abstract fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
+
     abstract val debugName: String
 
     fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return rule.hasMatch(seek, string)
+    }
+
+    fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return rule.reverseHasMatch(seek, string)
     }
 
     fun ignoreCallbacks(): Rule<T> {

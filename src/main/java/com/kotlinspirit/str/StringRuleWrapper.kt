@@ -30,7 +30,27 @@ class StringRuleWrapper(
         result.parseResult = parseResult
         if (parseResult.getParseCode().isNotError()) {
             result.data = string.subSequence(seek, parseResult.getSeek())
+        } else {
+            result.data = null
         }
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return rule.reverseParse(seek, string)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
+        val parseResult = rule.reverseParse(seek, string)
+        result.parseResult = parseResult
+        if (parseResult.getParseCode().isNotError()) {
+            result.data = string.subSequence(parseResult.getSeek() + 1, seek + 1)
+        } else {
+            result.data = null
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return rule.reverseHasMatch(seek, string)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -64,13 +84,5 @@ class StringRuleWrapper(
 
     override fun ignoreCallbacks(): StringRuleWrapper {
         return StringRuleWrapper(rule.ignoreCallbacks())
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return rule.getPrefixMaxLength()
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return rule.isPrefixFixedLength()
     }
 }

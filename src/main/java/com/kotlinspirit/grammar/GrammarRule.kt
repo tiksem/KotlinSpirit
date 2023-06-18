@@ -31,19 +31,24 @@ open class GrammarRule<T : Any>(
         stackSeek--
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    private inline fun baseParse(seek: Int, string: CharSequence, parser: Rule<*>.(Int, CharSequence) -> Long): Long {
         val grammar = pullGrammar()
         try {
-            return grammar.initRule().parse(seek, string)
+            return grammar.initRule().parser(seek, string)
         } finally {
             returnGrammar(grammar)
         }
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+    private inline fun baseParseWithResult(
+        seek: Int,
+        string: CharSequence,
+        result: ParseResult<T>,
+        parser: Rule<*>.(Int, CharSequence) -> Long
+    ) {
         val grammar = pullGrammar()
         try {
-            val parseResult = grammar.initRule().parse(seek, string)
+            val parseResult = grammar.initRule().parser(seek, string)
             result.parseResult = parseResult
             if (parseResult.getParseCode().isNotError()) {
                 result.data = grammar.result
@@ -51,6 +56,36 @@ open class GrammarRule<T : Any>(
         } finally {
             returnGrammar(grammar)
         }
+    }
+
+    override fun parse(seek: Int, string: CharSequence): Long {
+        return baseParse(seek, string, Rule<*>::parse)
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        baseParseWithResult(
+            seek = seek,
+            string = string,
+            result = result,
+            parser = Rule<*>::parse
+        )
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return baseParse(seek, string, Rule<*>::reverseParse)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        baseParseWithResult(
+            seek = seek,
+            string = string,
+            result = result,
+            parser = Rule<*>::reverseParse
+        )
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        TODO("Not yet implemented")
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {

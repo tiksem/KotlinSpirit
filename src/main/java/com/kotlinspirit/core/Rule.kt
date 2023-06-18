@@ -72,6 +72,10 @@ abstract class Rule<T : Any>(name: String?) {
     internal abstract fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
     internal abstract fun hasMatch(seek: Int, string: CharSequence): Boolean
 
+    internal abstract fun reverseParse(seek: Int, string: CharSequence): Long
+    internal abstract fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
+    internal abstract fun reverseHasMatch(seek: Int, string: CharSequence): Boolean
+
     internal inline fun findFirstSuccessfulSeek(string: CharSequence, callback: (Int, Int) -> Unit): Boolean {
         var seek = 0
         val length = string.length
@@ -315,6 +319,11 @@ abstract class Rule<T : Any>(name: String?) {
     abstract fun repeat(range: IntRange): Rule<*>
     /**
      * Returns a rule, that
+     * Matches this rule count times
+     */
+    abstract fun repeat(count: Int): Rule<*>
+    /**
+     * Returns a rule, that
      * Matches this rule 1 or more times
      */
     abstract operator fun unaryPlus(): Rule<*>
@@ -448,12 +457,6 @@ abstract class Rule<T : Any>(name: String?) {
     }
 
     abstract fun isThreadSafe(): Boolean
-    internal open fun getPrefixMaxLength(): Int {
-        return MAX_PREFIX_LENGTH
-    }
-    internal open fun isPrefixFixedLength(): Boolean {
-        return false
-    }
 
     abstract fun name(name: String): Rule<T>
 

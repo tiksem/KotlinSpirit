@@ -10,41 +10,77 @@ class FailIfRule<T : Any>(
     private val failPredicate: (T) -> Boolean,
     name: String? = null
 ) : RuleWithDefaultRepeat<T>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        val result = ParseResult<T>()
-        rule.parseWithResult(seek, string, result)
-        if (result.isError) {
-            return result.parseResult
-        }
-
-        val data = result.data ?: throw IllegalStateException("rule produces null, without error")
-        if (failPredicate(data)) {
-            return createStepResult(
-                seek = seek,
-                parseCode = ParseCode.FAIL_PREDICATE
-            )
-        }
-
-        return result.parseResult
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
-        rule.parseWithResult(seek, string, result)
+    private inline fun baseParse(
+        seek: Int,
+        result: ParseResult<T>,
+        doParseWithResult: (ParseResult<T>) -> Unit
+    ) {
+        doParseWithResult(result)
         if (result.isError) {
             return
         }
 
         val data = result.data ?: throw IllegalStateException("rule produces null, without error")
         if (failPredicate(data)) {
-             result.parseResult = createStepResult(
+            result.data = null
+            result.parseResult = createStepResult(
                 seek = seek,
                 parseCode = ParseCode.FAIL_PREDICATE
             )
+            return
         }
+    }
+
+    override fun parse(seek: Int, string: CharSequence): Long {
+        val result = ParseResult<T>()
+        baseParse(
+            seek = seek,
+            result = result,
+            doParseWithResult = {
+                rule.parseWithResult(seek, string, it)
+            }
+        )
+        return result.parseResult
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        baseParse(
+            seek = seek,
+            result = result,
+            doParseWithResult = {
+                rule.parseWithResult(seek, string, it)
+            }
+        )
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return parse(seek, string).getParseCode().isNotError()
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        val result = ParseResult<T>()
+        baseParse(
+            seek = seek,
+            result = result,
+            doParseWithResult = {
+                rule.reverseParseWithResult(seek, string, it)
+            }
+        )
+        return result.parseResult
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        baseParse(
+            seek = seek,
+            result = result,
+            doParseWithResult = {
+                rule.reverseParseWithResult(seek, string, it)
+            }
+        )
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return reverseParse(seek, string).getParseCode().isNotError()
     }
 
     override fun failIf(predicate: (T) -> Boolean): FailIfRule<T> {
@@ -80,9 +116,5 @@ class FailIfRule<T : Any>(
 
     override fun ignoreCallbacks(): FailIfRule<T> {
         return FailIfRule(rule.ignoreCallbacks(), failPredicate)
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return rule.getPrefixMaxLength()
     }
 }

@@ -41,6 +41,18 @@ class LazyRule<T : Any> internal constructor(
         return initRule().hasMatch(seek, string)
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return initRule().reverseParse(seek, string)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        initRule().reverseParseWithResult(seek, string, result)
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return initRule().reverseHasMatch(seek, string)
+    }
+
     override fun isThreadSafe(): Boolean {
         return false
     }

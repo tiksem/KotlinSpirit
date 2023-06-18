@@ -24,6 +24,18 @@ internal abstract class BaseRangeResultDefaultRepeatRule<T : Any> internal const
         return core.hasMatch(seek, string)
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return core.reverseParse(seek, string)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        core.reverseParseWithResult(seek, string, result)
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        TODO("Not yet implemented")
+    }
+
     override fun ignoreCallbacks(): Rule<T> {
         return core.ignoreCallbacks()
     }
@@ -36,14 +48,6 @@ internal abstract class BaseRangeResultDefaultRepeatRule<T : Any> internal const
 
     override fun isThreadSafe(): Boolean {
         return false
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return core.rule.getPrefixMaxLength()
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return core.rule.isPrefixFixedLength()
     }
 
     override fun getRange(out: ParseRange): RangeResultRuleDefaultRepeat<T> {

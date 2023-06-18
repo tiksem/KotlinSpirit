@@ -29,6 +29,7 @@ class QuotedRule<T : Any>(
         val l = left.parse(seek, string)
         if (l.getParseCode().isError()) {
             result.parseResult = l
+            result.data = null
             return
         }
         main.parseWithResult(l.getSeek(), string, result)
@@ -39,8 +40,6 @@ class QuotedRule<T : Any>(
         result.parseResult = r
         if (r.getParseCode().isError()) {
             result.data = null
-        } else {
-            result.parseResult
         }
     }
 
@@ -54,6 +53,48 @@ class QuotedRule<T : Any>(
             return false
         }
         return right.hasMatch(m.getSeek(), string)
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        val r = right.reverseParse(seek, string)
+        if (r.getParseCode().isError()) {
+            return r
+        }
+        val m = main.reverseParse(r.getSeek(), string)
+        if (m.getParseCode().isError()) {
+            return m
+        }
+        return left.reverseParse(m.getSeek(), string)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        val r = right.reverseParse(seek, string)
+        if (r.getParseCode().isError()) {
+            result.parseResult = r
+            result.data = null
+            return
+        }
+        main.reverseParseWithResult(r.getSeek(), string, result)
+        if (result.isError) {
+            return
+        }
+        val l = left.reverseParse(result.endSeek, string)
+        result.parseResult = l
+        if (r.getParseCode().isError()) {
+            result.data = null
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        val r = right.reverseParse(seek, string)
+        if (r.getParseCode().isError()) {
+            return false
+        }
+        val m = main.reverseParse(r.getSeek(), string)
+        if (m.getParseCode().isError()) {
+            return false
+        }
+        return left.reverseHasMatch(m.getSeek(), string)
     }
 
     override fun ignoreCallbacks(): QuotedRule<T> {
@@ -84,16 +125,4 @@ class QuotedRule<T : Any>(
 
     override val defaultDebugName: String
         get() = "${main.wrappedName}.quoted(${left.debugName}, ${right.debugName})"
-
-    override fun getPrefixMaxLength(): Int {
-        return (
-                left.getPrefixMaxLength().toLong() +
-                        right.getPrefixMaxLength() +
-                        main.getPrefixMaxLength()
-                ).coerceAtMost(MAX_PREFIX_LENGTH.toLong()).toInt()
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return left.isPrefixFixedLength() && right.isPrefixFixedLength() && main.isPrefixFixedLength()
-    }
 }

@@ -18,7 +18,6 @@ import com.kotlinspirit.rangeres.simple.RangeResultCharRule
 import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
 import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
-import com.kotlinspirit.str.StringOneOrMoreCharPredicateRule
 
 open class RuleWithDefaultRepeatResult<T : Any>(
     rule: Rule<T>,
@@ -31,6 +30,10 @@ open class RuleWithDefaultRepeatResult<T : Any>(
 
     override fun repeat(range: IntRange): Rule<List<T>> {
         return rule.repeat(range) as Rule<List<T>>
+    }
+
+    override fun repeat(count: Int): Rule<*> {
+        return rule.repeat(count)
     }
 
     override fun unaryPlus(): Rule<List<T>> {
@@ -107,7 +110,11 @@ open class CharPredicateResultRule private constructor(
         return (rule as CharPredicateRule).repeat(range)
     }
 
-    override fun unaryPlus(): StringOneOrMoreCharPredicateRule {
+    override fun repeat(count: Int): StringCharPredicateRangeRule {
+        return (rule as CharPredicateRule).repeat(count)
+    }
+
+    override fun unaryPlus(): StringCharPredicateRangeRule {
         return +(rule as CharPredicateRule)
     }
 

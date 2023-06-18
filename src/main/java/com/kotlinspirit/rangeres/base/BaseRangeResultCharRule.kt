@@ -23,6 +23,18 @@ internal abstract class BaseRangeResultCharRule(
         return core.hasMatch(seek, string)
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return core.reverseParse(seek, string)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        core.reverseParseWithResult(seek, string, result)
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return core.reverseHasMatch(seek, string)
+    }
+
     override fun ignoreCallbacks(): Rule<Char> {
         return core.ignoreCallbacks()
     }

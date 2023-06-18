@@ -9,14 +9,12 @@ import com.kotlinspirit.str.ExactStringRule
 class OneOfStringRule internal constructor(private val strings: List<CharSequence>, name: String? = null) :
     RuleWithDefaultRepeat<CharSequence>(name) {
 
-    private var tree: TernarySearchTree
-
-    init {
-        tree = TernarySearchTree(strings)
-    }
-
-    internal constructor(strings: List<CharSequence>, tree: TernarySearchTree, name: String? = null) : this(strings, name) {
-        this.tree = tree
+    private val tree = TernarySearchTree(strings)
+    // Reverse search is rarely used, that's why make it lazy to perform reversed search on when it's needed
+    private val reversedTree by lazy(lock = this) {
+        TernarySearchTree(strings.map {
+            it.reversed()
+        })
     }
 
     override fun parse(seek: Int, string: CharSequence): Long {
@@ -58,6 +56,42 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
         return tree.hasMatch(seek, string)
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        val result = reversedTree.reverseParse(seek, string)
+        return if (result >= -1) {
+            createStepResult(
+                seek = result,
+                parseCode = ParseCode.COMPLETE
+            )
+        } else {
+            createStepResult(
+                seek = seek,
+                parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
+            )
+        }
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
+        val r = reversedTree.reverseParse(seek, string)
+        if (r >= -1) {
+            result.parseResult = createStepResult(
+                seek = r,
+                parseCode = ParseCode.COMPLETE
+            )
+            result.data = string.subSequence(r + 1, seek + 1)
+        } else {
+            result.parseResult = createStepResult(
+                seek = seek,
+                parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
+            )
+            result.data = null
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return reversedTree.reverseHasMatch(seek, string)
+    }
+
     override infix fun or(string: String): OneOfStringRule {
         return OneOfStringRule(listOf(string) + strings)
     }
@@ -89,7 +123,7 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
         }
 
     override fun isThreadSafe(): Boolean {
-        return false
+        return true
     }
 
     override fun ignoreCallbacks(): OneOfStringRule {

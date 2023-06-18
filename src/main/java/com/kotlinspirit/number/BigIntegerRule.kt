@@ -8,53 +8,13 @@ import java.math.BigInteger
 
 open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteger>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        val length = string.length
-        if (seek >= length) {
-            return createStepResult(
-                seek = seek,
-                parseCode = ParseCode.EOF
-            )
-        }
-
-        var i = 0
-        when (string[i]) {
-            in '0'..'9' -> {
-                i++
-            }
-            '+', '-' -> {
-                i++
-                if (i >= length) {
-                    return createStepResult(
-                        seek = seek,
-                        parseCode = ParseCode.INVALID_BIG_INTEGER
-                    )
-                }
-
-                when (string[i]) {
-                    in '0'..'9' -> {
-                        i++
-                    }
-                    else -> {
-                        return createStepResult(
-                            seek = seek,
-                            parseCode = ParseCode.INVALID_BIG_INTEGER
-                        )
-                    }
-                }
-            }
-            else -> {
-                return createStepResult(
-                    seek = seek,
-                    parseCode = ParseCode.INVALID_BIG_INTEGER
-                )
-            }
-        }
-
-        while (i < length && string[i] in '0'..'9' ) {
-            i++
-        }
-
-        return createComplete(i)
+        return IntParsers.parse(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_BIG_INTEGER,
+            outOfBoundsParseCode = -1, // Not used
+            checkOutOfBounds = { false }
+        )
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigInteger>) {
@@ -74,10 +34,7 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
         }
 
         return when (string[seek]) {
-            '0' -> {
-                seek == length - 1 || string[seek + 1] !in '0'..'9'
-            }
-            in '1'..'9' -> {
+            in '0'..'9' -> {
                true
             }
             '+', '-' -> {
@@ -94,6 +51,30 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
             }
             else -> false
         }
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return IntParsers.reverseParse(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_BIG_INTEGER,
+            outOfBoundsParseCode = -1, // Not used
+            checkOutOfBounds = { false }
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigInteger>) {
+        val res = reverseParse(seek, string)
+        result.parseResult = res
+        if (res.getParseCode().isError()) {
+            result.data = null
+        } else {
+            result.data = BigInteger(string.substring(res.getSeek() + 1, seek + 1))
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return seek >= 0 && string[seek].isDigit()
     }
 
     override fun ignoreCallbacks(): BigIntegerRule {

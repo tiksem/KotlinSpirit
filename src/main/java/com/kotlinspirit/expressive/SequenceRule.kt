@@ -30,6 +30,8 @@ class SequenceRule(
         result.parseResult = parseResult
         if (parseResult.getParseCode().isNotError()) {
             result.data = string.subSequence(seek, parseResult.getSeek())
+        } else {
+            result.data = null
         }
     }
 
@@ -39,6 +41,34 @@ class SequenceRule(
             false
         } else {
             b.hasMatch(aResult.getSeek(), string)
+        }
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        val bResult = b.reverseParse(seek, string)
+        if (bResult.getParseCode().isError()) {
+            return bResult
+        }
+
+        return a.reverseParse(bResult.getSeek(), string)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
+        val parseResult = reverseParse(seek, string)
+        result.parseResult = parseResult
+        if (parseResult.getParseCode().isNotError()) {
+            result.data = string.subSequence(parseResult.getSeek() + 1, seek)
+        } else {
+            result.data = null
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        val bResult = b.reverseParse(seek, string)
+        return if (bResult.getParseCode().isError()) {
+            false
+        } else {
+            a.reverseHasMatch(bResult.getSeek(), string)
         }
     }
 
@@ -69,14 +99,6 @@ class SequenceRule(
 
     override fun ignoreCallbacks(): Rule<CharSequence> {
         return SequenceRule(a.ignoreCallbacks(), b.ignoreCallbacks())
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return a.getPrefixMaxLength() + b.getPrefixMaxLength()
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return a.isPrefixFixedLength() && b.isPrefixFixedLength()
     }
 
     override fun repeat(): Rule<List<CharSequence>> {

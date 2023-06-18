@@ -14,7 +14,8 @@ private const val DEBUG_MAX_TOKEN_LENGTH = 20
 
 class RuleDebugTreeNode(
     val rule: Rule<*>,
-    val string: CharSequence
+    val string: CharSequence,
+    val isReverse: Boolean
 ) {
     val name: String
         get() = (rule as? DebugRule)?.name ?: throw RuntimeException()
@@ -50,6 +51,7 @@ class RuleDebugTreeNode(
             }
             it.put("start", startSeek)
             it.put("end", endSeek)
+            it.put("isReverse", isReverse)
             if (children.isNotEmpty()) {
                 val arr = JSONArray().apply {
                     children.forEach { child ->
@@ -80,8 +82,8 @@ internal class DebugEngine {
         seek = null
     }
 
-    fun ruleParseStarted(rule: Rule<*>, startSeek: Int) {
-        val node = RuleDebugTreeNode(rule, string).also {
+    fun ruleParseStarted(rule: Rule<*>, startSeek: Int, isReverse: Boolean) {
+        val node = RuleDebugTreeNode(rule, string, isReverse).also {
             it.startSeek = startSeek
         }
         if (seek == null) {

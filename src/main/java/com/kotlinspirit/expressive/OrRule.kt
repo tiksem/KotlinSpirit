@@ -6,9 +6,8 @@ import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.core.isError
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
+import com.kotlinspirit.repeat.RepeatRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import com.kotlinspirit.repeat.ZeroOrMoreRule
-import kotlin.math.max
 
 open class OrRule<T : Any>(
     protected val a: Rule<T>,
@@ -38,8 +37,28 @@ open class OrRule<T : Any>(
         return a.hasMatch(seek, string) || b.hasMatch(seek, string)
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        val aResult = a.reverseParse(seek, string)
+        return if (aResult.getParseCode().isError()) {
+            b.reverseParse(seek, string)
+        } else {
+            aResult
+        }
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        a.reverseParseWithResult(seek, string, result)
+        if (result.parseResult.getParseCode().isError()) {
+            b.reverseParseWithResult(seek, string, result)
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return a.reverseHasMatch(seek, string) || b.reverseHasMatch(seek, string)
+    }
+
     override fun repeat(): Rule<List<T>> {
-        return ZeroOrMoreRule(this)
+        return RepeatRule(this, range = 0..Int.MAX_VALUE)
     }
 
     override fun clone(): OrRule<T> {
@@ -73,14 +92,6 @@ open class OrRule<T : Any>(
 
     override fun ignoreCallbacks(): OrRule<T> {
         return OrRule(a.ignoreCallbacks(), b.ignoreCallbacks(), name)
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return max(a.getPrefixMaxLength(), b.getPrefixMaxLength())
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return a.isPrefixFixedLength() && b.isPrefixFixedLength() && a.getPrefixMaxLength() == b.getPrefixMaxLength()
     }
 }
 

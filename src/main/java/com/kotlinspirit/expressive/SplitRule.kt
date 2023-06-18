@@ -20,13 +20,17 @@ class SplitRule<T : Any>(
         }
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    private inline fun baseParse(
+        seek: Int,
+        string: CharSequence,
+        parser: (rule: Rule<*>, seek: Int, string: CharSequence) -> Long
+    ): Long {
         var numberOfSplitItems = 0
         val max = range.last
         var i = seek
         var seekAfterRule = i
         while (numberOfSplitItems < max) {
-            val res = r.parse(i, string)
+            val res = parser(r, i, string)
             if (res.getParseCode().isError()) {
                 i = seekAfterRule
                 break
@@ -34,7 +38,7 @@ class SplitRule<T : Any>(
             seekAfterRule = res.getSeek()
             numberOfSplitItems++
 
-            val dividerRes = divider.parse(seekAfterRule, string)
+            val dividerRes = parser(divider, seekAfterRule, string)
             if (dividerRes.getParseCode().isError()) {
                 i = seekAfterRule
                 break
@@ -52,46 +56,20 @@ class SplitRule<T : Any>(
         }
     }
 
-    private fun parseSaveSeekOnError(seek: Int, string: CharSequence): Long {
-        var numberOfSplitItems = 0
-        val max = range.last
-        var i = seek
-        var seekAfterRule = i
-        while (numberOfSplitItems < max) {
-            val res = r.parse(i, string)
-            if (res.getParseCode().isError()) {
-                i = seekAfterRule
-                break
-            }
-            seekAfterRule = res.getSeek()
-            numberOfSplitItems++
-
-            val dividerRes = divider.parse(seekAfterRule, string)
-            if (dividerRes.getParseCode().isError()) {
-                i = seekAfterRule
-                break
-            }
-            i = dividerRes.getSeek()
-        }
-
-        return if (numberOfSplitItems < range.first) {
-            createStepResult(
-                seek = seekAfterRule,
-                parseCode = ParseCode.SPLIT_NOT_ENOUGH_DATA
-            )
-        } else {
-            createComplete(seek = i)
-        }
-    }
-
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
+    private inline fun baseParseWithResult(
+        seek: Int,
+        string: CharSequence,
+        result: ParseResult<List<T>>,
+        parser: (rule: Rule<*>, seek: Int, string: CharSequence) -> Long,
+        parserWithResult: (rule: Rule<T>, seek: Int, string: CharSequence, result: ParseResult<T>) -> Unit
+    ) {
         val list = ArrayList<T>()
         val max = range.last
         var i = seek
         var seekAfterRule = i
         val itemResult = ParseResult<T>()
         while (list.size < max) {
-            r.parseWithResult(i, string, itemResult)
+            parserWithResult(r, i, string, itemResult)
             if (itemResult.isError) {
                 i = seekAfterRule
                 break
@@ -99,7 +77,7 @@ class SplitRule<T : Any>(
             seekAfterRule = itemResult.endSeek
             list.add(itemResult.data ?: throw IllegalStateException("item result should not be null"))
 
-            val dividerRes = divider.parse(seekAfterRule, string)
+            val dividerRes = parser(divider, seekAfterRule, string)
             if (dividerRes.getParseCode().isError()) {
                 i = seekAfterRule
                 break
@@ -118,8 +96,68 @@ class SplitRule<T : Any>(
         }
     }
 
+    override fun parse(seek: Int, string: CharSequence): Long {
+        return baseParse(
+            seek = seek,
+            string = string,
+            parser = { rule, s, str ->
+                rule.parse(s, str)
+            }
+        )
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
+        baseParseWithResult(
+            seek = seek,
+            string = string,
+            result = result,
+            parser = { rule, s, str ->
+                rule.parse(s, str)
+            },
+            parserWithResult = { rule, s, str, r ->
+                rule.parseWithResult(
+                    seek = s,
+                    string = string,
+                    result = r
+                )
+            }
+        )
+    }
+
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return parse(seek, string).getParseCode().isNotError()
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return baseParse(
+            seek = seek,
+            string = string,
+            parser = { rule, s, str ->
+                rule.reverseParse(s, str)
+            }
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
+        baseParseWithResult(
+            seek = seek,
+            string = string,
+            result = result,
+            parser = { rule, s, str ->
+                rule.reverseParse(s, str)
+            },
+            parserWithResult = { rule, s, str, r ->
+                rule.reverseParseWithResult(
+                    seek = s,
+                    string = string,
+                    result = r
+                )
+            }
+        )
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return reverseParse(seek, string).getParseCode().isNotError()
     }
 
     override fun ignoreCallbacks(): SplitRule<T> {
@@ -145,25 +183,6 @@ class SplitRule<T : Any>(
 
     override fun isThreadSafe(): Boolean {
         return r.isThreadSafe() && divider.isThreadSafe()
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        val rangeLength = range.last - range.first
-        var sum = r.getPrefixMaxLength() * rangeLength.toLong()
-        val dividersMaxCount = rangeLength - 1
-        if (dividersMaxCount >= 0) {
-            sum += divider.getPrefixMaxLength() * dividersMaxCount.toLong()
-        }
-
-        return sum.coerceAtMost(MAX_PREFIX_LENGTH.toLong()).toInt()
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return when (range.last - range.first) {
-            0 -> true
-            1 -> r.isPrefixFixedLength()
-            else -> false
-        }
     }
 
     override fun name(name: String): SplitRule<T> {

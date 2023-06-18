@@ -330,3 +330,41 @@ fun CharSequence.count(rule: Rule<*>): Int {
 
     return count
 }
+
+internal inline fun CharSequence.all(startIndex: Int, endIndex: Int, predicate: (Char) -> Boolean): Boolean {
+    var i = startIndex
+    while (i < endIndex) {
+        val c = this[i++]
+        if (!predicate(c)) {
+            return false
+        }
+    }
+
+    return true
+}
+
+internal inline fun CharSequence.moveSeekUntilDontMatch(startIndex: Int, endIndex: Int, predicate: (Char) -> Boolean): Int {
+    var i = startIndex
+    while (i < endIndex) {
+        val c = this[i]
+        if (!predicate(c)) {
+            return i
+        }
+        ++i
+    }
+
+    return i
+}
+
+internal inline fun CharSequence.moveSeekReverseUntilDontMatch(startIndex: Int, endIndex: Int, predicate: (Char) -> Boolean): Int {
+    var i = startIndex
+    while (i > endIndex) {
+        val c = this[i]
+        if (!predicate(c)) {
+            return i
+        }
+        --i
+    }
+
+    return i
+}

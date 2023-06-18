@@ -6,7 +6,6 @@ import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.repeat.CharPredicateResultRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
-import com.kotlinspirit.str.StringOneOrMoreCharPredicateRule
 
 open class CharPredicateRule : CharRule {
     internal val predicate: (Char) -> Boolean
@@ -79,6 +78,49 @@ open class CharPredicateRule : CharRule {
         return seek < string.length && predicate(string[seek])
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        if (seek < 0) {
+            return createStepResult(
+                seek = seek,
+                parseCode = eofParseCode
+            )
+        }
+
+        return if (predicate(string[seek])) {
+            createComplete(seek - 1)
+        } else {
+            createStepResult(
+                seek = seek,
+                parseCode = ParseCode.CHAR_PREDICATE_FAILED
+            )
+        }
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        if (seek < 0) {
+            result.parseResult = createStepResult(
+                seek = seek,
+                parseCode = eofParseCode
+            )
+            return
+        }
+
+        val ch = string[seek]
+        if (predicate(ch)) {
+            result.data = ch
+            result.parseResult = createComplete(seek - 1)
+        } else {
+            result.parseResult = createStepResult(
+                seek = seek,
+                parseCode = ParseCode.CHAR_PREDICATE_FAILED
+            )
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return seek >= 0 && predicate(string[seek])
+    }
+
     override fun not(): CharPredicateRule {
         val predicate = this.predicate
         return CharPredicateRule(
@@ -132,8 +174,12 @@ open class CharPredicateRule : CharRule {
         return StringCharPredicateRangeRule(predicate, range)
     }
 
-    override fun unaryPlus(): StringOneOrMoreCharPredicateRule {
-        return StringOneOrMoreCharPredicateRule(predicate)
+    override fun unaryPlus(): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(predicate, range = 1..Int.MAX_VALUE)
+    }
+
+    override fun repeat(count: Int): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(predicate, range = count..count)
     }
 
     override fun invoke(callback: (Char) -> Unit): CharPredicateResultRule {

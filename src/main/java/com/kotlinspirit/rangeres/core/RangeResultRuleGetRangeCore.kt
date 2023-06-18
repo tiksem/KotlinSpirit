@@ -32,6 +32,29 @@ internal class RangeResultRuleGetRangeCore<T: Any>(
         }
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return rule.reverseParse(seek, string).also {
+            if (it.getParseCode().isNotError()) {
+                outRange.startSeek = it.getSeek() + 1
+                outRange.endSeek = seek + 1
+            } else {
+                outRange.startSeek = -1
+                outRange.endSeek = -1
+            }
+        }
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        rule.parseWithResult(seek, string, result)
+        if (!result.isError) {
+            outRange.startSeek = result.endSeek + 1
+            outRange.endSeek = seek + 1
+        } else {
+            outRange.startSeek = -1
+            outRange.endSeek = -1
+        }
+    }
+
     override val debugName: String
         get() = "getRange"
 }

@@ -10,15 +10,19 @@ import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
 
 abstract class RuleWithDefaultRepeat<T : Any>(name: String?) : Rule<T>(name) {
     override fun repeat(): Rule<List<T>> {
-        return ZeroOrMoreRule(this)
+        return RepeatRule(rule = this, range = 0..Int.MAX_VALUE)
     }
 
     override fun repeat(range: IntRange): Rule<List<T>> {
         return RepeatRule(this, range)
     }
 
+    override fun repeat(count: Int): Rule<List<T>> {
+        return repeat(range = count..count)
+    }
+
     override fun unaryPlus(): Rule<List<T>> {
-        return OneOrMoreRule(this)
+        return RepeatRule(rule = this, range = 1..Int.MAX_VALUE)
     }
 
     override fun invoke(callback: (T) -> Unit): RuleWithDefaultRepeatResult<T> {

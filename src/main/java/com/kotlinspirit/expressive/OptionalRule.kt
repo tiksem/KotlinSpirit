@@ -40,6 +40,30 @@ class OptionalRule<T : Any>(
         return true
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        val res = rule.reverseParse(seek, string)
+        if (res.getParseCode().isNotError()) {
+            return res
+        }
+
+        return createComplete(seek)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        rule.reverseParseWithResult(seek, string, result)
+        if (result.isError) {
+            result.data = null
+        }
+        result.parseResult = createStepResult(
+            seek = result.endSeek,
+            parseCode = ParseCode.COMPLETE
+        )
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return true
+    }
+
     override fun clone(): OptionalRule<T> {
         return OptionalRule(rule.clone(), name)
     }
@@ -70,9 +94,5 @@ class OptionalRule<T : Any>(
 
     override fun ignoreCallbacks(): OptionalRule<T> {
         return OptionalRule(rule.ignoreCallbacks())
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return rule.getPrefixMaxLength()
     }
 }

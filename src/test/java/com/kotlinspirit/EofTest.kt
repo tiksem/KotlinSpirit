@@ -10,9 +10,10 @@ class EofTest {
     fun testInteger() {
         val r = int + eof
         val p = r.compile()
-        Assert.assertEquals(p.matches("4343344334"), true)
+        Assert.assertEquals(p.matches("4343344334"), false) // out of bounds
+        Assert.assertEquals(p.matches("434334433"), true)
         Assert.assertEquals(p.matches("4343344334dsdsds"), false)
-        Assert.assertEquals(p.indexOf("dd4343344334"), 2)
+        Assert.assertEquals(p.indexOf("dd434334433"), 2)
     }
 
     @Test

@@ -1,8 +1,6 @@
 package com.kotlinspirit.repeat
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.ext.debugString
@@ -12,12 +10,16 @@ class RepeatRule<T : Any>(
     private val range: IntRange,
     name: String? = null
 ) : RuleWithDefaultRepeat<List<T>>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    private inline fun baseParse(
+        seek: Int,
+        parser: (seek: Int) -> Long
+    ): Long {
         var i = seek
         var resultsCount = 0
-        while (i < string.length && resultsCount < range.last) {
+
+        while (resultsCount < range.last) {
             val seekBefore = i
-            val ruleRes = rule.parse(i, string)
+            val ruleRes = parser(i)
             if (ruleRes.getParseCode().isError()) {
                 return if (resultsCount < range.first) {
                     ruleRes
@@ -26,27 +28,31 @@ class RepeatRule<T : Any>(
                 }
             } else {
                 i = ruleRes.getSeek()
+                if (i == seekBefore) {
+                    return if (resultsCount < range.first) {
+                        ruleRes
+                    } else {
+                        createComplete(seekBefore)
+                    }
+                }
                 resultsCount++
             }
         }
 
-        return if (resultsCount >= range.first) {
-            createComplete(i)
-        } else {
-            return createStepResult(
-                seek = i,
-                parseCode = ParseCode.EOF
-            )
-        }
+        return createComplete(i)
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
-        val i = seek
-        val list = ArrayList<T>()
+    private inline fun baseParseWithResult(
+        seek: Int,
+        result: ParseResult<List<T>>,
+        parser: (seek: Int, r: ParseResult<T>) -> Unit
+    ) {
+        var i = seek
+        val list = ArrayList<T>(range.first)
         val itemResult = ParseResult<T>()
-        while (i < string.length  && list.size < range.last) {
+        while (list.size < range.last) {
             val seekBefore = i
-            rule.parseWithResult(seek, string, itemResult)
+            parser(i, itemResult)
             val stepResult = itemResult.parseResult
             if (stepResult.getParseCode().isError()) {
                 if (list.size >= range.first) {
@@ -54,8 +60,14 @@ class RepeatRule<T : Any>(
                     result.parseResult = createComplete(seekBefore)
                 } else {
                     result.parseResult = stepResult
+                    result.data = null
                 }
+                return
             } else {
+                i = stepResult.getSeek()
+                if (i == seekBefore) {
+                    break
+                }
                 list.add(itemResult.data ?: continue)
             }
         }
@@ -71,28 +83,83 @@ class RepeatRule<T : Any>(
         }
     }
 
-    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        repeat (range.first) {
-            if (rule.parse(seek, string).getParseCode().isError()) {
+    override fun parse(seek: Int, string: CharSequence): Long {
+        return baseParse(
+            seek = seek,
+            parser = {
+                rule.parse(seek = it, string = string)
+            }
+        )
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
+        baseParseWithResult(seek, result, parser = { s, r ->
+            rule.parseWithResult(s, string, r)
+        })
+    }
+
+    private inline fun baseHasMatch(
+        seek: Int,
+        parser: (seek: Int) -> Long,
+        hasMatch: (seek: Int) -> Boolean
+    ): Boolean {
+        if (range.first <= 0) {
+            return true
+        }
+
+        var i = seek
+        repeat (range.first - 1) {
+            val r = parser(i)
+            if (r.getParseCode().isError()) {
+                return false
+            }
+            val seekBefore = i
+            i = r.getSeek()
+            if (seekBefore != i) {
                 return false
             }
         }
 
-        return true
+        return hasMatch(i)
     }
 
-    override fun not(): Rule<*> {
-        return when {
-            range.first <= 0 -> {
-                !ZeroOrMoreRule(rule)
+    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        return baseHasMatch(
+            seek = seek,
+            parser = {
+                rule.parse(seek = it, string = string)
+            },
+            hasMatch = {
+                rule.hasMatch(seek = it, string = string)
             }
-            range.first == 1 -> {
-                !OneOrMoreRule(rule)
+        )
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return baseParse(
+            seek = seek,
+            parser = {
+                rule.reverseParse(seek = it, string = string)
             }
-            else -> {
-                RepeatRule(rule, 0 until range.first) + !ZeroOrMoreRule(rule)
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<List<T>>) {
+        baseParseWithResult(seek, result, parser = { s, r ->
+            rule.reverseParseWithResult(s, string, r)
+        })
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return baseHasMatch(
+            seek = seek,
+            parser = {
+                rule.reverseParse(seek = it, string = string)
+            },
+            hasMatch = {
+                rule.reverseHasMatch(seek = it, string = string)
             }
-        }
+        )
     }
 
     override fun clone(): RepeatRule<T> {
@@ -122,19 +189,5 @@ class RepeatRule<T : Any>(
 
     override fun ignoreCallbacks(): RepeatRule<T> {
         return RepeatRule(rule.ignoreCallbacks(), range)
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return rule.getPrefixMaxLength() * (range.last - range.first).toLong().coerceAtMost(
-            MAX_PREFIX_LENGTH.toLong()
-        ).toInt()
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return when (range.last - range.first) {
-            0 -> true
-            1 -> rule.isPrefixFixedLength()
-            else -> false
-        }
     }
 }

@@ -8,12 +8,9 @@ import com.kotlinspirit.rangeres.callbacks.RangeResultCharCallbacksRule
 import com.kotlinspirit.rangeres.result.RangeResultCharCallbacksResultRule
 import com.kotlinspirit.rangeres.result.RangeResultCharResultRule
 import com.kotlinspirit.rangeres.simple.RangeResultCharRule
-import com.kotlinspirit.repeat.OneOrMoreRule
 import com.kotlinspirit.repeat.RepeatRule
-import com.kotlinspirit.repeat.ZeroOrMoreRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
-import com.kotlinspirit.str.StringOneOrMoreCharPredicateRule
 
 class CharResultRule(
     rule: CharRule,
@@ -21,15 +18,19 @@ class CharResultRule(
     name: String? = null
 ) : BaseRuleWithResult<Char>(rule, callback, name) {
     override fun repeat(): Rule<CharSequence> {
-        return ZeroOrMoreRule(this).asString()
+        return RepeatRule(this, range = 0..Int.MAX_VALUE).asString()
     }
 
     override fun repeat(range: IntRange): Rule<CharSequence> {
         return RepeatRule(this, range).asString()
     }
 
+    override fun repeat(count: Int): Rule<CharSequence> {
+        return RepeatRule(this, range = count..count).asString()
+    }
+
     override fun unaryPlus(): Rule<CharSequence> {
-        return OneOrMoreRule(this).asString()
+        return RepeatRule(this, range = 1..Int.MAX_VALUE).asString()
     }
 
     override fun getRange(out: ParseRange): CharRule {
@@ -105,7 +106,7 @@ abstract class CharRule(name: String?) : Rule<Char>(name) {
     }
 
     override fun repeat(): Rule<CharSequence> {
-        return ZeroOrMoreRule(this).asString()
+        return RepeatRule(this, range = 0..Int.MAX_VALUE).asString()
     }
 
     override fun repeat(range: IntRange): Rule<CharSequence> {
@@ -113,15 +114,11 @@ abstract class CharRule(name: String?) : Rule<Char>(name) {
     }
 
     override fun unaryPlus(): Rule<CharSequence> {
-        return OneOrMoreRule(this).asString()
+        return RepeatRule(this, range = 1..Int.MAX_VALUE).asString()
     }
 
-    override fun getPrefixMaxLength(): Int {
-        return 1
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return true
+    override fun repeat(count: Int): Rule<*> {
+        return RepeatRule(this, range = count..count).asString()
     }
 
     abstract override fun clone(): CharRule
@@ -148,6 +145,7 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
+            result.data = null
             return
         }
 
@@ -162,6 +160,41 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
         return seek < string.length
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        if (seek < 0) {
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.EOF
+            )
+        }
+
+        return createStepResult(
+            seek = seek - 1,
+            parseCode = ParseCode.COMPLETE
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        if (seek < 0) {
+            result.parseResult = createStepResult(
+                seek = seek,
+                parseCode = ParseCode.EOF
+            )
+            result.data = null
+            return
+        }
+
+        result.data = string[seek]
+        result.parseResult = createStepResult(
+            seek = seek - 1,
+            parseCode = ParseCode.COMPLETE
+        )
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return seek >= 0
+    }
+
     override fun clone(): AnyCharRule {
         return this
     }
@@ -171,9 +204,13 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
         return StringCharPredicateRule(predicate = { true })
     }
 
-    override fun unaryPlus(): StringOneOrMoreCharPredicateRule {
+    override fun repeat(count: Int): StringCharPredicateRangeRule {
+        return StringCharPredicateRangeRule(predicate = { true }, range = count..count)
+    }
+
+    override fun unaryPlus(): StringCharPredicateRangeRule {
         //TODO: Optimise
-        return StringOneOrMoreCharPredicateRule(predicate = { true })
+        return StringCharPredicateRangeRule(predicate = { true }, range = 1..Int.MAX_VALUE)
     }
 
     override fun repeat(range: IntRange): StringCharPredicateRangeRule {

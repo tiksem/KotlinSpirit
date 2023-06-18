@@ -57,7 +57,7 @@ class DiffRuleTest {
         verifyDiffSuccess(rule, "034434343")
         verifyDiffFailed(rule, "433443 44444")
         verifyDiffFailed(rule, "433443 44444 43433434")
-        verifyDiffFailed(rule, "", ParseCode.EOF)
+        verifyDiffFailed(rule, "", ParseCode.SPLIT_NOT_ENOUGH_DATA)
     }
 
     @Test

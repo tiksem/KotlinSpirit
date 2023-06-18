@@ -43,7 +43,7 @@ class LongTest {
     fun outOfRange() {
         val result = ParseResult<Long>()
         long.parseWithResult(0, "9223372036854775808", result)
-        Assert.assertEquals(ParseCode.INT_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.LONG_OUT_OF_BOUNDS, result.parseResult.getParseCode())
     }
 
     @Test

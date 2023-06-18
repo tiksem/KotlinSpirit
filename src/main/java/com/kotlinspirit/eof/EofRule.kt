@@ -28,6 +28,31 @@ class EofRule(name: String? = null) : Rule<Unit>(name) {
         }
     }
 
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        if (seek < 0) {
+            return createComplete(seek)
+        }
+
+        return createStepResult(
+            seek = seek,
+            parseCode = ParseCode.NO_EOF
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Unit>) {
+        val parseResult = parse(seek, string)
+        result.parseResult = parseResult
+        if (parseResult.getParseCode().isNotError()) {
+            result.data = Unit
+        } else {
+            result.data = null
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return seek < 0
+    }
+
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return seek == string.length
     }
@@ -37,6 +62,10 @@ class EofRule(name: String? = null) : Rule<Unit>(name) {
     }
 
     override fun repeat(range: IntRange): Rule<*> {
+        throw UnsupportedOperationException("repeat is not supported for eof rule")
+    }
+
+    override fun repeat(count: Int): Rule<*> {
         throw UnsupportedOperationException("repeat is not supported for eof rule")
     }
 

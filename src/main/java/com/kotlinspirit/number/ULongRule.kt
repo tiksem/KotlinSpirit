@@ -1,105 +1,71 @@
 package com.kotlinspirit.number
 
-import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.core.ParseCode
+import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class ULongRule(name: String? = null) : RuleWithDefaultRepeat<ULong>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        val length = string.length
-        if (seek >= length) {
-            return createStepResult(
-                seek = seek,
-                parseCode = ParseCode.EOF
-            )
-        }
-
-        var i = seek
-        var result = 0UL
-        var successFlag = false
-        do {
-            val char = string[i++]
-            when {
-                char in '0'..'9' -> {
-                    val resultBefore = result
-                    successFlag = true
-                    result *= 10UL
-                    result += (char - '0').toULong()
-                    // check int bounds
-                    if (result < resultBefore) {
-                        return createStepResult(
-                            seek = i,
-                            parseCode = ParseCode.ULONG_OUT_OF_BOUNDS
-                        )
-                    }
-                }
-                successFlag -> {
-                    return createComplete(i - 1)
-                }
-                else -> {
-                    return createStepResult(
-                        seek = i,
-                        parseCode = ParseCode.INVALID_ULONG
-                    )
-                }
+        return UIntParsers.parse(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_ULONG,
+            outOfBoundsParseCode = ParseCode.ULONG_OUT_OF_BOUNDS,
+            checkOutOfBounds = { before, after ->
+                after < before
             }
-        } while (i < length)
-
-        return createComplete(i)
+        )
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<ULong>) {
-        val length = string.length
-        if (seek >= length) {
-            r.parseResult = createStepResult(
-                seek = seek,
-                parseCode = ParseCode.EOF
-            )
-            return
-        }
-
-        var i = seek
-        var result = 0UL
-        var successFlag = false
-        do {
-            val char = string[i++]
-            when {
-                char in '0'..'9' -> {
-                    successFlag = true
-                    val resultBefore = result
-                    result *= 10UL
-                    result += (char - '0').toULong()
-                    // check int bounds
-                    if (result < resultBefore) {
-                        r.parseResult = createStepResult(
-                            seek = i,
-                            parseCode = ParseCode.ULONG_OUT_OF_BOUNDS
-                        )
-                        return
-                    }
-                }
-                successFlag -> {
-                    r.data = result.toULong()
-                    r.parseResult = createComplete(i - 1)
-                    return
-                }
-                else -> {
-                    r.parseResult = createStepResult(
-                        seek = i,
-                        parseCode = ParseCode.INVALID_ULONG
-                    )
-                    return
-                }
+        UIntParsers.parseWithResult(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_ULONG,
+            outOfBoundsParseCode = ParseCode.ULONG_OUT_OF_BOUNDS,
+            checkOutOfBounds = { before, after ->
+                after < before
             }
-        } while (i < length)
-
-        r.parseResult = createComplete(i)
-        r.data = result.toULong()
+        ) { value, parseResult ->
+            r.data = value
+            r.parseResult = parseResult
+        }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return parse(seek, string).getParseCode() == ParseCode.COMPLETE
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return UIntParsers.reverseParse(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_ULONG,
+            outOfBoundsParseCode = ParseCode.ULONG_OUT_OF_BOUNDS,
+            checkOutOfBounds = { before, after ->
+                after < before
+            }
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<ULong>) {
+        UIntParsers.reverseParseWithResult(
+            seek = seek,
+            string = string,
+            invalidIntParseCode = ParseCode.INVALID_ULONG,
+            outOfBoundsParseCode = ParseCode.ULONG_OUT_OF_BOUNDS,
+            checkOutOfBounds = { before, after ->
+                after < before
+            }
+        ) { value, parseResult ->
+            result.data = value
+            result.parseResult = parseResult
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return reverseParse(seek, string).getParseCode() == ParseCode.COMPLETE
     }
 
     override fun clone(): ULongRule {
@@ -122,13 +88,5 @@ class ULongRule(name: String? = null) : RuleWithDefaultRepeat<ULong>(name) {
 
     override fun ignoreCallbacks(): ULongRule {
         return this
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return 1
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return true
     }
 }

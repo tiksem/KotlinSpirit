@@ -6,6 +6,8 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Matches one character, if it doesn't match the original rule.
@@ -23,8 +25,7 @@ class NoRule(
                 seek = seek,
                 parseCode = ParseCode.NO_FAILED
             )
-            ParseCode.EOF -> createComplete(string.length)
-            else -> createComplete(seek + 1)
+            else -> createComplete(min(seek + 1, string.length))
         }
     }
 
@@ -37,20 +38,53 @@ class NoRule(
                     seek = seek,
                     parseCode = ParseCode.NO_FAILED
                 )
-            }
-            ParseCode.EOF -> {
-                result.parseResult = createComplete(seek)
-                result.data = 0.toChar()
+                result.data = null
             }
             else -> {
-                result.parseResult = createComplete(seek + 1)
-                result.data = string[seek]
+                val isEof = seek == string.length
+                result.parseResult = createComplete(if (isEof) seek else seek + 1)
+                result.data = if (isEof) 0.toChar() else string[seek]
             }
         }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return rule.parse(seek, string).getParseCode().isError()
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        val rResult = rule.reverseParse(seek, string)
+        val parseCode = rResult.getParseCode()
+        return when (parseCode) {
+            ParseCode.COMPLETE -> createStepResult(
+                seek = seek,
+                parseCode = ParseCode.NO_FAILED
+            )
+            else -> createComplete(max(seek - 1, -1))
+        }
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        val rResult = rule.reverseParse(seek, string)
+        val parseCode = rResult.getParseCode()
+        when (parseCode) {
+            ParseCode.COMPLETE -> {
+                result.parseResult = createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.NO_FAILED
+                )
+                result.data = null
+            }
+            else -> {
+                val isEof = seek == -1
+                result.parseResult = createComplete(if (isEof) seek else seek - 1)
+                result.data = if (isEof) 0.toChar() else string[seek]
+            }
+        }
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        TODO("Not yet implemented")
     }
 
     override fun clone(): NoRule {
@@ -76,14 +110,6 @@ class NoRule(
 
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
-    }
-
-    override fun getPrefixMaxLength(): Int {
-        return rule.getPrefixMaxLength()
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return rule.isPrefixFixedLength()
     }
 
     override fun ignoreCallbacks(): NoRule {

@@ -4,6 +4,8 @@ import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.str.exactStringParse
 import com.kotlinspirit.str.exactStringParseWithResult
+import com.kotlinspirit.str.exactStringReverseParse
+import com.kotlinspirit.str.exactStringReverseParseWithResult
 
 class DynamicStringRule(
     internal val stringProvider: () -> CharSequence,
@@ -30,6 +32,33 @@ class DynamicStringRule(
         val other = stringProvider()
         return string.regionMatches(
             thisOffset = seek,
+            other = other,
+            otherOffset = 0,
+            length = other.length
+        )
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return exactStringReverseParse(
+            seek = seek,
+            string = string,
+            token = stringProvider()
+        )
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
+        exactStringReverseParseWithResult(
+            seek = seek,
+            string = string,
+            token = stringProvider(),
+            result = result
+        )
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        val other = stringProvider()
+        return string.regionMatches(
+            thisOffset = seek - other.length + 1,
             other = other,
             otherOffset = 0,
             length = other.length

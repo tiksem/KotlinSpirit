@@ -77,6 +77,10 @@ internal class TernarySearchTree {
         return parse(root, seek, string)
     }
 
+    fun reverseParse(seek: Int, string: CharSequence): Int {
+        return reverseParse(root, seek, string)
+    }
+
     private fun parse(node: Node, seek: Int, string: CharSequence): Int {
         if (seek >= string.length) {
             return -1
@@ -106,6 +110,35 @@ internal class TernarySearchTree {
         }
     }
 
+    private fun reverseParse(node: Node, seek: Int, string: CharSequence): Int {
+        if (seek < 0) {
+            return -2
+        }
+
+        val ch = string[seek]
+        val nodeCh = node.char
+        when {
+            ch == nodeCh -> {
+                if (node.isEndOfWord) {
+                    val moreSearch = parse(node.eq ?: return seek - 1, seek - 1, string)
+                    return if (moreSearch >= -1) {
+                        moreSearch
+                    } else {
+                        seek - 1
+                    }
+                } else {
+                    return parse(node.eq ?: return -2, seek - 1, string)
+                }
+            }
+            ch < nodeCh -> {
+                return parse(node.left ?: return -2, seek, string)
+            }
+            else -> {
+                return parse(node.right ?: return -2, seek, string)
+            }
+        }
+    }
+
     private fun hasMatch(node: Node, seek: Int, string: CharSequence): Boolean {
         if (seek >= string.length) {
             return false
@@ -130,7 +163,35 @@ internal class TernarySearchTree {
         }
     }
 
+    private fun reverseHasMatch(node: Node, seek: Int, string: CharSequence): Boolean {
+        if (seek < 0) {
+            return false
+        }
+
+        val ch = string[seek]
+        val nodeCh = node.char
+        when {
+            ch == nodeCh -> {
+                if (node.isEndOfWord) {
+                    return true
+                } else {
+                    return hasMatch(node.eq ?: return false, seek - 1, string)
+                }
+            }
+            ch < nodeCh -> {
+                return hasMatch(node.left ?: return false, seek, string)
+            }
+            else -> {
+                return hasMatch(node.right ?: return false, seek, string)
+            }
+        }
+    }
+
     fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return hasMatch(root, seek, string)
+    }
+
+    fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return reverseHasMatch(root, seek, string)
     }
 }

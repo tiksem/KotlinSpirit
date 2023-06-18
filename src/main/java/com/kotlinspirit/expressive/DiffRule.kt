@@ -45,6 +45,44 @@ private fun internalHasMatch(
     return main.hasMatch(seek, string) && !diff.hasMatch(seek, string)
 }
 
+private fun internalReverseParse(seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>): Long {
+    val mainRes = main.reverseParse(seek, string)
+    return if (mainRes.getParseCode().isError()) {
+        mainRes
+    } else {
+        if (diff.hasMatch(mainRes.getSeek() + 1, string)) {
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.DIFF_FAILED
+            )
+        } else {
+            mainRes
+        }
+    }
+}
+
+private fun internalReverseHasMatch(
+    seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>
+): Boolean {
+    return internalReverseParse(seek, string, main, diff).getParseCode().isNotError()
+}
+
+private fun <T : Any> internalReverseParseWithResult(
+    seek: Int, string: CharSequence, result: ParseResult<T>, main: Rule<T>, diff: Rule<*>
+) {
+    main.reverseParseWithResult(seek, string, result)
+    val stepResult = result.parseResult
+    if (stepResult.getParseCode().isNotError()) {
+        if (diff.hasMatch(result.endSeek + 1, string)) {
+            result.parseResult = createStepResult(
+                seek = seek,
+                parseCode = ParseCode.DIFF_FAILED
+            )
+            return
+        }
+    }
+}
+
 private fun generateDebugName(main: Rule<*>, diff: Rule<*>): String {
     val mainName = main.wrappedName
     val diffName = diff.wrappedName
@@ -66,6 +104,18 @@ class DiffRuleWithDefaultRepeat<T : Any>(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return internalHasMatch(seek, string, main, diff)
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return internalReverseParse(seek, string, main, diff)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        internalParseWithResult(seek, string, result, main, diff)
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return internalReverseHasMatch(seek, string, main, diff)
     }
 
     override fun clone(): DiffRuleWithDefaultRepeat<T> {
@@ -94,14 +144,6 @@ class DiffRuleWithDefaultRepeat<T : Any>(
     override fun ignoreCallbacks(): DiffRuleWithDefaultRepeat<T> {
         return DiffRuleWithDefaultRepeat(main.ignoreCallbacks(), diff.ignoreCallbacks())
     }
-
-    override fun getPrefixMaxLength(): Int {
-        return main.getPrefixMaxLength()
-    }
-
-    override fun isPrefixFixedLength(): Boolean {
-        return main.isPrefixFixedLength()
-    }
 }
 
 class CharDiffRule(
@@ -119,6 +161,18 @@ class CharDiffRule(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         return internalHasMatch(seek, string, main, diff)
+    }
+
+    override fun reverseParse(seek: Int, string: CharSequence): Long {
+        return internalReverseParse(seek, string, main, diff)
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
+        internalParseWithResult(seek, string, result, main, diff)
+    }
+
+    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        return internalReverseHasMatch(seek, string, main, diff)
     }
 
     override val debugNameShouldBeWrapped: Boolean

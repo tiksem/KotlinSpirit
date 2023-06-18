@@ -1,35 +1,35 @@
 package com.kotlinspirit.number
 
-import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.core.ParseCode
+import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class ShortRule(name: String? = null) : RuleWithDefaultRepeat<Short>(name) {
+class ByteRule(name: String? = null) : RuleWithDefaultRepeat<Byte>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return IntParsers.parse(
             seek = seek,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_SHORT,
-            outOfBoundsParseCode = ParseCode.SHORT_OUT_OF_BOUNDS,
+            invalidIntParseCode = ParseCode.INVALID_BYTE,
+            outOfBoundsParseCode = ParseCode.BYTE_OUT_OF_BOUNDS,
             checkOutOfBounds = {
-                it > Short.MAX_VALUE
+                it > Byte.MAX_VALUE
             }
         )
     }
 
-    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Short>) {
+    override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Byte>) {
         IntParsers.parseWithResult(
             seek = seek,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_SHORT,
-            outOfBoundsParseCode = ParseCode.SHORT_OUT_OF_BOUNDS,
+            invalidIntParseCode = ParseCode.INVALID_BYTE,
+            outOfBoundsParseCode = ParseCode.BYTE_OUT_OF_BOUNDS,
             checkOutOfBounds = {
-                it > Short.MAX_VALUE
+                it > Byte.MAX_VALUE
             }
         ) { value, parseResult ->
             r.parseResult = parseResult
-            r.data = value?.toShort()
+            r.data = value?.toByte()
         }
     }
 
@@ -41,26 +41,26 @@ class ShortRule(name: String? = null) : RuleWithDefaultRepeat<Short>(name) {
         return IntParsers.reverseParse(
             seek = seek,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_SHORT,
-            outOfBoundsParseCode = ParseCode.SHORT_OUT_OF_BOUNDS,
+            invalidIntParseCode = ParseCode.INVALID_BYTE,
+            outOfBoundsParseCode = ParseCode.BYTE_OUT_OF_BOUNDS,
             checkOutOfBounds = {
-                it > Short.MAX_VALUE
+                it > Byte.MAX_VALUE
             }
         )
     }
 
-    override fun reverseParseWithResult(seek: Int, string: CharSequence, r: ParseResult<Short>) {
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, r: ParseResult<Byte>) {
         IntParsers.reverseParseWithResult(
             seek = seek,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_SHORT,
-            outOfBoundsParseCode = ParseCode.SHORT_OUT_OF_BOUNDS,
+            invalidIntParseCode = ParseCode.INVALID_BYTE,
+            outOfBoundsParseCode = ParseCode.BYTE_OUT_OF_BOUNDS,
             checkOutOfBounds = {
-                it > Short.MAX_VALUE
+                it > Byte.MAX_VALUE
             }
         ) { value, parseResult ->
             r.parseResult = parseResult
-            r.data = value?.toShort()
+            r.data = value?.toByte()
         }
     }
 
@@ -68,25 +68,25 @@ class ShortRule(name: String? = null) : RuleWithDefaultRepeat<Short>(name) {
         return parse(seek, string).getParseCode() == ParseCode.COMPLETE
     }
 
-    override fun clone(): ShortRule {
+    override fun clone(): ByteRule {
         return this
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
-    override fun name(name: String): ShortRule {
-        return ShortRule(name)
+    override fun name(name: String): ByteRule {
+        return ByteRule(name)
     }
 
     override val defaultDebugName: String
-        get() = "short"
+        get() = "byte"
 
     override fun isThreadSafe(): Boolean {
         return true
     }
 
-    override fun ignoreCallbacks(): ShortRule {
+    override fun ignoreCallbacks(): ByteRule {
         return this
     }
 }
