@@ -368,3 +368,15 @@ internal inline fun CharSequence.moveSeekReverseUntilDontMatch(startIndex: Int, 
 
     return i
 }
+
+internal fun CharSequence.indexOfChar(char: Char, startIndex: Int, endIndex: Int): Int {
+    var i = 0
+    while (i < endIndex) {
+        if (this[i] == char) {
+            return i
+        }
+        ++i
+    }
+
+    return -1
+}

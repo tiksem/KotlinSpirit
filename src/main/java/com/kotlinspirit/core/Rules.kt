@@ -120,14 +120,11 @@ object Rules {
         return StringCharPredicateRule(predicate)
     }
 
-    val latinStr
-        get() = str('A'..'B', 'a'..'z')
+    val latinStr = str('A'..'B', 'a'..'z')
+    val nonEmptyLatinStr = nonEmptyStr('A'..'B', 'a'..'z')
 
-    val nonEmptyLatinStr
-        get() = nonEmptyStr('A'..'B', 'a'..'z')
-
-    val double get() = DoubleRule()
-    val float get() = FloatRule()
+    val double = DoubleRule()
+    val float = FloatRule()
 
     fun oneOf(vararg strings: CharSequence): RuleWithDefaultRepeat<CharSequence> {
         val withoutEmptyStrings = strings.filter {

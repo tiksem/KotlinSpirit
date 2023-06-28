@@ -1,5 +1,9 @@
 package com.kotlinspirit.number
 
+import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.getParseCode
+import com.kotlinspirit.core.getSeek
+import com.kotlinspirit.core.isNotError
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 abstract class BaseFloatRule<T : Any>(
@@ -24,6 +28,64 @@ abstract class BaseFloatRule<T : Any>(
             string = string,
             invalidFloatErrorCode = invalidFloatErrorCode
         )
+    }
+
+    // TODO: Optimize
+    protected abstract fun String.getValue(): T
+
+    protected fun String.isNan(): Boolean {
+        return this[0] == 'N'
+    }
+
+    protected fun String.isPositiveInfinity(): Boolean {
+        if (this.length < 2) {
+            return false
+        }
+
+        return when (this[0]) {
+            'i', 'I' -> true
+            '+' -> {
+                val c = this[1]
+                c == 'i' || c == 'I'
+            }
+            else -> false
+        }
+    }
+
+    protected fun String.isNegativeInfinity(): Boolean {
+        if (this.length < 2) {
+            return false
+        }
+
+        return when (this[0]) {
+            '-' -> {
+                val c = this[1]
+                c == 'i' || c == 'I'
+            }
+            else -> false
+        }
+    }
+
+    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        val parseResult = parse(seek, string)
+        result.parseResult = parseResult
+        if (parseResult.getParseCode().isNotError()) {
+            // TODO: Optimize
+            result.data = string.substring(seek, parseResult.getSeek()).getValue()
+        } else {
+            result.data = null
+        }
+    }
+
+    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
+        val parseResult = reverseParse(seek, string)
+        result.parseResult = parseResult
+        if (parseResult.getParseCode().isNotError()) {
+            // TODO: Optimize
+            result.data = string.substring(parseResult.getSeek() + 1, seek + 1).getValue()
+        } else {
+            result.data = null
+        }
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {

@@ -39,7 +39,7 @@ class BigDecimalRule(name: String? = null) : RuleWithDefaultRepeat<BigDecimal>(n
     }
 
     override fun reverseParse(seek: Int, string: CharSequence): Long {
-        return FloatParsers.parse(
+        return FloatParsers.reverseParse(
             seek = seek,
             string = string,
             invalidFloatErrorCode = ParseCode.INVALID_BIG_DECIMAL

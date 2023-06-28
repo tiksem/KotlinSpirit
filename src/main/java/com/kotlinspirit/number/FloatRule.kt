@@ -9,27 +9,14 @@ class FloatRule(name: String? = null) : BaseFloatRule<Float>(
     name = name,
     invalidFloatErrorCode = ParseCode.INVALID_FLOAT
 ) {
-    override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Float>) {
-        FloatParsers.parseWithResult(
-            seek = seek,
-            string = string,
-            invalidFloatErrorCode = invalidFloatErrorCode
-        ) { value, parseResult ->
-            result.data = value?.toFloat()
-            result.parseResult = parseResult
+    override fun String.getValue(): Float {
+        // TODO: Optimize
+        return when {
+            isNan() -> Float.NaN
+            isNegativeInfinity() -> Float.NEGATIVE_INFINITY
+            isPositiveInfinity() -> Float.POSITIVE_INFINITY
+            else -> toFloat()
         }
-    }
-
-    override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Float>) {
-        FloatParsers.reverseParseWithResult(
-            seek = seek,
-            string = string,
-            invalidFloatErrorCode = invalidFloatErrorCode,
-            result = { value, parseResult ->
-                result.data = value?.toFloat()
-                result.parseResult = parseResult
-            }
-        )
     }
 
     override fun clone(): FloatRule {
@@ -46,8 +33,4 @@ class FloatRule(name: String? = null) : BaseFloatRule<Float>(
 
     override val defaultDebugName: String
         get() = "float"
-
-    companion object {
-        internal const val MAX_FLOAT_PREFIX_LENGTH = "-infinity".length
-    }
 }
