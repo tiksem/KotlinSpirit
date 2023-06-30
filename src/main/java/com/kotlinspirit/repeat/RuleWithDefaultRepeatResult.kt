@@ -69,10 +69,6 @@ open class RuleWithDefaultRepeatResult<T : Any>(
         return rule.isThreadSafe()
     }
 
-    override fun ignoreCallbacks(): RuleWithDefaultRepeat<T> {
-        return rule.ignoreCallbacks() as RuleWithDefaultRepeat<T>
-    }
-
     override fun getRange(out: ParseRange): RuleWithDefaultRepeat<T> {
         return RangeResultRuleDefaultRepeat(this, out)
     }
@@ -150,10 +146,6 @@ open class CharPredicateResultRule private constructor(
             ),
             engine = engine
         )
-    }
-
-    override fun ignoreCallbacks(): CharPredicateRule {
-        return rule.ignoreCallbacks() as CharPredicateRule
     }
 
     override fun getRange(out: ParseRange): CharRule {

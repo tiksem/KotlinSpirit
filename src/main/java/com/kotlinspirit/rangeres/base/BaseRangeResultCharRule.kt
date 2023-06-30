@@ -35,10 +35,6 @@ internal abstract class BaseRangeResultCharRule(
         return core.reverseHasMatch(seek, string)
     }
 
-    override fun ignoreCallbacks(): Rule<Char> {
-        return core.ignoreCallbacks()
-    }
-
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 

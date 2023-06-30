@@ -79,12 +79,6 @@ class LazyRule<T : Any> internal constructor(
         )
     }
 
-    override fun ignoreCallbacks(): LazyRule<T> {
-        return LazyRule(ruleProvider = {
-            ruleProvider().ignoreCallbacks() as RuleWithDefaultRepeat<T>
-        }, name = name)
-    }
-
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 

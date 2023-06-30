@@ -23,10 +23,6 @@ class FloatRule(name: String? = null) : BaseFloatRule<Float>(
         return this
     }
 
-    override fun ignoreCallbacks(): FloatRule {
-        return this
-    }
-
     override fun name(name: String): FloatRule {
         return FloatRule(name)
     }

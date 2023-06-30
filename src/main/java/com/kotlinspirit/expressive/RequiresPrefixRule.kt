@@ -101,10 +101,6 @@ class RequiresPrefixRule<T : Any>(
         return RequiresPrefixRule(prefixRule.clone(), bodyRule.clone(), name)
     }
 
-    override fun ignoreCallbacks(): RequiresPrefixRule<T> {
-        return RequiresPrefixRule(prefixRule.ignoreCallbacks(), bodyRule.ignoreCallbacks(), name)
-    }
-
     override fun isThreadSafe(): Boolean {
         return prefixRule.isThreadSafe() && bodyRule.isThreadSafe()
     }

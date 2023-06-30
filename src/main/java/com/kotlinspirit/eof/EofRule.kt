@@ -93,10 +93,6 @@ class EofRule(name: String? = null) : Rule<Unit>(name) {
         throw UnsupportedOperationException("getRangeResult is not supported for eof rule")
     }
 
-    override fun ignoreCallbacks(): EofRule {
-        return this
-    }
-
     override fun clone(): EofRule {
         return this
     }

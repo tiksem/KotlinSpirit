@@ -80,10 +80,6 @@ internal class DebugRule<T : Any>(
         throw UnsupportedOperationException("Method is not supported by DebugRule")
     }
 
-    override fun ignoreCallbacks(): Rule<T> {
-        throw UnsupportedOperationException("Method is not supported by DebugRule")
-    }
-
     override fun clone(): Rule<T> {
         throw UnsupportedOperationException("Method is not supported by DebugRule")
     }

@@ -81,8 +81,4 @@ class StringRuleWrapper(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
-
-    override fun ignoreCallbacks(): StringRuleWrapper {
-        return StringRuleWrapper(rule.ignoreCallbacks())
-    }
 }

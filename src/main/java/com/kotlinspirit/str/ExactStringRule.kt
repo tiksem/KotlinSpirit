@@ -193,10 +193,6 @@ open class ExactStringRule(
     override fun isThreadSafe(): Boolean {
         return true
     }
-
-    override fun ignoreCallbacks(): ExactStringRule {
-        return this
-    }
 }
 
 class EmptyStringRule(name: String? = null): ExactStringRule("", name) {

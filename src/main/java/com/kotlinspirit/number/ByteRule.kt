@@ -2,35 +2,49 @@ package com.kotlinspirit.number
 
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class ByteRule(name: String? = null) : RuleWithDefaultRepeat<Byte>(name) {
+class ByteRule(name: String? = null, private val radix: Int) : RuleWithDefaultRepeat<Byte>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        return IntParsers.parse(
+        return IntParsers.parseInt(
             seek = seek,
             string = string,
+            radix = radix,
             invalidIntParseCode = ParseCode.INVALID_BYTE,
             outOfBoundsParseCode = ParseCode.BYTE_OUT_OF_BOUNDS,
-            checkOutOfBounds = {
-                it > Byte.MAX_VALUE
+            onResult = {
+                if (it !in Byte.MIN_VALUE..Byte.MAX_VALUE) {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.BYTE_OUT_OF_BOUNDS
+                    )
+                }
             }
         )
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Byte>) {
-        IntParsers.parseWithResult(
+        r.data = null
+        r.parseResult = IntParsers.parseInt(
             seek = seek,
             string = string,
+            radix = radix,
             invalidIntParseCode = ParseCode.INVALID_BYTE,
             outOfBoundsParseCode = ParseCode.BYTE_OUT_OF_BOUNDS,
-            checkOutOfBounds = {
-                it > Byte.MAX_VALUE
+            onResult = {
+                if (it !in Byte.MIN_VALUE..Byte.MAX_VALUE) {
+                    r.parseResult = createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.BYTE_OUT_OF_BOUNDS
+                    )
+                    return
+                } else {
+                    r.data = it.toByte()
+                }
             }
-        ) { value, parseResult ->
-            r.parseResult = parseResult
-            r.data = value?.toByte()
-        }
+        )
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -76,7 +90,7 @@ class ByteRule(name: String? = null) : RuleWithDefaultRepeat<Byte>(name) {
         get() = false
 
     override fun name(name: String): ByteRule {
-        return ByteRule(name)
+        return ByteRule(name, radix)
     }
 
     override val defaultDebugName: String
@@ -84,9 +98,5 @@ class ByteRule(name: String? = null) : RuleWithDefaultRepeat<Byte>(name) {
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-
-    override fun ignoreCallbacks(): ByteRule {
-        return this
     }
 }

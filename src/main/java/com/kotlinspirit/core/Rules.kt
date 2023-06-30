@@ -21,15 +21,15 @@ object Rules {
         return LazyRule(ruleProvider)
     }
 
-    val int = IntRule()
+    val int = IntRule(radix = 10)
     val uint = UIntRule()
     val ulong = ULongRule()
-    val long = LongRule()
-    val short = ShortRule()
+    val long = LongRule(radix = 10)
+    val short = ShortRule(radix = 10)
     val ushort = UShortRule()
     val bigint = BigIntegerRule()
     val bigDecimal = BigDecimalRule()
-    val byte = ByteRule()
+    val byte = ByteRule(radix = 10)
     val ubyte = UByteRule()
 
     val char = AnyCharRule()

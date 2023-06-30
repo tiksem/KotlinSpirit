@@ -190,10 +190,6 @@ class BooleanRule(name: String? = null) : RuleWithDefaultRepeat<Boolean>(name) {
         return reverseParse(seek, string).getParseCode().isNotError()
     }
 
-    override fun ignoreCallbacks(): BooleanRule {
-        return this
-    }
-
     override fun isThreadSafe(): Boolean {
         return true
     }

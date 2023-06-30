@@ -8,13 +8,40 @@ import java.math.BigInteger
 
 open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteger>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        return IntParsers.parse(
-            seek = seek,
-            string = string,
-            invalidIntParseCode = ParseCode.INVALID_BIG_INTEGER,
-            outOfBoundsParseCode = -1, // Not used
-            checkOutOfBounds = { false }
-        )
+        val length = string.length
+        if (seek >= length) {
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.EOF
+            )
+        }
+
+        val firstChar = string[seek]
+        var i = seek
+        if (firstChar == '-' || firstChar == '+') {
+            i++
+            while (i < length && string[i].isDigit()) {
+                i++
+            }
+            if (i < seek + 2) {
+                return createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.INVALID_BIG_INTEGER
+                )
+            }
+            return createComplete(i)
+        } else if (firstChar.isDigit()) {
+            i++
+            while (i < length && string[i].isDigit()) {
+                i++
+            }
+            return createComplete(i)
+        } else {
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.INVALID_BIG_INTEGER
+            )
+        }
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigInteger>) {
@@ -75,10 +102,6 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
         return seek >= 0 && string[seek].isDigit()
-    }
-
-    override fun ignoreCallbacks(): BigIntegerRule {
-        return this
     }
 
     override val debugNameShouldBeWrapped: Boolean

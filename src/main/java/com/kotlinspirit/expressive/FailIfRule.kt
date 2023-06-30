@@ -113,8 +113,4 @@ class FailIfRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
-
-    override fun ignoreCallbacks(): FailIfRule<T> {
-        return FailIfRule(rule.ignoreCallbacks(), failPredicate)
-    }
 }

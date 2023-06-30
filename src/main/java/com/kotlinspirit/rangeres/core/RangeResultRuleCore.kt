@@ -20,8 +20,4 @@ internal abstract class RangeResultRuleCore<T : Any>(
     fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
         return rule.reverseHasMatch(seek, string)
     }
-
-    fun ignoreCallbacks(): Rule<T> {
-        return rule.ignoreCallbacks()
-    }
 }

@@ -70,8 +70,4 @@ open class StringCharPredicateRule(
     override fun isThreadSafe(): Boolean {
         return true
     }
-
-    override fun ignoreCallbacks(): StringCharPredicateRule {
-        return this
-    }
 }

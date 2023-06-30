@@ -85,8 +85,4 @@ class ULongRule(name: String? = null) : RuleWithDefaultRepeat<ULong>(name) {
     override fun isThreadSafe(): Boolean {
         return true
     }
-
-    override fun ignoreCallbacks(): ULongRule {
-        return this
-    }
 }

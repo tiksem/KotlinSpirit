@@ -161,10 +161,6 @@ class SplitRule<T : Any>(
         return reverseParse(seek, string).getParseCode().isNotError()
     }
 
-    override fun ignoreCallbacks(): SplitRule<T> {
-        return SplitRule(r.ignoreCallbacks(), divider.ignoreCallbacks(), range)
-    }
-
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 

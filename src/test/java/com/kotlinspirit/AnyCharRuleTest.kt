@@ -1,7 +1,9 @@
 package com.kotlinspirit
 
 import com.kotlinspirit.core.ParseCode
+import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rules.char
+import com.kotlinspirit.core.getSeek
 import org.junit.Assert
 import org.junit.Test
 
@@ -9,11 +11,13 @@ class AnyCharRuleTest {
     @Test
     fun parse() {
         Assert.assertEquals(char.compile().parseOrThrow("a"), 1)
+        Assert.assertEquals(char.reverseParse(0, "a").getSeek(), -1)
     }
 
     @Test
     fun parse2() {
         Assert.assertEquals(char.compile().parseOrThrow("awerr"), 1)
+        Assert.assertEquals(char.reverseParse(0, "awerr").getSeek(), -1)
     }
 
     @Test
@@ -24,10 +28,26 @@ class AnyCharRuleTest {
     }
 
     @Test
+    fun reverseParseWithResult() {
+        val result = ParseResult<Char>()
+        char.reverseParseWithResult(0, "a", result)
+        Assert.assertEquals(result.data, 'a')
+        Assert.assertEquals(result.endSeek, -1)
+    }
+
+    @Test
     fun parseWithResult2() {
         val result = char.compile().parseWithResult("adsdsds")
         Assert.assertEquals(result.data, 'a')
         Assert.assertEquals(result.endSeek, 1)
+    }
+
+    @Test
+    fun reverseParseWithResult2() {
+        val result = ParseResult<Char>()
+        char.reverseParseWithResult("adsdsds".length - 1, "adsdsds", result)
+        Assert.assertEquals(result.data, 's')
+        Assert.assertEquals(result.endSeek, "adsdsds".length - 2)
     }
 
     @Test
@@ -37,6 +57,14 @@ class AnyCharRuleTest {
         Assert.assertEquals(result.endSeek, 0)
 
         Assert.assertEquals(char.compile().tryParse(""), null)
+    }
+
+    @Test
+    fun parseEofReverse() {
+        val result = ParseResult<Char>()
+        char.reverseParseWithResult(-1, "", result)
+        Assert.assertEquals(result.errorCode, ParseCode.EOF)
+        Assert.assertEquals(result.endSeek, -1)
     }
 
     @Test

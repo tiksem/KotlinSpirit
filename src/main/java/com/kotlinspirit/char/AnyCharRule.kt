@@ -66,10 +66,6 @@ class CharResultRule(
 
     override val debugNameShouldBeWrapped: Boolean
         get() = rule.debugNameShouldBeWrapped
-
-    override fun ignoreCallbacks(): CharRule {
-        return rule.ignoreCallbacks() as CharRule
-    }
 }
 
 abstract class CharRule(name: String?) : Rule<Char>(name) {
@@ -234,10 +230,6 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-
-    override fun ignoreCallbacks(): AnyCharRule {
-        return this
     }
 
     override val debugNameShouldBeWrapped: Boolean

@@ -442,8 +442,6 @@ abstract class Rule<T : Any>(name: String?) {
         return quoted(str(left), str(right))
     }
 
-    abstract fun ignoreCallbacks(): Rule<T>
-
     abstract fun clone(): Rule<T>
 
     fun compile(debug: Boolean = false): Parser<T> {

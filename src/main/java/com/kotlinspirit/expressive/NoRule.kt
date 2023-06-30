@@ -111,8 +111,4 @@ class NoRule(
     override fun isThreadSafe(): Boolean {
         return rule.isThreadSafe()
     }
-
-    override fun ignoreCallbacks(): NoRule {
-        return NoRule(rule.ignoreCallbacks())
-    }
 }

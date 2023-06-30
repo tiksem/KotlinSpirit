@@ -118,8 +118,4 @@ class SuffixExpectationRule<T : Any>(
             engine = engine
         )
     }
-
-    override fun ignoreCallbacks(): SuffixExpectationRule<T> {
-        return SuffixExpectationRule(body.ignoreCallbacks(), suffix.ignoreCallbacks())
-    }
 }

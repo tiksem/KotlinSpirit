@@ -120,8 +120,4 @@ open class StringCharPredicateRangeRule(
     override fun isThreadSafe(): Boolean {
         return true
     }
-
-    override fun ignoreCallbacks(): StringCharPredicateRangeRule {
-        return this
-    }
 }

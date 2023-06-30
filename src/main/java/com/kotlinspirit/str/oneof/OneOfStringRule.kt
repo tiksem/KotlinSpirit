@@ -125,8 +125,4 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
     override fun isThreadSafe(): Boolean {
         return true
     }
-
-    override fun ignoreCallbacks(): OneOfStringRule {
-        return this
-    }
 }

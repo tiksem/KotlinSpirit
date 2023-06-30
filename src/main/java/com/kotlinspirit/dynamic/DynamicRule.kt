@@ -32,15 +32,6 @@ class DynamicRule<T : Any>(
         return ruleFactory().reverseHasMatch(seek, string)
     }
 
-    override fun ignoreCallbacks(): DynamicRule<T> {
-        return DynamicRule(
-            name = name,
-            ruleFactory = {
-                ruleFactory().ignoreCallbacks()
-            }
-        )
-    }
-
     override fun isThreadSafe(): Boolean {
         return false
     }

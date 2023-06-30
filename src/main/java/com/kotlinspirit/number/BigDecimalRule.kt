@@ -78,10 +78,6 @@ class BigDecimalRule(name: String? = null) : RuleWithDefaultRepeat<BigDecimal>(n
         return parse(seek, string).getParseCode().isNotError()
     }
 
-    override fun ignoreCallbacks(): BigDecimalRule {
-        return this
-    }
-
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 

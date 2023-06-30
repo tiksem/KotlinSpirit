@@ -89,10 +89,6 @@ open class OrRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return a.isThreadSafe() && b.isThreadSafe()
     }
-
-    override fun ignoreCallbacks(): OrRule<T> {
-        return OrRule(a.ignoreCallbacks(), b.ignoreCallbacks(), name)
-    }
 }
 
 class AnyOrRule(a: Rule<Any>, b: Rule<Any>, name: String? = null) : OrRule<Any>(a, b, name) {

@@ -5,170 +5,167 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 
 internal object IntParsers {
-    inline fun parse(
+    inline fun parseInt(
         seek: Int,
+        radix: Int,
         string: CharSequence,
         invalidIntParseCode: Int,
         outOfBoundsParseCode: Int,
-        checkOutOfBounds: (Long) -> Boolean
+        onResult: (Int) -> Unit
     ): Long {
-        val length = string.length
-        if (seek >= length) {
-            return createStepResult(
-                seek = seek,
-                parseCode = ParseCode.EOF
-            )
-        }
-
+        var negative = false
         var i = seek
-        var result = 0L
-        var sign = 1
-        var successFlag = false
-        do {
-            val char = string[i++]
-            when {
-                char == '-' -> {
-                    if (successFlag) {
-                        return createComplete(i)
-                    } else if (sign == 1) {
-                        sign = -1
-                    }
-                }
-                char == '+' -> {
-                    if (successFlag) {
-                        return createComplete(i)
-                    }
-                }
-                char in '0'..'9' -> {
-                    successFlag = true
-                    result *= 10
-                    result += char - '0'
-                    // check int bounds
-                    if (checkOutOfBounds(result)) {
-                        return createStepResult(
-                            seek = seek,
-                            parseCode = outOfBoundsParseCode
-                        )
-                    }
-                }
-                successFlag -> {
-                    return createComplete(i - 1)
-                }
-                else -> {
+        val len = string.length
+        var limit = -Int.MAX_VALUE
+        var hasSign = false
+
+        if (i < len) {
+            val firstChar: Char = string[i]
+            if (firstChar < '0') { // Possible leading "+" or "-"
+                if (firstChar == '-') {
+                    negative = true
+                    limit = Int.MIN_VALUE
+                } else if (firstChar != '+') {
                     return createStepResult(
                         seek = seek,
                         parseCode = invalidIntParseCode
                     )
                 }
-            }
-        } while (i < length)
-
-        return if (successFlag) {
-            createComplete(i)
-        } else {
-            createStepResult(
-                seek = seek,
-                parseCode = invalidIntParseCode
-            )
-        }
-    }
-
-    inline fun parseWithResult(
-        seek: Int,
-        string: CharSequence,
-        invalidIntParseCode: Int,
-        outOfBoundsParseCode: Int,
-        checkOutOfBounds: (Long) -> Boolean,
-        getResult: (Long?, Long) -> Unit
-    ) {
-        val length = string.length
-        if (seek >= length) {
-            getResult(
-                null,
-                createStepResult(
-                    seek = seek,
-                    parseCode = ParseCode.EOF
-                )
-            )
-
-            return
-        }
-
-        var i = seek
-        var sign = 1
-        var result = 0L
-        var successFlag = false
-        do {
-            val char = string[i++]
-            when {
-                (char == '-' || char == '+') && !successFlag -> {
-                    when {
-                        i == seek + 1 -> {
-                            if (char == '-') {
-                                sign = -1
-                            }
-                        }
-                        else -> {
-                            getResult(
-                                null,
-                                createStepResult(
-                                    seek = seek,
-                                    parseCode = invalidIntParseCode
-                                )
-                            )
-                            return
-                        }
-                    }
-                }
-                char in '0'..'9' -> {
-                    successFlag = true
-                    result *= 10
-                    result += char - '0'
-                    // check int bounds
-                    if (checkOutOfBounds(result)) {
-                        getResult(
-                            null,
-                            createStepResult(
-                                seek = seek,
-                                parseCode = outOfBoundsParseCode
-                            )
-                        )
-                        return
-                    }
-                }
-                successFlag -> {
-                    getResult(
-                        result * sign,
-                        createComplete(i - 1)
+                if (i > len - 2) { // Cannot have lone "+" or "-"
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = invalidIntParseCode
                     )
-                    return
                 }
-                else -> {
-                    getResult(
-                        null,
-                        createStepResult(
+                i++
+                hasSign = true
+            }
+            val multmin: Int = limit / radix
+            var result = 0
+            while (i < len) {
+                // Accumulating negatively avoids surprises near MAX_VALUE
+                val digit: Int = Character.digit(string[i++], radix)
+                if (digit < 0) {
+                    if (i > seek + 1) {
+                        i--
+                        break
+                    } else {
+                        return createStepResult(
                             seek = seek,
                             parseCode = invalidIntParseCode
                         )
+                    }
+                } else if (result < multmin) {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = outOfBoundsParseCode
                     )
-
-                    return
                 }
-            }
-        } while (i < length)
 
-        if (successFlag) {
-            getResult(
-                result * sign,
-                createComplete(i)
-            )
-        } else {
-            getResult(
-                null,
+                result *= radix
+                if (result < limit + digit) {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = outOfBoundsParseCode
+                    )
+                }
+                result -= digit
+            }
+            onResult(if (negative) result else -result)
+
+            return if (hasSign && i < seek + 2) {
                 createStepResult(
                     seek = seek,
                     parseCode = invalidIntParseCode
                 )
+            } else {
+                createComplete(i)
+            }
+        } else {
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.EOF
+            )
+        }
+    }
+
+    inline fun parseLong(
+        seek: Int,
+        radix: Int,
+        string: CharSequence,
+        onResult: (Long) -> Unit
+    ): Long {
+        var negative = false
+        var i = seek
+        val len = string.length
+        var limit = -Long.MAX_VALUE
+
+        if (i < len) {
+            val firstChar: Char = string[i]
+            var hasSign = false
+            if (firstChar < '0') { // Possible leading "+" or "-"
+                if (firstChar == '-') {
+                    negative = true
+                    limit = Long.MIN_VALUE
+                } else if (firstChar != '+') {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_LONG
+                    )
+                }
+                if (i > len - 2) { // Cannot have lone "+" or "-"
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.INVALID_LONG
+                    )
+                }
+                i++
+                hasSign = true
+            }
+            val multmin = limit / radix
+            var result = 0L
+            while (i < len) {
+                // Accumulating negatively avoids surprises near MAX_VALUE
+                val digit: Int = Character.digit(string[i++], radix)
+                if (digit < 0) {
+                    if (i > seek + 1) {
+                        i--
+                        break
+                    } else {
+                        return createStepResult(
+                            seek = seek,
+                            parseCode = ParseCode.INVALID_LONG
+                        )
+                    }
+                } else if (result < multmin) {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.LONG_OUT_OF_BOUNDS
+                    )
+                }
+                result *= radix
+                if (result < limit + digit) {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.LONG_OUT_OF_BOUNDS
+                    )
+                }
+                result -= digit
+            }
+            onResult(if (negative) result else -result)
+
+            return if (hasSign && i < seek + 2) {
+                createStepResult(
+                    seek = seek,
+                    parseCode = ParseCode.INVALID_LONG
+                )
+            } else {
+                createComplete(i)
+            }
+        } else {
+            return createStepResult(
+                seek = seek,
+                parseCode = ParseCode.EOF
             )
         }
     }

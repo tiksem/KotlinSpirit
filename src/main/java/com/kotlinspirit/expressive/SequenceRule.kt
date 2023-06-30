@@ -97,10 +97,6 @@ class SequenceRule(
         return a.isThreadSafe() && b.isThreadSafe()
     }
 
-    override fun ignoreCallbacks(): Rule<CharSequence> {
-        return SequenceRule(a.ignoreCallbacks(), b.ignoreCallbacks())
-    }
-
     override fun repeat(): Rule<List<CharSequence>> {
         return super.repeat()
     }

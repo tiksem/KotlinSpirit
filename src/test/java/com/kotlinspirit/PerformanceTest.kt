@@ -3,6 +3,7 @@ package com.kotlinspirit
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.digit
 import com.kotlinspirit.core.Rules.double
+import com.kotlinspirit.core.Rules.int
 import com.kotlinspirit.core.Rules.oneOf
 import org.junit.Test
 import kotlin.random.Random
@@ -42,6 +43,19 @@ class PerformanceTest {
         time = System.currentTimeMillis()
         repeat(1000) {
             pattern.matches(input)
+        }
+        System.out.println(System.currentTimeMillis() - time)
+
+        val strs = (0..1000000).map { it.toString() }
+        val p = int.compile()
+        time = System.currentTimeMillis()
+        strs.forEach {
+            p.parse(it)
+        }
+        System.out.println(System.currentTimeMillis() - time)
+        time = System.currentTimeMillis()
+        strs.forEach {
+            Integer.parseInt(it)
         }
         System.out.println(System.currentTimeMillis() - time)
     }

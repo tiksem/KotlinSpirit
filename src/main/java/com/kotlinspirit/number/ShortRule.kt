@@ -5,32 +5,45 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class ShortRule(name: String? = null) : RuleWithDefaultRepeat<Short>(name) {
+class ShortRule(name: String? = null, private val radix: Int) : RuleWithDefaultRepeat<Short>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        return IntParsers.parse(
+        return IntParsers.parseInt(
             seek = seek,
             string = string,
+            radix = radix,
             invalidIntParseCode = ParseCode.INVALID_SHORT,
             outOfBoundsParseCode = ParseCode.SHORT_OUT_OF_BOUNDS,
-            checkOutOfBounds = {
-                it > Short.MAX_VALUE
+            onResult = {
+                if (it !in Short.MIN_VALUE..Short.MAX_VALUE) {
+                    return createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.SHORT_OUT_OF_BOUNDS
+                    )
+                }
             }
         )
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Short>) {
-        IntParsers.parseWithResult(
+        r.data = null
+        r.parseResult = IntParsers.parseInt(
             seek = seek,
             string = string,
+            radix = radix,
             invalidIntParseCode = ParseCode.INVALID_SHORT,
             outOfBoundsParseCode = ParseCode.SHORT_OUT_OF_BOUNDS,
-            checkOutOfBounds = {
-                it > Short.MAX_VALUE
+            onResult = {
+                if (it !in Short.MIN_VALUE..Short.MAX_VALUE) {
+                    r.parseResult = createStepResult(
+                        seek = seek,
+                        parseCode = ParseCode.SHORT_OUT_OF_BOUNDS
+                    )
+                    return
+                } else {
+                    r.data = it.toShort()
+                }
             }
-        ) { value, parseResult ->
-            r.parseResult = parseResult
-            r.data = value?.toShort()
-        }
+        )
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -76,7 +89,7 @@ class ShortRule(name: String? = null) : RuleWithDefaultRepeat<Short>(name) {
         get() = false
 
     override fun name(name: String): ShortRule {
-        return ShortRule(name)
+        return ShortRule(name, radix)
     }
 
     override val defaultDebugName: String
@@ -84,9 +97,5 @@ class ShortRule(name: String? = null) : RuleWithDefaultRepeat<Short>(name) {
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-
-    override fun ignoreCallbacks(): ShortRule {
-        return this
     }
 }

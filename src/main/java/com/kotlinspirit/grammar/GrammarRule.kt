@@ -116,8 +116,4 @@ open class GrammarRule<T : Any>(
     override fun isThreadSafe(): Boolean {
         return false
     }
-
-    override fun ignoreCallbacks(): GrammarRule<T> {
-        return this
-    }
 }

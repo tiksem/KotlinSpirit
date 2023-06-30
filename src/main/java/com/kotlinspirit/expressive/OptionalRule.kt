@@ -91,8 +91,4 @@ class OptionalRule<T : Any>(
     override fun name(name: String): OptionalRule<T> {
         return OptionalRule(rule, name)
     }
-
-    override fun ignoreCallbacks(): OptionalRule<T> {
-        return OptionalRule(rule.ignoreCallbacks())
-    }
 }

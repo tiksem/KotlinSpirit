@@ -65,10 +65,6 @@ class DynamicStringRule(
         )
     }
 
-    override fun ignoreCallbacks(): DynamicStringRule {
-        return this
-    }
-
     override fun isThreadSafe(): Boolean {
         return false
     }

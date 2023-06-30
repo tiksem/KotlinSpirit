@@ -85,8 +85,4 @@ class UIntRule(name: String? = null) : RuleWithDefaultRepeat<UInt>(name) {
     override fun isThreadSafe(): Boolean {
         return true
     }
-
-    override fun ignoreCallbacks(): UIntRule {
-        return this
-    }
 }

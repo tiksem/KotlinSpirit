@@ -220,8 +220,4 @@ open class CharPredicateRule : CharRule {
     override fun name(name: String): Rule<Char> {
         return CharPredicateRule(data, predicate, eofParseCode, name)
     }
-
-    override fun ignoreCallbacks(): CharPredicateRule {
-        return this
-    }
 }

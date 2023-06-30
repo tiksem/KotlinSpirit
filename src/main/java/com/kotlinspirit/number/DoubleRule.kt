@@ -20,10 +20,6 @@ class DoubleRule(name: String? = null) : BaseFloatRule<Double>(
         return this
     }
 
-    override fun ignoreCallbacks(): DoubleRule {
-        return this
-    }
-
     override fun name(name: String): DoubleRule {
         return DoubleRule(name)
     }

@@ -5,32 +5,26 @@ import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class LongRule(name: String? = null) : RuleWithDefaultRepeat<Long>(name) {
+class LongRule(name: String? = null, private val radix: Int) : RuleWithDefaultRepeat<Long>(name) {
     override fun parse(seek: Int, string: CharSequence): Long {
-        return IntParsers.parse(
+        return IntParsers.parseLong(
             seek = seek,
+            radix = radix,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_LONG,
-            outOfBoundsParseCode = ParseCode.LONG_OUT_OF_BOUNDS,
-            checkOutOfBounds = {
-                it < 0
-            }
+            onResult = {}
         )
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, r: ParseResult<Long>) {
-        IntParsers.parseWithResult(
+        r.data = null
+        r.parseResult = IntParsers.parseLong(
             seek = seek,
+            radix = radix,
             string = string,
-            invalidIntParseCode = ParseCode.INVALID_LONG,
-            outOfBoundsParseCode = ParseCode.LONG_OUT_OF_BOUNDS,
-            checkOutOfBounds = {
-                it < 0
+            onResult = {
+                r.data = it
             }
-        ) { value, parseResult ->
-            r.parseResult = parseResult
-            r.data = value
-        }
+        )
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -76,7 +70,7 @@ class LongRule(name: String? = null) : RuleWithDefaultRepeat<Long>(name) {
         get() = false
 
     override fun name(name: String): LongRule {
-        return LongRule(name)
+        return LongRule(name, radix)
     }
 
     override val defaultDebugName: String
@@ -84,9 +78,5 @@ class LongRule(name: String? = null) : RuleWithDefaultRepeat<Long>(name) {
 
     override fun isThreadSafe(): Boolean {
         return true
-    }
-
-    override fun ignoreCallbacks(): LongRule {
-        return this
     }
 }

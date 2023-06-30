@@ -33,11 +33,7 @@ internal abstract class BaseRangeResultDefaultRepeatRule<T : Any> internal const
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun ignoreCallbacks(): Rule<T> {
-        return core.ignoreCallbacks()
+        return core.reverseHasMatch(seek, string)
     }
 
     override val debugNameShouldBeWrapped: Boolean

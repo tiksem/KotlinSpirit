@@ -85,8 +85,4 @@ class UShortRule(name: String? = null) : RuleWithDefaultRepeat<UShort>(name) {
     override fun isThreadSafe(): Boolean {
         return true
     }
-
-    override fun ignoreCallbacks(): UShortRule {
-        return this
-    }
 }

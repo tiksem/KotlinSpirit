@@ -97,10 +97,6 @@ class QuotedRule<T : Any>(
         return left.reverseHasMatch(m.getSeek(), string)
     }
 
-    override fun ignoreCallbacks(): QuotedRule<T> {
-        return this
-    }
-
     override val debugNameShouldBeWrapped: Boolean
         get() = true
 

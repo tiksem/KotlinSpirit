@@ -85,8 +85,4 @@ class UByteRule(name: String? = null) : RuleWithDefaultRepeat<UByte>(name) {
     override fun isThreadSafe(): Boolean {
         return true
     }
-
-    override fun ignoreCallbacks(): UByteRule {
-        return this
-    }
 }
