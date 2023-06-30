@@ -2,7 +2,7 @@ package com.kotlinspirit
 
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
-import com.kotlinspirit.core.Rules.dynamic
+import com.kotlinspirit.core.Rules.dynamicString
 import com.kotlinspirit.core.Rules.nonEmptyLatinStr
 import com.kotlinspirit.grammar.Grammar
 import org.junit.Assert
@@ -25,7 +25,7 @@ private val parser = object : Grammar<Tag>() {
             name = it.toString()
         }) + char('>') + ((char - '<').repeat()) {
             body = it.toString()
-        } + "</" + dynamic {
+        } + "</" + dynamicString {
             name
         } + '>'
     }

@@ -5,6 +5,7 @@ import com.kotlinspirit.core.createComplete
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.ext.all
 import com.kotlinspirit.ext.debugString
+import com.kotlinspirit.ext.moveSeekReverseUntilDontMatch
 import com.kotlinspirit.ext.moveSeekUntilDontMatch
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import kotlin.math.max
@@ -75,7 +76,7 @@ open class StringCharPredicateRangeRule(
             )
         }
 
-        val newSeek = string.moveSeekUntilDontMatch(
+        val newSeek = string.moveSeekReverseUntilDontMatch(
             startIndex = seek,
             endIndex = max(-1, lastSeek - range.last),
             predicate = predicate

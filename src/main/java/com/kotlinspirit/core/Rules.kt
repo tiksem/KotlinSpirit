@@ -1,8 +1,10 @@
 package com.kotlinspirit.core
 
+import com.kotlinspirit.bool.BooleanRule
 import com.kotlinspirit.char.*
 import com.kotlinspirit.char.CharPredicateData
 import com.kotlinspirit.char.CharPredicates
+import com.kotlinspirit.dynamic.DynamicRule
 import com.kotlinspirit.dynamic.DynamicStringRule
 import com.kotlinspirit.eof.EofRule
 import com.kotlinspirit.expressive.*
@@ -138,9 +140,14 @@ object Rules {
         }
     }
 
-    fun dynamic(stringProvider: () -> CharSequence): DynamicStringRule {
+    fun dynamicString(stringProvider: () -> CharSequence): DynamicStringRule {
         return DynamicStringRule(stringProvider)
     }
 
+    fun <T : Any> dynamicRule(ruleFactory: () -> Rule<T>): DynamicRule<T> {
+        return DynamicRule(name = null, ruleFactory = ruleFactory)
+    }
+
     val eof = EofRule()
+    val boolean = BooleanRule()
 }

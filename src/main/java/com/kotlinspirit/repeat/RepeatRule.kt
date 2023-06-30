@@ -148,6 +148,7 @@ class RepeatRule<T : Any>(
         baseParseWithResult(seek, result, parser = { s, r ->
             rule.reverseParseWithResult(s, string, r)
         })
+        result.data = result.data?.asReversed()
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {

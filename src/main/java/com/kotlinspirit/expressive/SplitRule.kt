@@ -154,6 +154,7 @@ class SplitRule<T : Any>(
                 )
             }
         )
+        result.data = result.data?.asReversed()
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
