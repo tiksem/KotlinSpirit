@@ -32,6 +32,22 @@ object Rules {
     val byte = ByteRule(radix = 10)
     val ubyte = UByteRule()
 
+    fun int(value: Int): ExactIntRule {
+        return ExactIntRule(value)
+    }
+
+    fun long(value: Long): ExactLongRule {
+        return ExactLongRule(value)
+    }
+
+    fun float(value: Float): ExactFloatRule {
+        return ExactFloatRule(value)
+    }
+
+    fun double(value: Double): ExactDoubleRule {
+        return ExactDoubleRule(value)
+    }
+
     val char = AnyCharRule()
     val digit = char('0'..'9')
     val space: CharPredicateRule = charIf {

@@ -3,11 +3,13 @@ package com.kotlinspirit
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.double
+import com.kotlinspirit.core.Rules.int
 import com.kotlinspirit.core.Rules.lazy
 import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.core.plus
 import com.kotlinspirit.expressive.LazyRule
 import com.kotlinspirit.grammar.Grammar
+import com.kotlinspirit.grammar.nestedResult
 import org.json.JSONObject
 import org.junit.Assert
 import org.junit.Test
@@ -25,6 +27,7 @@ private val value: LazyRule<Any> = lazy {
 
 private val jsonObject = object : Grammar<Map<String, Any>>() {
     private var key: String = ""
+    private var value: Any? = null
     override var result = LinkedHashMap<String, Any>()
         private set
 
@@ -32,11 +35,22 @@ private val jsonObject = object : Grammar<Map<String, Any>>() {
         result = LinkedHashMap()
     }
 
+    private fun onKeyOrValueSet() {
+        val value = this.value
+        if (value != null && key.isNotEmpty()) {
+            result[key] = value
+            this.value = null
+            key = ""
+        }
+    }
+
     override fun defineRule(): Rule<*> {
         val jsonPair = skipper + jsonString {
             key = it.toString().replace("\\\"", "\"")
+            onKeyOrValueSet()
         } + skipper + ':' + skipper + value {
-            result[key] = it
+            value = it
+            onKeyOrValueSet()
         } + skipper
         return char('{') + skipper + jsonPair.split(
             divider = ',',
@@ -109,6 +123,23 @@ class JsonParserTest {
             "some \\\" str",
             jsonString.compile().parseGetResultOrThrow("\"some \\\" str\"  ")
         )
+
+        val reverseParser = nestedResult(
+            nested = jsonString,
+            entire = {
+                int(1234).requiresPrefix(it)
+            }
+        ).compile()
+
+        Assert.assertEquals(
+            "some str",
+            reverseParser.findFirst("\"some str\"1234")
+        )
+
+        Assert.assertEquals(
+            "some \\\" str",
+            reverseParser.findFirst("\"some \\\" str\"1234")
+        )
     }
 
     @Test
@@ -117,6 +148,18 @@ class JsonParserTest {
             "some str",
             value.compile().parseGetResultOrThrow("\"some str\"")
         )
+
+        val reverseParser = nestedResult(
+            nested = value,
+            entire = {
+                int(1234).requiresPrefix(it)
+            }
+        ).compile()
+
+        Assert.assertEquals(
+            "some str",
+            reverseParser.findFirst("\"some str\"1234")
+        )
     }
 
     @Test
@@ -124,6 +167,18 @@ class JsonParserTest {
         Assert.assertArrayEquals(
             arrayOf(1223233.0, "aaaaaa", 123456.0),
             jsonArray.compile().parseGetResultOrThrow("[  1223233, \"aaaaaa\", 123456]").toTypedArray()
+        )
+
+        val reverseParser = nestedResult(
+            nested = jsonArray,
+            entire = {
+                int(1234).requiresPrefix(it)
+            }
+        ).compile()
+
+        Assert.assertArrayEquals(
+            arrayOf(1223233.0, "aaaaaa", 123456.0),
+            reverseParser.findFirst("[  1223233, \"aaaaaa\", 123456]1234")?.toTypedArray()
         )
     }
 
@@ -180,17 +235,21 @@ class JsonParserTest {
                 "    }\n" +
                 "  ]\n" +
                 "}"
-        val p = jsonObject.compile(debug = true)
 
-        (0..10).map {
-            Thread {
-                val value = p.parseGetResultOrThrow(str)
-                JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
-            }.also {
-                it.start()
+        val p = jsonObject.compile(debug = true)
+        val reverseParser = nestedResult(
+            nested = jsonObject,
+            entire = {
+                int(9898989).requiresPrefix(it)
             }
-        }.forEach {
-            it.join()
-        }
+        ).compile()
+
+        val value = p.parseGetResultOrThrow(str)
+        JSONAssert.assertEquals(JSONObject(str), JSONObject(value), true)
+        JSONAssert.assertEquals(
+            JSONObject(str),
+            JSONObject(reverseParser.findFirst(str + "9898989")),
+            true
+        )
     }
 }

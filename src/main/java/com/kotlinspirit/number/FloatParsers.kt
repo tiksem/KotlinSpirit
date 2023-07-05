@@ -382,6 +382,9 @@ internal object FloatParsers {
                                 return createComplete(i - 1)
                             }
                         }
+                        else -> {
+                            break
+                        }
                     }
                 }
 

@@ -117,9 +117,9 @@ internal fun exactStringReverseParseWithResult(
 }
 
 open class ExactStringRule(
-    internal val string: CharSequence,
+    string: CharSequence,
     name: String? = null
-) : RuleWithDefaultRepeat<CharSequence>(name) {
+) : BaseExactStringRule<CharSequence>(string, name) {
     override fun parse(seek: Int, string: CharSequence): Long {
         return exactStringParse(seek, string, this.string)
     }
@@ -135,34 +135,12 @@ open class ExactStringRule(
         )
     }
 
-    override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return string.regionMatches(
-            thisOffset = seek,
-            other = this.string,
-            otherOffset = 0,
-            length = this.string.length
-        )
-    }
-
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
-        return exactStringReverseParse(seek, string, this.string)
-    }
-
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
         exactStringReverseParseWithResult(
             seek = seek,
             string = string,
             token = this.string,
             result = result
-        )
-    }
-
-    override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
-        return string.regionMatches(
-            thisOffset = seek - this.string.length + 1,
-            other = this.string,
-            otherOffset = 0,
-            length = this.string.length
         )
     }
 
@@ -183,10 +161,6 @@ open class ExactStringRule(
 
     override val defaultDebugName: String
         get() = "str:$string"
-
-    override fun isThreadSafe(): Boolean {
-        return true
-    }
 }
 
 class EmptyStringRule(name: String? = null): ExactStringRule("", name) {

@@ -43,7 +43,7 @@ inline fun <T : Any> nestedResult(
 ): GrammarRule<T> {
     return nestedResult(
         nested = {
-            nested
+            nested.clone()
         },
         entire = entire
     )

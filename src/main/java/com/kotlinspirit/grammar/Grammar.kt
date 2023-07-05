@@ -22,7 +22,16 @@ abstract class Grammar<T : Any> {
     open fun clone(): Grammar<T> {
         val constructor = javaClass.declaredConstructors[0]
         constructor.isAccessible = true
-        return constructor.newInstance() as Grammar<T>
+        return if (constructor.parameterCount == 0) {
+            constructor.newInstance()
+        } else {
+            constructor.newInstance(
+                *javaClass.declaredFields.sliceArray(0 until constructor.parameterCount).map {
+                    it.isAccessible = true
+                    it.get(this)
+                }.toTypedArray()
+            )
+        } as Grammar<T>
     }
 
     fun toRule(): GrammarRule<T> {
