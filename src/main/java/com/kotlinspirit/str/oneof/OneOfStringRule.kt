@@ -4,7 +4,6 @@ import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import com.kotlinspirit.str.ExactStringRule
 
 class OneOfStringRule internal constructor(private val strings: List<CharSequence>, name: String? = null) :
     RuleWithDefaultRepeat<CharSequence>(name) {
@@ -90,18 +89,6 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
         return reversedTree.reverseHasMatch(seek, string)
-    }
-
-    override infix fun or(string: String): OneOfStringRule {
-        return OneOfStringRule(listOf(string) + strings)
-    }
-
-    infix fun or(anotherRule: ExactStringRule): OneOfStringRule {
-        return OneOfStringRule(listOf(anotherRule.string) + strings)
-    }
-
-    infix fun or(anotherRule: OneOfStringRule): OneOfStringRule {
-        return OneOfStringRule(anotherRule.strings + strings)
     }
 
     override fun clone(): OneOfStringRule {

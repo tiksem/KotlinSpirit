@@ -33,12 +33,12 @@ fun Char.requiresPrefix(rule: Rule<*>): RequiresPrefixRule<Char> {
     return RequiresPrefixRule(bodyRule = ExactCharRule(this), prefixRule = rule)
 }
 
-infix fun String.or(rule: ExactStringRule): OneOfStringRule {
+infix fun String.or(rule: ExactStringRule): OrRule<CharSequence> {
     return ExactStringRule(this) or rule
 }
 
-infix fun String.or(rule: String): OneOfStringRule {
-    return ExactStringRule(this) or rule
+infix fun String.or(rule: String): OrRule<CharSequence> {
+    return ExactStringRule(this) or ExactStringRule(rule)
 }
 
 infix fun String.or(rule: Rule<*>): AnyOrRule {

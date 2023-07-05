@@ -8,6 +8,7 @@ import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RepeatRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
+import com.kotlinspirit.str.ExactStringRule
 
 open class OrRule<T : Any>(
     protected val a: Rule<T>,
@@ -94,5 +95,19 @@ open class OrRule<T : Any>(
 class AnyOrRule(a: Rule<Any>, b: Rule<Any>, name: String? = null) : OrRule<Any>(a, b, name) {
     override fun clone(): AnyOrRule {
         return AnyOrRule(a.clone(), b.clone(), name)
+    }
+}
+
+class StringOrRule(a: Rule<CharSequence>, b: Rule<CharSequence>, name: String? = null) : OrRule<CharSequence>(a, b, name) {
+    override fun clone(): StringOrRule {
+        return StringOrRule(a.clone(), b.clone(), name)
+    }
+
+    override fun or(string: String): StringOrRule {
+        return this or ExactStringRule(string)
+    }
+
+    infix fun or(a: ExactStringRule): StringOrRule {
+        return StringOrRule(this, a)
     }
 }

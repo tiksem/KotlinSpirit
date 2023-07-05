@@ -1,10 +1,8 @@
 package com.kotlinspirit.str
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.expressive.StringOrRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import com.kotlinspirit.str.oneof.OneOfStringRule
 
 internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequence): Long {
     val tokenLength = token.length
@@ -168,12 +166,8 @@ open class ExactStringRule(
         )
     }
 
-    infix fun or(anotherRule: ExactStringRule): OneOfStringRule {
-        return OneOfStringRule(listOf(string, anotherRule.string))
-    }
-
-    override infix fun or(string: String): OneOfStringRule {
-        return OneOfStringRule(listOf(this.string, string))
+    override infix fun or(string: String): StringOrRule {
+        return StringOrRule(this, ExactStringRule(string))
     }
 
     override fun clone(): ExactStringRule {
