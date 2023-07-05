@@ -33,6 +33,8 @@ private val jsonObject = object : Grammar<Map<String, Any>>() {
 
     override fun resetResult() {
         result = LinkedHashMap()
+        key = ""
+        value = null
     }
 
     private fun onKeyOrValueSet() {
