@@ -43,7 +43,7 @@ Let's describe basic rules used as simple units for creating complex rules. Don'
 ## Number rules
 Those rules represent the corresponding numbers, with bound checks for integers
 ```
-int, long, float, double, uint, ulong, short, ushort, bigDecimal, bigint
+int, long, float, double, uint, ulong, short, ushort, byte, ubyte, bigDecimal, bigint
 ```
 You can also pass ranges and exact numbers to match spesific values
 ```
