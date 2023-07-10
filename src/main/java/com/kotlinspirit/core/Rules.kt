@@ -15,6 +15,8 @@ import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
+import java.util.OptionalDouble
+import kotlin.math.absoluteValue
 
 object Rules {
     fun <T : Any> lazy(ruleProvider: () -> Rule<T>): LazyRule<T> {
@@ -32,20 +34,84 @@ object Rules {
     val byte = ByteRule(radix = 10)
     val ubyte = UByteRule()
 
-    fun int(value: Int): ExactIntRule {
-        return ExactIntRule(value)
+    fun int(value: Int): RuleWithDefaultRepeat<Int> {
+        return int.failIf { it != value }
     }
 
-    fun long(value: Long): ExactLongRule {
-        return ExactLongRule(value)
+    fun int(range: IntRange): RuleWithDefaultRepeat<Int> {
+        return int.failIf { it !in range }
     }
 
-    fun float(value: Float): ExactFloatRule {
-        return ExactFloatRule(value)
+    fun long(value: Long): RuleWithDefaultRepeat<Long> {
+        return long.failIf { it != value }
     }
 
-    fun double(value: Double): ExactDoubleRule {
-        return ExactDoubleRule(value)
+    fun long(range: LongRange): RuleWithDefaultRepeat<Long> {
+        return long.failIf { it !in range }
+    }
+
+    fun short(value: Short): RuleWithDefaultRepeat<Short> {
+        return short.failIf { it != value }
+    }
+
+    fun short(value: IntRange): RuleWithDefaultRepeat<Short> {
+        return short.failIf { it !in value }
+    }
+
+    fun byte(value: Byte): RuleWithDefaultRepeat<Byte> {
+        return byte.failIf { it != value }
+    }
+
+    fun byte(value: IntRange): RuleWithDefaultRepeat<Byte> {
+        return byte.failIf { it !in value }
+    }
+
+    fun uint(value: UInt): RuleWithDefaultRepeat<UInt> {
+        return uint.failIf { it != value }
+    }
+
+    fun uint(value: UIntRange): RuleWithDefaultRepeat<UInt> {
+        return uint.failIf { it !in value }
+    }
+
+    fun ulong(value: ULong): RuleWithDefaultRepeat<ULong> {
+        return ulong.failIf { it != value }
+    }
+
+    fun ulong(value: ULongRange): RuleWithDefaultRepeat<ULong> {
+        return ulong.failIf { it !in value }
+    }
+
+    fun ushort(value: UShort): RuleWithDefaultRepeat<UShort> {
+        return ushort.failIf { it != value }
+    }
+
+    fun ushort(value: UIntRange): RuleWithDefaultRepeat<UShort> {
+        return ushort.failIf { it !in value }
+    }
+
+    fun ubyte(value: UByte): RuleWithDefaultRepeat<UByte> {
+        return ubyte.failIf { it != value }
+    }
+
+    fun ubyte(value: UIntRange): RuleWithDefaultRepeat<UByte> {
+        return ubyte.failIf { it !in value }
+    }
+
+    fun float(value: Float, delta: Float = 0.0f): RuleWithDefaultRepeat<Float> {
+        return float.failIf { it != value && (it - value).absoluteValue > delta }
+    }
+
+    fun double(value: Double, delta: Double): RuleWithDefaultRepeat<Double> {
+        return double.failIf { it != value && (it - value).absoluteValue > delta }
+    }
+
+    fun float(range: ClosedRange<Float>): RuleWithDefaultRepeat<Float> {
+        return float.failIf { it !in range }
+    }
+
+    fun double(range: ClosedRange<Double>): RuleWithDefaultRepeat<Double> {
+        return double.failIf { it !in range }
     }
 
     val char = AnyCharRule()
