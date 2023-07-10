@@ -509,11 +509,10 @@ The rule has the same result as the main rule. The result seek of the rule is th
 fun requiresPrefix(other: Rule<*>): RequiresPrefixRule<T>
 ```
 ```Kotlin
-val parser = int.expectsSuffix("yo!").compile()
-parser.parseGetResultOrThrow("345yo!") // 345
-parser.tryParse("345yo!") // "345".length
+val parser = (+char('a'..'z')).requiresPrefix(int).compile()
+parser.findFirst("345yo") // yo
 ```
-Prefix rule is complicated. It requires reverse search to check for the prefix. It means it requires some special attention for grammars and callbacks. So if you grammar is inside the prefix rule all the callbacks are executed in reverse order. Let's write a simple xml parser with tags only and without attributes to see how it works.
+Prefix rule is complicated. It requires reverse search to check for the prefix. It means it requires some special attention for grammars and callbacks. So if your grammar is inside the prefix rule all the callbacks are executed in a reverse order. Let's write a simple xml parser with tags only and without attributes to see how it works.
 ```Kotlin
 private data class Xml(
     val body: List<Any>,
