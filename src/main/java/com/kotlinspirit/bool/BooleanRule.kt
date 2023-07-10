@@ -166,6 +166,7 @@ class BooleanRule(name: String? = null) : RuleWithDefaultRepeat<Boolean>(name) {
                 ) {
                     result.parseResult = createComplete(seek - TRUE_LENGTH)
                     result.data = true
+                    return
                 } else if (
                     string[seek - 1] == 's' &&
                     string[seek - 2] == 'l' &&
