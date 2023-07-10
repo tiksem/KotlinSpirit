@@ -145,6 +145,8 @@ Repeat rule is specified by:
 
 `repeated.repeat()` Repeat 0 or more times
 
+`repeat(n: Int)` Repeat exactly n times
+
 `repeated.repeat(m..n)` Repeat from m to n times
 
 `+repeated` Repeat 1 or more times
