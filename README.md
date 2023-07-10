@@ -492,6 +492,14 @@ Assert.assertEquals(parser.parseGetResultOrThrow("<a>Hello!</a>"), Tag(body = "H
 This rule works the same way as `dynamicString` above, but it's more advanced, cause you can return any dynamically generated rule you want.
 For example: `dynamicRule { int or double }`
 
+# Suffix rule
+The rule has the same result as the main rule. The result seek of the rule is the same as the main's rule result seek.
+```Kotlin
+val parser = int.expectsSuffix("yo!").compile()
+parser.parseGetResultOrThrow("345yo!") // 345
+parser.tryParse("345yo!") // "345".length
+```
+
 # Building advanced replacers
 Sometimes you need to create some advanced replace logic, so Parser repalce functions don't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements with groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integers, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
 ```Kotlin
