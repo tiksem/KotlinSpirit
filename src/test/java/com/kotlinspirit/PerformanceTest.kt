@@ -11,17 +11,15 @@ import kotlin.random.Random
 class PerformanceTest {
     @Test
     fun test1() {
-        double
-
-        val pattern = Regex("^(?:Ivan|Vasil|Eblan|[A-Z]+)+@[0-9]+$")
+        val pattern = Regex("^(?:Ivan|Vasil|Vivaldi|[A-Z]+)+@[0-9]+$")
         val parser = (
-                (oneOf("Ivan", "Vasil", "Eblan") or char('A'..'Z'))
+                (oneOf("Ivan", "Vasil", "Vivaldi") or char('A'..'Z'))
                     .repeat().asString() + '@' + digit.repeat()
                 )
             .compile()
 
         val input = StringBuilder()
-        val arr = arrayOf("Ivan", "Vasil", "Eblan")
+        val arr = arrayOf("Ivan", "Vasil", "Vivaldi")
         repeat(500) {
             if (Random.nextBoolean()) {
                 input.append(Random.nextInt('A'.code, 'Z'.code + 1).toChar())
@@ -43,19 +41,6 @@ class PerformanceTest {
         time = System.currentTimeMillis()
         repeat(1000) {
             pattern.matches(input)
-        }
-        System.out.println(System.currentTimeMillis() - time)
-
-        val strs = (0..1000000).map { it.toString() }
-        val p = int.compile()
-        time = System.currentTimeMillis()
-        strs.forEach {
-            p.parse(it)
-        }
-        System.out.println(System.currentTimeMillis() - time)
-        time = System.currentTimeMillis()
-        strs.forEach {
-            Integer.parseInt(it)
         }
         System.out.println(System.currentTimeMillis() - time)
     }
