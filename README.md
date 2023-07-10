@@ -155,7 +155,7 @@ Char repeat example:
 ```Kotlin
 val name = char('A'..'Z') + char('a'..'z').repeat(1..19)
 ```
-Matches any name with 2 - 20 length.
+Matches any name, started with an uppercase letter, ends with lowercase letters, and has 2 - 20 length.
 
 Lets repeat the names
 ```Kotlin
