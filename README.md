@@ -492,13 +492,75 @@ Assert.assertEquals(parser.parseGetResultOrThrow("<a>Hello!</a>"), Tag(body = "H
 This rule works the same way as `dynamicString` above, but it's more advanced, cause you can return any dynamically generated rule you want.
 For example: `dynamicRule { int or double }`
 
-# Suffix rule
-The rule has the same result as the main rule. The result seek of the rule is the same as the main's rule result seek.
+## Suffix rule
+The rule has the same result as the main rule. The result seek of the rule is the same as the main's rule result seek. It points that some suffix is required after the main rule.
+```Kotlin
+fun expectsSuffix(other: Rule<*>): SuffixExpectationRule<T>
+```
 ```Kotlin
 val parser = int.expectsSuffix("yo!").compile()
 parser.parseGetResultOrThrow("345yo!") // 345
 parser.tryParse("345yo!") // "345".length
 ```
+
+## Prefix rule
+The rule has the same result as the main rule. The result seek of the rule is the same as the main's rule result seek. It points that some prefix is required before the main rule.
+```Kotlin
+fun requiresPrefix(other: Rule<*>): RequiresPrefixRule<T>
+```
+```Kotlin
+val parser = int.expectsSuffix("yo!").compile()
+parser.parseGetResultOrThrow("345yo!") // 345
+parser.tryParse("345yo!") // "345".length
+```
+Prefix rule is complicated. It requires reverse search to check for the prefix. It means it requires some special attention for grammars and callbacks. So if you grammar is inside the prefix rule all the callbacks are executed in reverse order. Let's write a simple xml parser with tags only and without attributes to see how it works.
+```Kotlin
+private data class Xml(
+    val body: List<Any>,
+    val name: String
+)
+
+private val xmlRule = object : Grammar<Xml>() {
+    private var name = ""
+    private var body = emptyList<Any>()
+
+    override val result: Xml
+        get() = Xml(body, name)
+
+    override fun defineRule(): Rule<*> {
+        val firstTagNameOccurrence = nonEmptyLatinStr {
+            name = it.toString()
+        }
+
+        val secondTagNameOccurrence = dynamicString {
+            name
+        }
+
+        val tagName = dynamicRule {
+            if (name.isEmpty()) {
+                firstTagNameOccurrence
+            } else {
+                secondTagNameOccurrence
+            }
+        }
+
+        val openingTag = char('<') + tagName + char('>')
+
+        val closedTag = str("</") + tagName + '>'
+
+        return openingTag + xmlTagBody {
+            body = it
+        } + closedTag
+    }
+
+    override fun resetResult() {
+        name = ""
+    }
+}.toRule()
+
+private val xmlTagBody: Rule<List<Any>> = (xmlRule or (char - char('<', '>')).repeat()).repeat()
+```
+Here we use `dynamicRule` to identify if we return a tagName we already remembered during parsing, or use nonEmptyLatinStr to check a tag. If we simply keep the same order as we did in our `Dynamic string rule` example above, the parser will not work for reverse search, used in the prefix rule.
 
 # Building advanced replacers
 Sometimes you need to create some advanced replace logic, so Parser repalce functions don't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements with groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integers, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
