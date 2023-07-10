@@ -1,4 +1,4 @@
-# KotlinSpirit
+f# KotlinSpirit
 
 Lightweight library for creating parsers, inspired by C++ boost spirit library.
 
@@ -90,9 +90,9 @@ oneOf(vararg strings: CharSequence)
 Example: `oneOf("Jhon", "Ivan", "Bin")` matches one of the names.
 
 #### Performance note:
-The search is optimized by using `TernarySearchTree` for matching strings. To maximize the performance try to order the strings in oneOf to be NOT sorted, this will keep `TernarySearchTree` more balanced. Also it's more effective to use or operator for small sequence of strings with minimum repeted substrings. 
+The search is optimized by using `TernarySearchTree` for matching strings. To maximize the performance try to order the strings in oneOf to be NOT sorted, this will keep `TernarySearchTree` more balanced.
 
-So the example above could be written as:
+Also it's more effective to use or operator for small sequence of strings with minimum repeted substrings. So the example above could be written as:
 ```Kotlin
 str("Jhon") or "Ivan" or "Bin"
 ```
