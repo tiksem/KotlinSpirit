@@ -55,6 +55,11 @@ int, long, float, double, uint, ulong, short, ushort, bigDecimal, bigint
 `char(chars: CharArray, ranges: Array<CharRange>)` Mix of chars list and ranges
 
 `charIf(predicate: (Char) -> Boolean)` Char with a custom matching predicate
+## Boolean rule
+Mathches true or false
+```
+boolean
+```
 ## String rules
 `str(string: String)` Matches an exact string. For example `str("Sun")`
 
@@ -73,20 +78,20 @@ In our example above you may notice, that the name rule contains `+char('a'..'z'
 `+rule` is a repeat operator. We will discuss it later.
 
 ### OneOf string rule
-Matches one of the strings from a given list.
+Matches one of the strings from a given list. The rule is always greedy so it tries to match as long string as possible from the given list
 ```Kotlin
 oneOf(vararg strings: CharSequence)
 ```
 Example: `oneOf("Jhon", "Ivan", "Bin")` matches one of the names.
 
-You can also use operator `or` for creating `oneOf` rule. So the example above could be written as:
+#### Performance note:
+The search is optimized by using `TernarySearchTree` for matching strings. To maximize the performance try to order the strings in oneOf to be NOT sorted, this will keep `TernarySearchTree` more balanced. Also it's more effective to use or operator for small sequence of strings with minimum repeted substrings. 
+
+So the example above could be written as:
 ```Kotlin
 str("Jhon") or "Ivan" or "Bin"
 ```
 We will discuss `or` operator later.
-
-#### Performance note:
-The search is optimized by using `TernarySearchTree` for matching strings. To maximize the performance try to order the strings in oneOf to be NOT sorted, this will keep `TernarySearchTree` more balanced.
 
 # Operators
 
