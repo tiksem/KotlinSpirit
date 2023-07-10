@@ -45,6 +45,11 @@ Those rules represent the corresponding numbers, with bound checks for integers
 ```
 int, long, float, double, uint, ulong, short, ushort, bigDecimal, bigint
 ```
+You can also pass ranges and exact numbers to match spesific values
+```
+int(-12)
+long(11L..4334L)
+```
 ## Char rules
 `char` represents any single chcracter
 
@@ -446,7 +451,7 @@ Note: `toRule` is used to convert the grammar to a rule.
 ## Dynamic string rule
 This rule is usually used to remember some token during the parsing process, the result of the rule is `CharSequence`
 
-The rule has the following syntax `dynamic { someToken }`
+The rule has the following syntax `dynamicString { someToken }`
 
 As an example let's create a simple parser for html tag with body and without any nested tags and attributes
 ```Kotlin
@@ -467,7 +472,7 @@ private val parser = object : Grammar<Tag>() {
             name = it.toString()
         }) + char('>') + ((char - '<').repeat()) {
             body = it.toString()
-        } + "</" + dynamic {
+        } + "</" + dynamicString {
             name
         } + '>'
     }
@@ -483,6 +488,9 @@ Assert.assertFalse(parser.matches("<a>Hello!</b>"))
 Assert.assertFalse(parser.matches("<b>Hello!</a>"))
 Assert.assertEquals(parser.parseGetResultOrThrow("<a>Hello!</a>"), Tag(body = "Hello!", name = "a"))
 ```
+## Dynamic rule
+This rule works the same way as `dynamicString` above, but it's more advanced, cause you can return any dynamically generated rule you want.
+For example: `dynamicRule { int or double }`
 
 # Building advanced replacers
 Sometimes you need to create some advanced replace logic, so Parser repalce functions don't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements with groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integers, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
