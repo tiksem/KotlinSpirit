@@ -6,10 +6,10 @@ import com.kotlinspirit.ext.includeRanges
 import java.util.*
 
 internal class CharPredicateData(
-    chars: SortedSet<Char>,
+    chars: CharArray, // should be sorted
     ranges: List<CharRange>
 ) {
-    val chars: SortedSet<Char>
+    val chars: CharArray
     val ranges: List<CharRange>
 
     init {
@@ -18,20 +18,20 @@ internal class CharPredicateData(
         }
 
         if (this.ranges.size != ranges.size) {
-            this.chars = TreeSet(chars).also {
-                it.addAll(ranges.map { range ->
-                    range.first
-                })
-            }
+            this.chars = (chars + ranges.filter {
+                it.first == it.last
+            }.map {
+                it.first
+            }).toSortedSet().toCharArray()
         } else {
-            this.chars = chars
+            this.chars = chars.sortedArray()
         }
     }
 
-    constructor(chars: CharArray) : this(chars.toSortedSet(), emptyList()) {
+    constructor(chars: CharArray) : this(chars, emptyList()) {
     }
 
-    constructor(ranges: Array<out CharRange>) : this(sortedSetOf(), ranges.toList()) {
+    constructor(ranges: Array<out CharRange>) : this(charArrayOf(), ranges.toList()) {
     }
 
     operator fun plus(other: CharPredicateData): CharPredicateData {
@@ -51,15 +51,11 @@ internal class CharPredicateData(
                 })
             }
         }
-        val chars = TreeSet(chars)
-        chars.removeAll(other.chars)
-        chars.eraseIf { ch ->
-            other.ranges.any {
-                it.contains(ch)
-            }
-        }
         return CharPredicateData(
-            chars = chars - other.chars,
+            chars = chars.removeAllContainedInGivenSortedArrayOrGivenRanges(
+                sortedArray = other.chars,
+                ranges = other.ranges
+            ),
             ranges = ranges.excludeRanges(rangesToExclude)
         )
     }
@@ -67,7 +63,7 @@ internal class CharPredicateData(
     fun toPredicate(): (Char) -> Boolean {
         return CharPredicates.from(
             ranges = ranges.toTypedArray(),
-            chars = chars.toCharArray()
+            chars = chars
         )
     }
 
@@ -81,7 +77,7 @@ internal class CharPredicateData(
 
         other as CharPredicateData
 
-        if (chars != other.chars) return false
+        if (!chars.contentEquals(other.chars)) return false
         if (ranges != other.ranges) return false
 
         return true

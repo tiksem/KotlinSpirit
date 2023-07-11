@@ -140,7 +140,7 @@ object Rules {
     fun char(chars: CharArray, ranges: Array<CharRange>): CharPredicateRule {
         return CharPredicateRule(
             CharPredicateData(
-                chars = chars.toSortedSet(),
+                chars = chars,
                 ranges = ranges.toList()
             )
         )

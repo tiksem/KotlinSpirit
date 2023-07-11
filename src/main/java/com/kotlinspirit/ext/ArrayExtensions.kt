@@ -15,3 +15,23 @@ internal fun CharArray.binarySearchContains(char: Char): Boolean {
 internal fun <T> Array<T>.contains(predicate: (T) -> Boolean): Boolean {
     return find(predicate) != null
 }
+
+internal fun CharArray.removeAllContainedInGivenSortedArrayOrGivenRanges(
+    sortedArray: CharArray,
+    ranges: List<CharRange>
+): CharArray {
+    val result = CharArray(size)
+    var i = 0
+    forEach {
+        if (
+            !sortedArray.binarySearchContains(it) &&
+            !ranges.any { range ->
+                range.contains(it)
+            }
+        ) {
+            result[i++] = it
+        }
+    }
+
+    return result.copyOf(newSize = i)
+}
