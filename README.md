@@ -3,7 +3,8 @@
 Lightweight library for creating parsers, inspired by C++ boost spirit library.
 
 # Introduction
-There are no good libraries or frameworks to parse text easily in Kotlin. Yeah, we have regular expressions. But they are hard to debug, hard to read, hard to reuse and they perform poorly. One time I got StackOverflow error easily while parsing a large text. However parser generators are too powerful and complex for simple use cases. So the idea was to create a simple library with compile-time expressions checking to create parsers fast and integrate them easily directly with Kotlin code and Kotlin types.
+
+There are no many good libraries or frameworks to parse text easily in Kotlin. Yeah, we have regular expressions. But they are hard to debug, hard to read, relatively hard to reuse and they crash with StackOverflow exception on large inputs. Yeah, we have parser generators. But they are too powerful and complex for simple use cases. So the idea was to create a simple library with compile-time expressions checking to create parsers fast and integrate them easily directly with Kotlin code and Kotlin types.
 
 # Gradle installation
 
