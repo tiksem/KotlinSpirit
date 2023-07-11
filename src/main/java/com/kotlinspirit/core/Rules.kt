@@ -9,6 +9,7 @@ import com.kotlinspirit.dynamic.DynamicStringRule
 import com.kotlinspirit.eof.EofRule
 import com.kotlinspirit.expressive.*
 import com.kotlinspirit.number.*
+import com.kotlinspirit.regexp.RegexpRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.str.EmptyStringRule
 import com.kotlinspirit.str.ExactStringRule
@@ -232,4 +233,16 @@ object Rules {
 
     val eof = EofRule()
     val boolean = BooleanRule()
+
+    fun regexp(pattern: String): RegexpRule {
+        return RegexpRule(Regex(pattern))
+    }
+
+    fun regexp(pattern: Regex): RegexpRule {
+        return RegexpRule(pattern)
+    }
+}
+
+fun Regex.toRule(): RegexpRule {
+    return Rules.regexp(this)
 }

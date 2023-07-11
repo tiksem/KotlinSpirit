@@ -36,6 +36,7 @@ object ParseCode {
     const val BIG_DECIMAL_EXPONENT_OVERFLOW = 32
     const val NO_EOF = 33
     const val BOOLEAN_NO_MATCH = 34
+    const val REGEX_NO_MATCH = 35
     const val PREFIX_NOT_SATISFIED = 3000
 }
 
@@ -102,6 +103,7 @@ internal fun Int.parseCodeToString(): String {
         ParseCode.UBYTE_OUT_OF_BOUNDS -> "UBYTE_OUT_OF_BOUNDS"
         ParseCode.NO_EOF -> "NO_EOF"
         ParseCode.BOOLEAN_NO_MATCH -> "BOOLEAN_NO_MATCH"
+        ParseCode.REGEX_NO_MATCH -> "REGEX_NO_MATCH"
         else -> if (this > ParseCode.PREFIX_NOT_SATISFIED) {
             "PREFIX_NOT_SATISFIED_" + (this - ParseCode.PREFIX_NOT_SATISFIED).parseCodeToString()
         } else {
