@@ -115,7 +115,7 @@ fun Any.toCharSequence(): CharSequence {
 
 fun CharSequence.matches(rule: Rule<*>): Boolean {
     return rule.parse(0, this).let {
-        it.getParseCode().isNotError() && it.getSeek() == length
+        it.isComplete && it.seek == length
     }
 }
 
@@ -140,10 +140,10 @@ fun CharSequence.lastIndexOfLongestMatch(rule: Rule<*>): Int? {
         var seek = start - 1
         while (seek >= 0) {
             val parseResult = rule.parse(seek, this)
-            if (parseResult.getParseCode().isError()) {
+            if (parseResult.isError) {
                 break
             }
-            val endSeek = parseResult.getSeek()
+            val endSeek = parseResult.seek
             if (endSeek < end) {
                 break
             }
@@ -281,7 +281,7 @@ fun CharSequence.endsWith(rule: Rule<*>): Boolean {
     var seek = length - 1
     while (seek >= 0) {
         val parseResult = rule.parse(seek, this)
-        if (parseResult.getParseCode().isNotError() && parseResult.getSeek() == length) {
+        if (parseResult.isComplete && parseResult.seek == length) {
             return true
         }
         --seek
@@ -302,8 +302,8 @@ fun <T : Any> CharSequence.parseWithResult(rule: Rule<T>): T? {
 
 fun CharSequence.parse(rule: Rule<*>): Int? {
     return rule.parse(0, this).let {
-        if (it.getParseCode().isNotError()) {
-            it.getSeek()
+        if (it.isComplete) {
+            it.seek
         } else {
             null
         }
@@ -315,8 +315,8 @@ fun CharSequence.count(rule: Rule<*>): Int {
     var i = 0
     while (i < length) {
         val rRes = rule.parse(i, this)
-        if (rRes.getParseCode().isNotError()) {
-            val seek = rRes.getSeek()
+        if (rRes.isComplete) {
+            val seek = rRes.seek
             if (seek == i) {
                 i++
             } else {

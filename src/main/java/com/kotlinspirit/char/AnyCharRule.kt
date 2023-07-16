@@ -121,15 +121,15 @@ abstract class CharRule(name: String?) : Rule<Char>(name) {
 }
 
 open class AnyCharRule(name: String? = null) : CharRule(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek >= string.length) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
         }
 
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek + 1,
             parseCode = ParseCode.COMPLETE
         )
@@ -137,7 +137,7 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         if (seek >= string.length) {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -146,7 +146,7 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
         }
 
         result.data = string[seek]
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = seek + 1,
             parseCode = ParseCode.COMPLETE
         )
@@ -156,15 +156,15 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
         return seek < string.length
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek < 0) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
         }
 
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek - 1,
             parseCode = ParseCode.COMPLETE
         )
@@ -172,7 +172,7 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
 
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         if (seek < 0) {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -181,7 +181,7 @@ open class AnyCharRule(name: String? = null) : CharRule(name) {
         }
 
         result.data = string[seek]
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = seek - 1,
             parseCode = ParseCode.COMPLETE
         )

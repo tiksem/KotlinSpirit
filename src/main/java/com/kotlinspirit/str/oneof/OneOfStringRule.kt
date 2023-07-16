@@ -2,7 +2,7 @@ package com.kotlinspirit.str.oneof
 
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class OneOfStringRule internal constructor(private val strings: List<CharSequence>, name: String? = null) :
@@ -16,15 +16,15 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
         })
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val result = tree.parse(seek, string)
         return if (result >= 0) {
-            createStepResult(
+            ParseSeekResult(
                 seek = result,
                 parseCode = ParseCode.COMPLETE
             )
         } else {
-            createStepResult(
+            ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
             )
@@ -38,13 +38,13 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
     ) {
         val r = tree.parse(seek, string)
         if (r >= 0) {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = r,
                 parseCode = ParseCode.COMPLETE
             )
             result.data = string.subSequence(seek, r)
         } else {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
             )
@@ -55,15 +55,15 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
         return tree.hasMatch(seek, string)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         val result = reversedTree.reverseParse(seek, string)
         return if (result >= -1) {
-            createStepResult(
+            ParseSeekResult(
                 seek = result,
                 parseCode = ParseCode.COMPLETE
             )
         } else {
-            createStepResult(
+            ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
             )
@@ -73,13 +73,13 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
         val r = reversedTree.reverseParse(seek, string)
         if (r >= -1) {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = r,
                 parseCode = ParseCode.COMPLETE
             )
             result.data = string.subSequence(r + 1, seek + 1)
         } else {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.ONE_OF_STRING_NOT_FOUND
             )

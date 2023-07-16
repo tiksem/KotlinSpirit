@@ -2,9 +2,7 @@ package com.kotlinspirit
 
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.Rules.long
-import com.kotlinspirit.core.ParseException
 import com.kotlinspirit.core.ParseResult
-import com.kotlinspirit.core.getParseCode
 import org.junit.Assert
 import org.junit.Test
 
@@ -43,7 +41,7 @@ class LongTest {
     fun outOfRange() {
         val result = ParseResult<Long>()
         long.parseWithResult(0, "9223372036854775808", result)
-        Assert.assertEquals(ParseCode.LONG_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.LONG_OUT_OF_BOUNDS, result.parseResult.parseCode)
     }
 
     @Test

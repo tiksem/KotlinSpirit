@@ -23,7 +23,7 @@ class FailIfRule<T : Any>(
         val data = result.data ?: throw IllegalStateException("rule produces null, without error")
         if (failPredicate(data)) {
             result.data = null
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.FAIL_PREDICATE
             )
@@ -31,7 +31,7 @@ class FailIfRule<T : Any>(
         }
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val result = ParseResult<T>()
         baseParse(
             seek = seek,
@@ -54,10 +54,10 @@ class FailIfRule<T : Any>(
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return parse(seek, string).getParseCode().isNotError()
+        return parse(seek, string).isComplete
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         val result = ParseResult<T>()
         baseParse(
             seek = seek,
@@ -80,7 +80,7 @@ class FailIfRule<T : Any>(
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
-        return reverseParse(seek, string).getParseCode().isNotError()
+        return reverseParse(seek, string).isComplete
     }
 
     override fun failIf(predicate: (T) -> Boolean): FailIfRule<T> {

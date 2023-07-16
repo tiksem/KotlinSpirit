@@ -1,9 +1,7 @@
 package com.kotlinspirit.expressive
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.core.isError
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
@@ -13,20 +11,20 @@ class RequiresPrefixRule<T : Any>(
     private val bodyRule: Rule<T>,
     name: String? = null
 ) : RuleWithDefaultRepeat<T>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val bodyParseResult = bodyRule.parse(seek, string)
-        if (bodyParseResult.getParseCode().isError()) {
+        if (bodyParseResult.isError) {
             return bodyParseResult
         }
 
         val reverseParseResult = prefixRule.reverseParse(seek - 1, string)
-        if (reverseParseResult.getParseCode().isNotError()) {
+        if (reverseParseResult.isComplete) {
             return bodyParseResult
         }
 
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek,
-            parseCode = ParseCode.PREFIX_NOT_SATISFIED + reverseParseResult.getParseCode()
+            parseCode = ParseCode.PREFIX_NOT_SATISFIED + reverseParseResult.parseCode
         )
     }
 
@@ -37,13 +35,13 @@ class RequiresPrefixRule<T : Any>(
         }
 
         val prefixParseResult = prefixRule.reverseParse(seek - 1, string)
-        if (prefixParseResult.getParseCode().isNotError()) {
+        if (prefixParseResult.isComplete) {
             return
         }
 
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = seek,
-            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.getParseCode()
+            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.parseCode
         )
         result.data = null
     }
@@ -52,20 +50,20 @@ class RequiresPrefixRule<T : Any>(
         return bodyRule.hasMatch(seek, string) && prefixRule.reverseHasMatch(seek - 1, string)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         val bodyParseResult = bodyRule.reverseParse(seek, string)
-        if (bodyParseResult.getParseCode().isError()) {
+        if (bodyParseResult.isError) {
             return bodyParseResult
         }
 
-        val prefixParseResult = prefixRule.reverseParse(bodyParseResult.getSeek(), string)
-        if (prefixParseResult.getParseCode().isNotError()) {
+        val prefixParseResult = prefixRule.reverseParse(bodyParseResult.seek, string)
+        if (prefixParseResult.isComplete) {
             return bodyParseResult
         }
 
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek,
-            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.getParseCode()
+            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.parseCode
         )
     }
 
@@ -76,23 +74,23 @@ class RequiresPrefixRule<T : Any>(
         }
 
         val prefixParseResult = prefixRule.reverseParse(result.endSeek, string)
-        if (prefixParseResult.getParseCode().isNotError()) {
+        if (prefixParseResult.isComplete) {
             return
         }
 
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = seek,
-            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.getParseCode()
+            parseCode = ParseCode.PREFIX_NOT_SATISFIED + prefixParseResult.parseCode
         )
         result.data = null
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
         return bodyRule.reverseParse(seek, string).let {
-            if (it.getParseCode().isError()) {
+            if (it.isError) {
                 false
             } else {
-                prefixRule.reverseHasMatch(seek = it.getSeek(), string = string)
+                prefixRule.reverseHasMatch(seek = it.seek, string = string)
             }
         }
     }

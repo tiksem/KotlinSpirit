@@ -20,21 +20,21 @@ class UIntTest {
     fun outOfRange() {
         val result = ParseResult<UInt>()
         uint.parseWithResult(0, "4294967296", result)
-        Assert.assertEquals(ParseCode.UINT_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.UINT_OUT_OF_BOUNDS, result.parseResult.parseCode)
     }
 
     @Test
     fun invalid() {
         val result = ParseResult<UInt>()
         uint.parseWithResult(0, "dsds65537", result)
-        Assert.assertEquals(ParseCode.INVALID_UINT, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.INVALID_UINT, result.parseResult.parseCode)
     }
 
     @Test
     fun invalid2() {
         val result = ParseResult<UInt>()
         uint.parseWithResult(0, "-65537", result)
-        Assert.assertEquals(ParseCode.INVALID_UINT, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.INVALID_UINT, result.parseResult.parseCode)
     }
 
     @Test

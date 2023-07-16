@@ -2,8 +2,6 @@ package com.kotlinspirit.expressive
 
 import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import kotlin.math.max
@@ -17,24 +15,24 @@ class NoRule(
     private val rule: Rule<*>,
     name: String? = null
 ) : CharRule(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val rResult = rule.parse(seek, string)
-        val parseCode = rResult.getParseCode()
+        val parseCode = rResult.parseCode
         return when (parseCode) {
-            ParseCode.COMPLETE -> createStepResult(
+            ParseCode.COMPLETE -> ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.NO_FAILED
             )
-            else -> createComplete(min(seek + 1, string.length))
+            else -> ParseSeekResult(min(seek + 1, string.length))
         }
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         val rResult = rule.parse(seek, string)
-        val parseCode = rResult.getParseCode()
+        val parseCode = rResult.parseCode
         when (parseCode) {
             ParseCode.COMPLETE -> {
-                result.parseResult = createStepResult(
+                result.parseResult = ParseSeekResult(
                     seek = seek,
                     parseCode = ParseCode.NO_FAILED
                 )
@@ -42,34 +40,34 @@ class NoRule(
             }
             else -> {
                 val isEof = seek == string.length
-                result.parseResult = createComplete(if (isEof) seek else seek + 1)
+                result.parseResult = ParseSeekResult(if (isEof) seek else seek + 1)
                 result.data = if (isEof) 0.toChar() else string[seek]
             }
         }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return rule.parse(seek, string).getParseCode().isError()
+        return rule.parse(seek, string).isError
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         val rResult = rule.reverseParse(seek, string)
-        val parseCode = rResult.getParseCode()
+        val parseCode = rResult.parseCode
         return when (parseCode) {
-            ParseCode.COMPLETE -> createStepResult(
+            ParseCode.COMPLETE -> ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.NO_FAILED
             )
-            else -> createComplete(max(seek - 1, -1))
+            else -> ParseSeekResult(max(seek - 1, -1))
         }
     }
 
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         val rResult = rule.reverseParse(seek, string)
-        val parseCode = rResult.getParseCode()
+        val parseCode = rResult.parseCode
         when (parseCode) {
             ParseCode.COMPLETE -> {
-                result.parseResult = createStepResult(
+                result.parseResult = ParseSeekResult(
                     seek = seek,
                     parseCode = ParseCode.NO_FAILED
                 )
@@ -77,7 +75,7 @@ class NoRule(
             }
             else -> {
                 val isEof = seek == -1
-                result.parseResult = createComplete(if (isEof) seek else seek - 1)
+                result.parseResult = ParseSeekResult(if (isEof) seek else seek - 1)
                 result.data = if (isEof) 0.toChar() else string[seek]
             }
         }

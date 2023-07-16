@@ -1,8 +1,6 @@
 package com.kotlinspirit.str
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.ext.all
 import com.kotlinspirit.ext.debugString
 import com.kotlinspirit.ext.moveSeekReverseUntilDontMatch
@@ -16,18 +14,18 @@ open class StringCharPredicateRangeRule(
     private val range: IntRange,
     name: String? = null
 ) : RuleWithDefaultRepeat<CharSequence>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val first = range.first
         val lastSeek = seek + first
         if (lastSeek > string.length) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
             )
         }
 
         if (!string.all(startIndex = seek, endIndex = lastSeek, predicate = predicate)) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
             )
@@ -39,15 +37,15 @@ open class StringCharPredicateRangeRule(
             predicate = predicate
         )
 
-        return createComplete(newSeek)
+        return ParseSeekResult(newSeek)
     }
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
         val parseResult = parse(seek, string)
-        result.data = if (parseResult.getParseCode().isError()) {
+        result.data = if (parseResult.isError) {
             null
         } else {
-            string.subSequence(seek, parseResult.getSeek())
+            string.subSequence(seek, parseResult.seek)
         }
         result.parseResult = parseResult
     }
@@ -60,17 +58,17 @@ open class StringCharPredicateRangeRule(
         )
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         val lastSeek = seek - range.first + 1
         if (lastSeek < 0) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 ParseCode.STRING_NOT_ENOUGH_DATA
             )
         }
 
         if (!string.all(startIndex = lastSeek, endIndex = seek + 1, predicate = predicate)) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
             )
@@ -82,7 +80,7 @@ open class StringCharPredicateRangeRule(
             predicate = predicate
         )
 
-        return createComplete(newSeek)
+        return ParseSeekResult(newSeek)
     }
 
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
@@ -90,7 +88,7 @@ open class StringCharPredicateRangeRule(
         result.data = if (result.isError) {
             null
         } else {
-            string.subSequence(parseResult.getSeek() + 1, seek + 1)
+            string.subSequence(parseResult.seek + 1, seek + 1)
         }
         result.parseResult = parseResult
     }

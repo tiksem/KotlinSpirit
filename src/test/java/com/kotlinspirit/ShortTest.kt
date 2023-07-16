@@ -41,14 +41,14 @@ class ShortTest {
     fun outOfRange() {
         val result = ParseResult<Short>()
         short.parseWithResult(0, "32768", result)
-        Assert.assertEquals(ParseCode.SHORT_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.SHORT_OUT_OF_BOUNDS, result.parseResult.parseCode)
     }
 
     @Test
     fun invalid() {
         val result = ParseResult<Short>()
         short.parseWithResult(0, "dsds65537", result)
-        Assert.assertEquals(ParseCode.INVALID_SHORT, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.INVALID_SHORT, result.parseResult.parseCode)
     }
 
     @Test

@@ -2,11 +2,11 @@ package com.kotlinspirit.number
 
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
-import com.kotlinspirit.core.getParseCode
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class LongRule(name: String? = null, private val radix: Int) : RuleWithDefaultRepeat<Long>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return IntParsers.parseLong(
             seek = seek,
             radix = radix,
@@ -28,10 +28,10 @@ class LongRule(name: String? = null, private val radix: Int) : RuleWithDefaultRe
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return parse(seek, string).getParseCode() == ParseCode.COMPLETE
+        return parse(seek, string).parseCode == ParseCode.COMPLETE
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return IntParsers.reverseParse(
             seek = seek,
             string = string,
@@ -59,7 +59,7 @@ class LongRule(name: String? = null, private val radix: Int) : RuleWithDefaultRe
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
-        return parse(seek, string).getParseCode() == ParseCode.COMPLETE
+        return parse(seek, string).parseCode == ParseCode.COMPLETE
     }
 
     override fun clone(): LongRule {

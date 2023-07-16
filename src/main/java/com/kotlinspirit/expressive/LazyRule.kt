@@ -1,6 +1,7 @@
 package com.kotlinspirit.expressive
 
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
@@ -29,7 +30,7 @@ class LazyRule<T : Any> internal constructor(
         }
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return initRule().parse(seek, string)
     }
 
@@ -41,7 +42,7 @@ class LazyRule<T : Any> internal constructor(
         return initRule().hasMatch(seek, string)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return initRule().reverseParse(seek, string)
     }
 

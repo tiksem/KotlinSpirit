@@ -1,8 +1,6 @@
 package com.kotlinspirit.expressive
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.core.isError
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
@@ -12,13 +10,13 @@ class SequenceRule(
     private val b: Rule<*>,
     name: String? = null
 ) : RuleWithDefaultRepeat<CharSequence>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val aResult = a.parse(seek, string)
-        if (aResult.getParseCode().isError()) {
+        if (aResult.isError) {
             return aResult
         }
 
-        return b.parse(aResult.getSeek(), string)
+        return b.parse(aResult.seek, string)
     }
 
     override fun parseWithResult(
@@ -28,8 +26,8 @@ class SequenceRule(
     ) {
         val parseResult = parse(seek, string)
         result.parseResult = parseResult
-        if (parseResult.getParseCode().isNotError()) {
-            result.data = string.subSequence(seek, parseResult.getSeek())
+        if (parseResult.isComplete) {
+            result.data = string.subSequence(seek, parseResult.seek)
         } else {
             result.data = null
         }
@@ -37,27 +35,27 @@ class SequenceRule(
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
         val aResult = a.parse(seek, string)
-        return if (aResult.getParseCode().isError()) {
+        return if (aResult.isError) {
             false
         } else {
-            b.hasMatch(aResult.getSeek(), string)
+            b.hasMatch(aResult.seek, string)
         }
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         val bResult = b.reverseParse(seek, string)
-        if (bResult.getParseCode().isError()) {
+        if (bResult.isError) {
             return bResult
         }
 
-        return a.reverseParse(bResult.getSeek(), string)
+        return a.reverseParse(bResult.seek, string)
     }
 
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
         val parseResult = reverseParse(seek, string)
         result.parseResult = parseResult
-        if (parseResult.getParseCode().isNotError()) {
-            result.data = string.subSequence(parseResult.getSeek() + 1, seek)
+        if (parseResult.isComplete) {
+            result.data = string.subSequence(parseResult.seek + 1, seek)
         } else {
             result.data = null
         }
@@ -65,10 +63,10 @@ class SequenceRule(
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
         val bResult = b.reverseParse(seek, string)
-        return if (bResult.getParseCode().isError()) {
+        return if (bResult.isError) {
             false
         } else {
-            a.reverseHasMatch(bResult.getSeek(), string)
+            a.reverseHasMatch(bResult.seek, string)
         }
     }
 

@@ -1,8 +1,7 @@
 package com.kotlinspirit.number
 
 import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.core.ParseSeekResult
 
 internal object UIntParsers {
     inline fun parse(
@@ -11,10 +10,10 @@ internal object UIntParsers {
         invalidIntParseCode: Int,
         outOfBoundsParseCode: Int,
         checkOutOfBounds: (ULong, ULong) -> Boolean
-    ): Long {
+    ): ParseSeekResult {
         val length = string.length
         if (seek >= length) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -33,17 +32,17 @@ internal object UIntParsers {
                     result += (char - '0').toUInt()
                     // check int bounds
                     if (checkOutOfBounds(resultBefore, result)) {
-                        return createStepResult(
+                        return ParseSeekResult(
                             seek = seek,
                             parseCode = outOfBoundsParseCode
                         )
                     }
                 }
                 successFlag -> {
-                    return createComplete(i - 1)
+                    return ParseSeekResult(i - 1)
                 }
                 else -> {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidIntParseCode
                     )
@@ -51,7 +50,7 @@ internal object UIntParsers {
             }
         } while (i < length)
 
-        return createComplete(i)
+        return ParseSeekResult(i)
     }
 
     inline fun parseWithResult(
@@ -60,13 +59,13 @@ internal object UIntParsers {
         invalidIntParseCode: Int,
         outOfBoundsParseCode: Int,
         checkOutOfBounds: (ULong, ULong) -> Boolean,
-        getResult: (ULong?, Long) -> Unit
+        getResult: (ULong?, ParseSeekResult) -> Unit
     ) {
         val length = string.length
         if (seek >= length) {
             getResult(
                 null,
-                createStepResult(
+                ParseSeekResult(
                     seek = seek,
                     parseCode = ParseCode.EOF
                 )
@@ -89,7 +88,7 @@ internal object UIntParsers {
                     if (checkOutOfBounds(resultBefore, result)) {
                         getResult(
                             null,
-                            createStepResult(
+                            ParseSeekResult(
                                 seek = seek,
                                 parseCode = outOfBoundsParseCode
                             )
@@ -100,14 +99,14 @@ internal object UIntParsers {
                 successFlag -> {
                     getResult(
                         result,
-                        createComplete(i - 1)
+                        ParseSeekResult(i - 1)
                     )
                     return
                 }
                 else -> {
                     getResult(
                         null,
-                        createStepResult(
+                        ParseSeekResult(
                             seek = i,
                             parseCode = invalidIntParseCode
                         )
@@ -117,7 +116,7 @@ internal object UIntParsers {
             }
         } while (i < length)
 
-        getResult(result, createComplete(i))
+        getResult(result, ParseSeekResult(i))
     }
 
     inline fun reverseParse(
@@ -126,9 +125,9 @@ internal object UIntParsers {
         invalidIntParseCode: Int,
         outOfBoundsParseCode: Int,
         checkOutOfBounds: (ULong, ULong) -> Boolean
-    ): Long {
+    ): ParseSeekResult {
         if (seek < 0) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -136,7 +135,7 @@ internal object UIntParsers {
 
         val ch = string[seek]
         if (ch !in '0'..'9') {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = invalidIntParseCode
             )
@@ -153,7 +152,7 @@ internal object UIntParsers {
                     val resultBefore = result
                     result += multiplier * (c - '0').toULong()
                     if (checkOutOfBounds(resultBefore, result)) {
-                        return createStepResult(
+                        return ParseSeekResult(
                             seek = seek,
                             parseCode = outOfBoundsParseCode
                         )
@@ -162,12 +161,12 @@ internal object UIntParsers {
                     --i
                 }
                 else -> {
-                    return createComplete(i)
+                    return ParseSeekResult(i)
                 }
             }
         }
 
-        return createComplete(-1)
+        return ParseSeekResult(-1)
     }
 
     inline fun reverseParseWithResult(
@@ -176,12 +175,12 @@ internal object UIntParsers {
         invalidIntParseCode: Int,
         outOfBoundsParseCode: Int,
         checkOutOfBounds: (ULong, ULong) -> Boolean,
-        getResult: (ULong?, Long) -> Unit
+        getResult: (ULong?, ParseSeekResult) -> Unit
     ) {
         if (seek < 0) {
             getResult(
                 null,
-                createStepResult(
+                ParseSeekResult(
                     seek = seek,
                     parseCode = ParseCode.EOF
                 )
@@ -193,7 +192,7 @@ internal object UIntParsers {
         if (ch !in '0'..'9') {
             getResult(
                 null,
-                createStepResult(
+                ParseSeekResult(
                     seek = seek,
                     parseCode = invalidIntParseCode
                 )
@@ -214,7 +213,7 @@ internal object UIntParsers {
                     if (checkOutOfBounds(resultBefore, result)) {
                         getResult(
                             null,
-                            createStepResult(
+                            ParseSeekResult(
                                 seek = seek,
                                 parseCode = outOfBoundsParseCode
                             )
@@ -230,6 +229,6 @@ internal object UIntParsers {
             }
         }
 
-        getResult(result, createComplete(i))
+        getResult(result, ParseSeekResult(i))
     }
 }

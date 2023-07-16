@@ -1,8 +1,6 @@
 package com.kotlinspirit.expressive
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
@@ -12,13 +10,13 @@ class OptionalRule<T : Any>(
     name: String? = null
 ) : RuleWithDefaultRepeat<T>(name) {
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val res = rule.parse(seek, string)
-        if (res.getParseCode().isNotError()) {
+        if (res.isComplete) {
             return res
         }
 
-        return createComplete(seek)
+        return ParseSeekResult(seek)
     }
 
     override fun parseWithResult(
@@ -30,7 +28,7 @@ class OptionalRule<T : Any>(
         if (result.isError) {
             result.data = null
         }
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = result.endSeek,
             parseCode = ParseCode.COMPLETE
         )
@@ -40,13 +38,13 @@ class OptionalRule<T : Any>(
         return true
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         val res = rule.reverseParse(seek, string)
-        if (res.getParseCode().isNotError()) {
+        if (res.isComplete) {
             return res
         }
 
-        return createComplete(seek)
+        return ParseSeekResult(seek)
     }
 
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
@@ -54,7 +52,7 @@ class OptionalRule<T : Any>(
         if (result.isError) {
             result.data = null
         }
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = result.endSeek,
             parseCode = ParseCode.COMPLETE
         )

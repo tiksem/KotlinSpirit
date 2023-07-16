@@ -1,9 +1,8 @@
 package com.kotlinspirit.grammar
 
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.core.Rule
-import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.core.isNotError
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
@@ -31,7 +30,11 @@ open class GrammarRule<T : Any>(
         stackSeek--
     }
 
-    private inline fun baseParse(seek: Int, string: CharSequence, parser: Rule<*>.(Int, CharSequence) -> Long): Long {
+    private inline fun baseParse(
+        seek: Int,
+        string: CharSequence,
+        parser: Rule<*>.(Int, CharSequence) -> ParseSeekResult
+    ): ParseSeekResult {
         val grammar = pullGrammar()
         try {
             return grammar.initRule().parser(seek, string)
@@ -44,13 +47,13 @@ open class GrammarRule<T : Any>(
         seek: Int,
         string: CharSequence,
         result: ParseResult<T>,
-        parser: Rule<*>.(Int, CharSequence) -> Long
+        parser: Rule<*>.(Int, CharSequence) -> ParseSeekResult
     ) {
         val grammar = pullGrammar()
         try {
             val parseResult = grammar.initRule().parser(seek, string)
             result.parseResult = parseResult
-            if (parseResult.getParseCode().isNotError()) {
+            if (parseResult.isComplete) {
                 result.data = grammar.result
             }
         } finally {
@@ -58,7 +61,7 @@ open class GrammarRule<T : Any>(
         }
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return baseParse(seek, string, Rule<*>::parse)
     }
 
@@ -71,7 +74,7 @@ open class GrammarRule<T : Any>(
         )
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return baseParse(seek, string, Rule<*>::reverseParse)
     }
 

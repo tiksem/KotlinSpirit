@@ -1,9 +1,6 @@
 package com.kotlinspirit.expressive
 
-import com.kotlinspirit.core.ParseResult
-import com.kotlinspirit.core.Rule
-import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.core.isError
+import com.kotlinspirit.core.*
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RepeatRule
@@ -18,9 +15,9 @@ open class OrRule<T : Any>(
     private var activeRule = a
     private var stepBeginSeek = -1
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val aResult = a.parse(seek, string)
-        return if (aResult.getParseCode().isError()) {
+        return if (aResult.isError) {
             b.parse(seek, string)
         } else {
             aResult
@@ -29,7 +26,7 @@ open class OrRule<T : Any>(
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         a.parseWithResult(seek, string, result)
-        if (result.parseResult.getParseCode().isError()) {
+        if (result.parseResult.isError) {
             b.parseWithResult(seek, string, result)
         }
     }
@@ -38,9 +35,9 @@ open class OrRule<T : Any>(
         return a.hasMatch(seek, string) || b.hasMatch(seek, string)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         val aResult = a.reverseParse(seek, string)
-        return if (aResult.getParseCode().isError()) {
+        return if (aResult.isError) {
             b.reverseParse(seek, string)
         } else {
             aResult
@@ -49,7 +46,7 @@ open class OrRule<T : Any>(
 
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>) {
         a.reverseParseWithResult(seek, string, result)
-        if (result.parseResult.getParseCode().isError()) {
+        if (result.parseResult.isError) {
             b.reverseParseWithResult(seek, string, result)
         }
     }

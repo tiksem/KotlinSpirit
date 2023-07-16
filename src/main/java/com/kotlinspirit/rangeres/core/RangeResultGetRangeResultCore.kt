@@ -9,7 +9,7 @@ internal class RangeResultGetRangeResultCore<T : Any>(
 ) : RangeResultRuleCore<T>(rule) {
     private val parseResult = ParseResult<T>()
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         parseWithResult(seek, string, parseResult)
         return parseResult.parseResult
     }
@@ -27,7 +27,7 @@ internal class RangeResultGetRangeResultCore<T : Any>(
         }
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         reverseParseWithResult(seek, string, parseResult)
         return parseResult.parseResult
     }

@@ -8,12 +8,12 @@ abstract class BaseRuleWithResult<T : Any>(
     private val result = ParseResult<T>()
 
     private fun postParse(result: ParseResult<T>) {
-        if (result.parseResult.getParseCode().isNotError()) {
+        if (result.parseResult.isComplete) {
             callback(result.data ?: throw IllegalStateException("result is null"))
         }
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         rule.parseWithResult(seek, string, result)
         postParse(result)
         return result.parseResult
@@ -28,7 +28,7 @@ abstract class BaseRuleWithResult<T : Any>(
         return rule.hasMatch(seek, string)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         rule.reverseParseWithResult(seek, string, result)
         postParse(result)
         return result.parseResult

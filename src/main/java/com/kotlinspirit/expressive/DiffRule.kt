@@ -2,18 +2,18 @@ package com.kotlinspirit.expressive
 
 import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-private fun internalParse(seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>): Long {
+private fun internalParse(seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>): ParseSeekResult {
     val mainRes = main.parse(seek, string)
-    return if (mainRes.getParseCode().isError()) {
+    return if (mainRes.isError) {
         mainRes
     } else {
         if (diff.hasMatch(seek, string)) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED
             )
@@ -28,9 +28,9 @@ private fun <T : Any> internalParseWithResult(
 ) {
     main.parseWithResult(seek, string, result)
     val stepResult = result.parseResult
-    if (stepResult.getParseCode().isNotError()) {
+    if (stepResult.isComplete) {
         if (diff.hasMatch(seek, string)) {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED
             )
@@ -45,13 +45,13 @@ private fun internalHasMatch(
     return main.hasMatch(seek, string) && !diff.hasMatch(seek, string)
 }
 
-private fun internalReverseParse(seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>): Long {
+private fun internalReverseParse(seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>): ParseSeekResult {
     val mainRes = main.reverseParse(seek, string)
-    return if (mainRes.getParseCode().isError()) {
+    return if (mainRes.isError) {
         mainRes
     } else {
-        if (diff.hasMatch(mainRes.getSeek() + 1, string)) {
-            return createStepResult(
+        if (diff.hasMatch(mainRes.seek + 1, string)) {
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED
             )
@@ -64,7 +64,7 @@ private fun internalReverseParse(seek: Int, string: CharSequence, main: Rule<*>,
 private fun internalReverseHasMatch(
     seek: Int, string: CharSequence, main: Rule<*>, diff: Rule<*>
 ): Boolean {
-    return internalReverseParse(seek, string, main, diff).getParseCode().isNotError()
+    return internalReverseParse(seek, string, main, diff).isComplete
 }
 
 private fun <T : Any> internalReverseParseWithResult(
@@ -72,9 +72,9 @@ private fun <T : Any> internalReverseParseWithResult(
 ) {
     main.reverseParseWithResult(seek, string, result)
     val stepResult = result.parseResult
-    if (stepResult.getParseCode().isNotError()) {
+    if (stepResult.isComplete) {
         if (diff.hasMatch(result.endSeek + 1, string)) {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED
             )
@@ -94,7 +94,7 @@ class DiffRuleWithDefaultRepeat<T : Any>(
     protected val diff: Rule<*>,
     name: String? = null
 ) : RuleWithDefaultRepeat<T>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return internalParse(seek, string, main, diff)
     }
 
@@ -106,7 +106,7 @@ class DiffRuleWithDefaultRepeat<T : Any>(
         return internalHasMatch(seek, string, main, diff)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return internalReverseParse(seek, string, main, diff)
     }
 
@@ -147,7 +147,7 @@ class CharDiffRule(
     protected val diff: Rule<*>,
     name: String? = null
 ) : CharRule(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return internalParse(seek, string, main, diff)
     }
 
@@ -159,7 +159,7 @@ class CharDiffRule(
         return internalHasMatch(seek, string, main, diff)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return internalReverseParse(seek, string, main, diff)
     }
 

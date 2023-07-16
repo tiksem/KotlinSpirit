@@ -27,21 +27,21 @@ class UShortTest {
     fun outOfRange() {
         val result = ParseResult<UShort>()
         ushort.parseWithResult(0, "65537", result)
-        Assert.assertEquals(ParseCode.USHORT_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.USHORT_OUT_OF_BOUNDS, result.parseResult.parseCode)
     }
 
     @Test
     fun invalid() {
         val result = ParseResult<UShort>()
         ushort.parseWithResult(0, "dsds65537", result)
-        Assert.assertEquals(ParseCode.INVALID_USHORT, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.INVALID_USHORT, result.parseResult.parseCode)
     }
 
     @Test
     fun invalid2() {
         val result = ParseResult<UShort>()
         Rules.ushort.parseWithResult(0, "-3434", result)
-        Assert.assertEquals(ParseCode.INVALID_USHORT, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.INVALID_USHORT, result.parseResult.parseCode)
     }
 
     @Test

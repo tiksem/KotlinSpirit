@@ -1,18 +1,16 @@
 package com.kotlinspirit.eof
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 
 class EofRule(name: String? = null) : Rule<Unit>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek == string.length) {
-            return createComplete(seek)
+            return ParseSeekResult(seek)
         }
 
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.NO_EOF
         )
@@ -21,19 +19,19 @@ class EofRule(name: String? = null) : Rule<Unit>(name) {
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Unit>) {
         val parseResult = parse(seek, string)
         result.parseResult = parseResult
-        if (parseResult.getParseCode().isNotError()) {
+        if (parseResult.isComplete) {
             result.data = Unit
         } else {
             result.data = null
         }
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek < 0) {
-            return createComplete(seek)
+            return ParseSeekResult(seek)
         }
 
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.NO_EOF
         )
@@ -42,7 +40,7 @@ class EofRule(name: String? = null) : Rule<Unit>(name) {
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Unit>) {
         val parseResult = parse(seek, string)
         result.parseResult = parseResult
-        if (parseResult.getParseCode().isNotError()) {
+        if (parseResult.isComplete) {
             result.data = Unit
         } else {
             result.data = null

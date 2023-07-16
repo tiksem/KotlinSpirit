@@ -2,6 +2,7 @@ package com.kotlinspirit.debug
 
 import com.kotlinspirit.core.BaseRuleWithResult
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
@@ -10,7 +11,7 @@ internal class DebugRule<T : Any>(
     private val rule: Rule<T>,
     private val engine: DebugEngine
 ) : Rule<T>(rule.debugName) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         engine.ruleParseStarted(rule = this, startSeek = seek, isReverse = false)
         return rule.parse(seek, string).also {
             engine.ruleParseEnded(rule = this, result = it)
@@ -27,7 +28,7 @@ internal class DebugRule<T : Any>(
         return rule.hasMatch(seek, string)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         engine.ruleParseStarted(rule = this, startSeek = seek, isReverse = true)
         return rule.reverseParse(seek, string).also {
             engine.ruleParseEnded(rule = this, result = it)

@@ -1,14 +1,13 @@
 package com.kotlinspirit.number
 
 import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.core.ParseSeekResult
 
 internal object FloatParsers {
-    fun parse(seek: Int, string: CharSequence, invalidFloatErrorCode: Int): Long {
+    fun parse(seek: Int, string: CharSequence, invalidFloatErrorCode: Int): ParseSeekResult {
         val length = string.length
         if (seek >= length) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -23,7 +22,7 @@ internal object FloatParsers {
             '-', '+', '.' -> {
                 i++
                 if (i >= length) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
@@ -33,7 +32,7 @@ internal object FloatParsers {
                 val after = string[i]
                 if (c != '.' && (after == 'i' || after == 'I')) {
                     return if (string.startsWith("nf", i + 1)) {
-                        createComplete(
+                        ParseSeekResult(
                             seek = if (string.startsWith("inity", i + 3)) {
                                 i + 3 + 5
                             } else {
@@ -41,7 +40,7 @@ internal object FloatParsers {
                             }
                         )
                     } else {
-                        createStepResult(
+                        ParseSeekResult(
                             seek = seek,
                             parseCode = invalidFloatErrorCode
                         )
@@ -51,7 +50,7 @@ internal object FloatParsers {
                 noMoreDots = c == '.'
                 if (!noMoreDots && after == '.') {
                     if (++i >= length) {
-                        return createStepResult(
+                        return ParseSeekResult(
                             seek = seek,
                             parseCode = invalidFloatErrorCode
                         )
@@ -65,7 +64,7 @@ internal object FloatParsers {
                         i++
                     }
                 } else {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
@@ -80,7 +79,7 @@ internal object FloatParsers {
             'I', 'i' -> {
                 // Check for positive infinity
                 if (++i >= length) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
@@ -88,7 +87,7 @@ internal object FloatParsers {
 
                 val after = string[i]
                 return if (i + 1 < length && after == 'n' && string[i + 1] == 'f') {
-                    createComplete(
+                    ParseSeekResult(
                         seek = if (string.startsWith("inity", i + 2)) {
                             i + 2 + 5
                         } else {
@@ -96,7 +95,7 @@ internal object FloatParsers {
                         }
                     )
                 } else {
-                    createStepResult(
+                    ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
@@ -104,16 +103,16 @@ internal object FloatParsers {
             }
             'N' -> {
                 return if (i + 2 < length && string[++i] == 'a' && string[++i] == 'N') {
-                    createComplete(i + 1)
+                    ParseSeekResult(i + 1)
                 } else {
-                    createStepResult(
+                    ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
                 }
             }
             else -> {
-                return createStepResult(
+                return ParseSeekResult(
                     seek = seek,
                     parseCode = invalidFloatErrorCode
                 )
@@ -121,19 +120,19 @@ internal object FloatParsers {
         }
 
         if (i >= length) {
-            return createComplete(i)
+            return ParseSeekResult(i)
         }
 
         when (string[i]) {
             '.' -> {
                 if (noMoreDots) {
                     return if (i == seek) {
-                        createStepResult(
+                        ParseSeekResult(
                             seek = seek,
                             parseCode = invalidFloatErrorCode
                         )
                     } else {
-                        createComplete(i)
+                        ParseSeekResult(i)
                     }
                 }
 
@@ -154,9 +153,9 @@ internal object FloatParsers {
                                     while (i < length && string[i].isDigit()) {
                                         i++
                                     }
-                                    createComplete(i)
+                                    ParseSeekResult(i)
                                 } else {
-                                    createComplete(i - 2)
+                                    ParseSeekResult(i - 2)
                                 }
                             } else {
                                 return if (string[i].isDigit()) {
@@ -164,19 +163,19 @@ internal object FloatParsers {
                                     while (i < length && string[i].isDigit()) {
                                         i++
                                     }
-                                    createComplete(i)
+                                    ParseSeekResult(i)
                                 } else {
-                                    createComplete(i - 1)
+                                    ParseSeekResult(i - 1)
                                 }
                             }
                         } else {
-                            return createComplete(saveI)
+                            return ParseSeekResult(saveI)
                         }
                     } else {
-                        return createComplete(i - 1)
+                        return ParseSeekResult(i - 1)
                     }
                 } else {
-                    return createComplete(saveI)
+                    return ParseSeekResult(saveI)
                 }
             }
             'e', 'E' -> {
@@ -189,9 +188,9 @@ internal object FloatParsers {
                             while (i < length && string[i].isDigit()) {
                                 i++
                             }
-                            createComplete(i)
+                            ParseSeekResult(i)
                         } else {
-                            createComplete(i - 2)
+                            ParseSeekResult(i - 2)
                         }
                     } else {
                         return if (string[i].isDigit()) {
@@ -199,17 +198,17 @@ internal object FloatParsers {
                             while (i < length && string[i].isDigit()) {
                                 i++
                             }
-                            createComplete(i)
+                            ParseSeekResult(i)
                         } else {
-                            createComplete(i - 1)
+                            ParseSeekResult(i - 1)
                         }
                     }
                 } else {
-                    return createComplete(saveI)
+                    return ParseSeekResult(saveI)
                 }
             }
             else -> {
-                return createComplete(i)
+                return ParseSeekResult(i)
             }
         }
     }
@@ -276,9 +275,9 @@ internal object FloatParsers {
         }
     }
 
-    fun reverseParse(seek: Int, string: CharSequence, invalidFloatErrorCode: Int): Long {
+    fun reverseParse(seek: Int, string: CharSequence, invalidFloatErrorCode: Int): ParseSeekResult {
         if (seek < 0 || string.isEmpty()) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -323,23 +322,23 @@ internal object FloatParsers {
                                                         continue
                                                     }
                                                     else -> {
-                                                        return createComplete(i + 2)
+                                                        return ParseSeekResult(i + 2)
                                                     }
                                                 }
                                             } else {
-                                                return createComplete(i + 1)
+                                                return ParseSeekResult(i + 1)
                                             }
                                         }
-                                        else -> return createComplete(i + 1)
+                                        else -> return ParseSeekResult(i + 1)
                                     }
                                 } else {
-                                    return createComplete(i)
+                                    return ParseSeekResult(i)
                                 }
                             }
                         }
                         '+', '-' -> {
                             if (eFound || dotFound) {
-                                return createComplete(i - 1)
+                                return ParseSeekResult(i - 1)
                             }
 
                             if (i != 0) {
@@ -361,25 +360,25 @@ internal object FloatParsers {
                                                                 continue
                                                             }
                                                             else -> {
-                                                                return createComplete(i + 2)
+                                                                return ParseSeekResult(i + 2)
                                                             }
                                                         }
                                                     } else {
-                                                        return createComplete(i + 1)
+                                                        return ParseSeekResult(i + 1)
                                                     }
                                                 }
-                                                else -> return createComplete(i + 1)
+                                                else -> return ParseSeekResult(i + 1)
                                             }
                                         } else {
-                                            return createComplete(i)
+                                            return ParseSeekResult(i)
                                         }
                                     }
                                     else -> {
-                                        return createComplete(i)
+                                        return ParseSeekResult(i)
                                     }
                                 }
                             } else {
-                                return createComplete(i - 1)
+                                return ParseSeekResult(i - 1)
                             }
                         }
                         else -> {
@@ -388,12 +387,12 @@ internal object FloatParsers {
                     }
                 }
 
-                return createComplete(i)
+                return ParseSeekResult(i)
             }
             '.' -> {
                 var i = seek - 1
                 if (i < 0 || string[i--] !in '0'..'9') {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
@@ -411,20 +410,20 @@ internal object FloatParsers {
                     }
                 }
 
-                return createComplete(i)
+                return ParseSeekResult(i)
             }
             'N' -> {
                 if (seek < 2) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
                 }
 
                 return if (string[seek - 1] == 'a' && string[seek - 2] == 'N') {
-                    createComplete(seek - 3)
+                    ParseSeekResult(seek - 3)
                 } else {
-                    createStepResult(
+                    ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
@@ -432,7 +431,7 @@ internal object FloatParsers {
             }
             'y' -> {
                 if (seek < 7) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
@@ -450,18 +449,18 @@ internal object FloatParsers {
                             }
                         }
                     } else {
-                        createStepResult(
+                        ParseSeekResult(
                             seek = seek,
                             parseCode = invalidFloatErrorCode
                         )
                     }
 
-                    return createComplete(i)
+                    return ParseSeekResult(i)
                 }
             }
             'f' -> {
                 if (seek < 2 || string[seek - 1] != 'n') {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidFloatErrorCode
                     )
@@ -469,7 +468,7 @@ internal object FloatParsers {
 
                 return when (string[seek - 2]) {
                     'i', 'I' -> {
-                        createComplete(
+                        ParseSeekResult(
                             seek = if (seek == 2) {
                                 -1
                             } else {
@@ -483,7 +482,7 @@ internal object FloatParsers {
                         )
                     }
                     else -> {
-                        createStepResult(
+                        ParseSeekResult(
                             seek = seek,
                             parseCode = invalidFloatErrorCode
                         )
@@ -492,7 +491,7 @@ internal object FloatParsers {
             }
         }
 
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek,
             parseCode = invalidFloatErrorCode
         )

@@ -13,51 +13,25 @@ import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.str.ExactStringRule
 
-private val DEFAULT_STEP_RESULT = createStepResult(
+private val DEFAULT_STEP_RESULT = ParseSeekResult(
     seek = 0,
     parseCode = ParseCode.COMPLETE
 )
 
-class ParseSeekResult(
-    private val stepResult: Long
-) {
-    val errorCode: Int
-        get() {
-            val stepCode = stepResult.getParseCode()
-            return if (stepCode.isError()) {
-                stepCode
-            } else {
-                -1
-            }
-        }
-
-    val isError: Boolean
-        get() = stepResult.getParseCode().isError()
-
-    val endSeek: Int
-        get() = stepResult.getSeek()
-}
-
 class ParseResult<T> {
     var data: T? = null
         internal set
-    internal var parseResult: Long = DEFAULT_STEP_RESULT
+    internal var parseResult: ParseSeekResult = DEFAULT_STEP_RESULT
 
     val errorCode: Int
-        get() {
-            val stepCode = parseResult.getParseCode()
-            return if (stepCode.isError()) {
-                stepCode
-            } else {
-                -1
-            }
-        }
+        get() = parseResult.errorCode
 
     val isError: Boolean
-        get() = parseResult.getParseCode().isError()
-
+        get() = parseResult.isError
+    val isComplete: Boolean
+        get() = parseResult.isComplete
     val endSeek: Int
-        get() = parseResult.getSeek()
+        get() = parseResult.seek
 }
 
 /**
@@ -68,11 +42,11 @@ abstract class Rule<T : Any>(name: String?) {
     var name = name
         private set
 
-    internal abstract fun parse(seek: Int, string: CharSequence): Long
+    internal abstract fun parse(seek: Int, string: CharSequence): ParseSeekResult
     internal abstract fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
     internal abstract fun hasMatch(seek: Int, string: CharSequence): Boolean
 
-    internal abstract fun reverseParse(seek: Int, string: CharSequence): Long
+    internal abstract fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult
     internal abstract fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<T>)
     internal abstract fun reverseHasMatch(seek: Int, string: CharSequence): Boolean
 
@@ -81,11 +55,11 @@ abstract class Rule<T : Any>(name: String?) {
         val length = string.length
         do {
             val result = parse(seek, string)
-            if (result.getParseCode().isNotError()) {
-                callback(seek, result.getSeek())
+            if (!result.isError) {
+                callback(seek, result.seek)
                 return true
             }
-            val newSeek = result.getSeek()
+            val newSeek = result.seek
             if (newSeek == seek) {
                 seek++
             } else {
@@ -101,7 +75,7 @@ abstract class Rule<T : Any>(name: String?) {
         do {
             val result = parse(seek, string)
             if (hasMatch(seek, string)) {
-                callback(seek, result.getSeek())
+                callback(seek, result.seek)
                 return true
             }
             --seek
@@ -136,10 +110,10 @@ abstract class Rule<T : Any>(name: String?) {
         val length = string.length
         do {
             val result = parse(seek, string)
-            if (result.getParseCode().isNotError()) {
-                callback(seek, result.getSeek())
+            if (!result.isError) {
+                callback(seek, result.seek)
             }
-            val newSeek = result.getSeek()
+            val newSeek = result.seek
             if (newSeek == seek) {
                 seek++
             } else {

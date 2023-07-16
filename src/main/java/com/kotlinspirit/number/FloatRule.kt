@@ -1,9 +1,6 @@
 package com.kotlinspirit.number
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class FloatRule(name: String? = null) : BaseFloatRule<Float>(
     name = name,

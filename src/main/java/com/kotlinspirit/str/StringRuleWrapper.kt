@@ -1,8 +1,6 @@
 package com.kotlinspirit
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.core.getSeek
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
@@ -17,7 +15,7 @@ class StringRuleWrapper(
         return RuleWithDefaultRepeatResult(this, callback)
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return rule.parse(seek, string)
     }
 
@@ -28,22 +26,22 @@ class StringRuleWrapper(
     ) {
         val parseResult = rule.parse(seek, string)
         result.parseResult = parseResult
-        if (parseResult.getParseCode().isNotError()) {
-            result.data = string.subSequence(seek, parseResult.getSeek())
+        if (parseResult.isComplete) {
+            result.data = string.subSequence(seek, parseResult.seek)
         } else {
             result.data = null
         }
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return rule.reverseParse(seek, string)
     }
 
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<CharSequence>) {
         val parseResult = rule.reverseParse(seek, string)
         result.parseResult = parseResult
-        if (parseResult.getParseCode().isNotError()) {
-            result.data = string.subSequence(parseResult.getSeek() + 1, seek + 1)
+        if (parseResult.isComplete) {
+            result.data = string.subSequence(parseResult.seek + 1, seek + 1)
         } else {
             result.data = null
         }

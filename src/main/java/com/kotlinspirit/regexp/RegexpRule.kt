@@ -1,18 +1,16 @@
 package com.kotlinspirit.regexp
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class RegexpRule(private val regex: Regex, name: String? = null) : RuleWithDefaultRepeat<MatchResult>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val match = regex.matchAt(string, seek)
         if (match != null) {
-            return createComplete(match.range.last - 1)
+            return ParseSeekResult(match.range.last - 1)
         }
 
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.REGEX_NO_MATCH
         )
@@ -22,9 +20,9 @@ class RegexpRule(private val regex: Regex, name: String? = null) : RuleWithDefau
         val match = regex.matchAt(string, seek)
         result.data = match
         result.parseResult = if (match != null) {
-            createComplete(match.range.last - 1)
+            ParseSeekResult(match.range.last - 1)
         } else {
-            createStepResult(
+            ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.REGEX_NO_MATCH
             )
@@ -35,7 +33,7 @@ class RegexpRule(private val regex: Regex, name: String? = null) : RuleWithDefau
         return regex.matchesAt(string, seek)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         throw UnsupportedOperationException("regexp rule is not supported inside prefix rule yet")
     }
 

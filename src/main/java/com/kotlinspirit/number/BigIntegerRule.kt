@@ -1,16 +1,14 @@
 package com.kotlinspirit.number
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import java.math.BigInteger
 
 open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteger>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val length = string.length
         if (seek >= length) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -24,20 +22,20 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
                 i++
             }
             if (i < seek + 2) {
-                return createStepResult(
+                return ParseSeekResult(
                     seek = seek,
                     parseCode = ParseCode.INVALID_BIG_INTEGER
                 )
             }
-            return createComplete(i)
+            return ParseSeekResult(i)
         } else if (firstChar.isDigit()) {
             i++
             while (i < length && string[i].isDigit()) {
                 i++
             }
-            return createComplete(i)
+            return ParseSeekResult(i)
         } else {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.INVALID_BIG_INTEGER
             )
@@ -47,10 +45,10 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigInteger>) {
         val res = parse(seek, string)
         result.parseResult = res
-        if (res.getParseCode().isError()) {
+        if (res.isError) {
             result.data = null
         } else {
-            result.data = BigInteger(string.substring(seek, res.getSeek()))
+            result.data = BigInteger(string.substring(seek, res.seek))
         }
     }
 
@@ -80,7 +78,7 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
         }
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return IntParsers.reverseParse(
             seek = seek,
             string = string,
@@ -93,10 +91,10 @@ open class BigIntegerRule(name: String? = null) : RuleWithDefaultRepeat<BigInteg
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigInteger>) {
         val res = reverseParse(seek, string)
         result.parseResult = res
-        if (res.getParseCode().isError()) {
+        if (res.isError) {
             result.data = null
         } else {
-            result.data = BigInteger(string.substring(res.getSeek() + 1, seek + 1))
+            result.data = BigInteger(string.substring(res.seek + 1, seek + 1))
         }
     }
 

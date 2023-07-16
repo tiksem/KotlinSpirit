@@ -1,6 +1,7 @@
 package com.kotlinspirit.dynamic
 
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.str.exactStringParse
 import com.kotlinspirit.str.exactStringParseWithResult
@@ -11,7 +12,7 @@ class DynamicStringRule(
     internal val stringProvider: () -> CharSequence,
     name: String? = null,
 ) : RuleWithDefaultRepeat<CharSequence>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return exactStringParse(
             seek = seek,
             string = string,
@@ -38,7 +39,7 @@ class DynamicStringRule(
         )
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return exactStringReverseParse(
             seek = seek,
             string = string,

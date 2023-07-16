@@ -12,34 +12,34 @@ class RepeatRule<T : Any>(
 ) : RuleWithDefaultRepeat<List<T>>(name) {
     private inline fun baseParse(
         seek: Int,
-        parser: (seek: Int) -> Long
-    ): Long {
+        parser: (seek: Int) -> ParseSeekResult
+    ): ParseSeekResult {
         var i = seek
         var resultsCount = 0
 
         while (resultsCount < range.last) {
             val seekBefore = i
             val ruleRes = parser(i)
-            if (ruleRes.getParseCode().isError()) {
+            if (ruleRes.isError) {
                 return if (resultsCount < range.first) {
                     ruleRes
                 } else {
-                    createComplete(seekBefore)
+                    ParseSeekResult(seekBefore)
                 }
             } else {
-                i = ruleRes.getSeek()
+                i = ruleRes.seek
                 if (i == seekBefore) {
                     return if (resultsCount < range.first) {
                         ruleRes
                     } else {
-                        createComplete(seekBefore)
+                        ParseSeekResult(seekBefore)
                     }
                 }
                 resultsCount++
             }
         }
 
-        return createComplete(i)
+        return ParseSeekResult(i)
     }
 
     private inline fun baseParseWithResult(
@@ -54,17 +54,17 @@ class RepeatRule<T : Any>(
             val seekBefore = i
             parser(i, itemResult)
             val stepResult = itemResult.parseResult
-            if (stepResult.getParseCode().isError()) {
+            if (stepResult.isError) {
                 if (list.size >= range.first) {
                     result.data = list
-                    result.parseResult = createComplete(seekBefore)
+                    result.parseResult = ParseSeekResult(seekBefore)
                 } else {
                     result.parseResult = stepResult
                     result.data = null
                 }
                 return
             } else {
-                i = stepResult.getSeek()
+                i = stepResult.seek
                 if (i == seekBefore) {
                     break
                 }
@@ -74,16 +74,16 @@ class RepeatRule<T : Any>(
 
         if (list.size >= range.first) {
             result.data = list
-            result.parseResult = createComplete(i)
+            result.parseResult = ParseSeekResult(i)
         } else {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = i,
                 parseCode = ParseCode.EOF
             )
         }
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return baseParse(
             seek = seek,
             parser = {
@@ -100,7 +100,7 @@ class RepeatRule<T : Any>(
 
     private inline fun baseHasMatch(
         seek: Int,
-        parser: (seek: Int) -> Long,
+        parser: (seek: Int) -> ParseSeekResult,
         hasMatch: (seek: Int) -> Boolean
     ): Boolean {
         if (range.first <= 0) {
@@ -110,11 +110,11 @@ class RepeatRule<T : Any>(
         var i = seek
         repeat (range.first - 1) {
             val r = parser(i)
-            if (r.getParseCode().isError()) {
+            if (r.isError) {
                 return false
             }
             val seekBefore = i
-            i = r.getSeek()
+            i = r.seek
             if (seekBefore != i) {
                 return false
             }
@@ -135,7 +135,7 @@ class RepeatRule<T : Any>(
         )
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return baseParse(
             seek = seek,
             parser = {

@@ -13,7 +13,7 @@ class BigDecimalTest {
     fun testInteger() {
         val str = "23423453453456543435453"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -24,7 +24,7 @@ class BigDecimalTest {
     fun testIntegerWithDot() {
         val str = "23423453453456543435453."
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -35,7 +35,7 @@ class BigDecimalTest {
     fun testDoubleWithDotAndDigits() {
         val str = "23423453453456543435453.2322332"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -46,7 +46,7 @@ class BigDecimalTest {
     fun testDoubleWithE() {
         val str = "23423453453456543435453.2322332e122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -57,7 +57,7 @@ class BigDecimalTest {
     fun testDoubleWithEUppercase() {
         val str = "23423453453456543435453.2322332E122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -68,7 +68,7 @@ class BigDecimalTest {
     fun testDoubleWithENegative() {
         val str = "23423453453456543435453.2322332e-122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -79,7 +79,7 @@ class BigDecimalTest {
     fun testDoubleWithEUppercaseNegative() {
         val str = "23423453453456543435453.2322332E-122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -90,7 +90,7 @@ class BigDecimalTest {
     fun testDoubleWithEPlus() {
         val str = "23423453453456543435453.2322332e+122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -101,7 +101,7 @@ class BigDecimalTest {
     fun testDoubleWithEUppercasePlus() {
         val str = "23423453453456543435453.2322332E+122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -112,7 +112,7 @@ class BigDecimalTest {
     fun testDoubleWithENoFraction() {
         val str = "23423453453456543435453.e122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -123,7 +123,7 @@ class BigDecimalTest {
     fun testDoubleWithEUppercaseNoFraction() {
         val str = "23423453453456543435453.E122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -134,7 +134,7 @@ class BigDecimalTest {
     fun testDoubleWithENegativeNoFraction() {
         val str = "23423453453456543435453.e-122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -145,7 +145,7 @@ class BigDecimalTest {
     fun testDoubleWithEUppercaseNegativeNoFraction() {
         val str = "23423453453456543435453.E-122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -156,7 +156,7 @@ class BigDecimalTest {
     fun testDoubleWithEPlusNoFraction() {
         val str = "23423453453456543435453.e+122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -167,7 +167,7 @@ class BigDecimalTest {
     fun testDoubleWithEUppercasePlusNoFraction() {
         val str = "23423453453456543435453.E+122"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -178,7 +178,7 @@ class BigDecimalTest {
     fun testIntegerWithE() {
         val str = "23423453453456543435453e5"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -189,7 +189,7 @@ class BigDecimalTest {
     fun testIntegerWithENegative() {
         val str = "23423453453456543435453e-5"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -200,7 +200,7 @@ class BigDecimalTest {
     fun testIntegerWithEUppercase() {
         val str = "23423453453456543435453E5"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -211,7 +211,7 @@ class BigDecimalTest {
     fun testIntegerWithENegativeUppercase() {
         val str = "23423453453456543435453E-5"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -222,7 +222,7 @@ class BigDecimalTest {
     fun testIntegerNegative() {
         val str = "-23423453453456543435453"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -233,7 +233,7 @@ class BigDecimalTest {
     fun testIntegerPlus() {
         val str = "+23423453453456543435453"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -244,7 +244,7 @@ class BigDecimalTest {
     fun startedWithDot() {
         val str = ".4343343434"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -255,7 +255,7 @@ class BigDecimalTest {
     fun startedWithDotE() {
         val str = ".4343343434e345"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -266,7 +266,7 @@ class BigDecimalTest {
     fun startedWithDotEnegative() {
         val str = ".4343343434e-345"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -277,7 +277,7 @@ class BigDecimalTest {
     fun notMoreDot() {
         val str = ".4343343.56677"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = ".4343343".length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -288,7 +288,7 @@ class BigDecimalTest {
     fun startsWithDotAndMinus() {
         val str = "-.4343343"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -299,7 +299,7 @@ class BigDecimalTest {
     fun startsWithDotAndPlus() {
         val str = "+.4343343"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -310,7 +310,7 @@ class BigDecimalTest {
     fun testMinusDotError() {
         val str = "-."
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_BIG_DECIMAL
             )
@@ -321,7 +321,7 @@ class BigDecimalTest {
     fun testMinusDotError2() {
         val str = "-.dhfgdhg"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_BIG_DECIMAL
             )
@@ -332,7 +332,7 @@ class BigDecimalTest {
     fun testMinusError() {
         val str = "-"
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_BIG_DECIMAL
             )
@@ -371,7 +371,7 @@ class BigDecimalTest {
         val result = ParseResult<BigDecimal>()
         bigDecimal.parseWithResult(0 , "5.0  ", result)
         Assert.assertEquals(result.data ?: BigDecimal(-1.0), BigDecimal("5.0"))
-        Assert.assertEquals(result.parseResult.getParseCode(), ParseCode.COMPLETE)
+        Assert.assertEquals(result.parseResult.parseCode, ParseCode.COMPLETE)
         Assert.assertEquals(result.endSeek, "5.0".length)
     }
 
@@ -379,7 +379,7 @@ class BigDecimalTest {
     fun notMoreDotError() {
         val str = ".."
         Assert.assertEquals(
-            bigDecimal.parse(0, str), createStepResult(
+            bigDecimal.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_BIG_DECIMAL
             )

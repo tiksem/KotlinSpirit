@@ -1,6 +1,7 @@
 package com.kotlinspirit.dynamic
 
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
@@ -8,7 +9,7 @@ class DynamicRule<T : Any>(
     name: String? = null,
     private val ruleFactory: () -> Rule<T>
 ) : RuleWithDefaultRepeat<T>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return ruleFactory().parse(seek, string)
     }
 
@@ -20,7 +21,7 @@ class DynamicRule<T : Any>(
         return ruleFactory().hasMatch(seek, string)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return ruleFactory().reverseParse(seek, string)
     }
 

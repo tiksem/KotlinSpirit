@@ -20,21 +20,21 @@ class ULongTest {
     fun outOfRange() {
         val result = ParseResult<ULong>()
         ulong.parseWithResult(0, "18446744073709551616", result)
-        Assert.assertEquals(ParseCode.ULONG_OUT_OF_BOUNDS, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.ULONG_OUT_OF_BOUNDS, result.parseResult.parseCode)
     }
 
     @Test
     fun invalid() {
         val result = ParseResult<ULong>()
         ulong.parseWithResult(0, "dsds65537", result)
-        Assert.assertEquals(ParseCode.INVALID_ULONG, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.INVALID_ULONG, result.parseResult.parseCode)
     }
 
     @Test
     fun invalid2() {
         val result = ParseResult<ULong>()
         ulong.parseWithResult(0, "-65537", result)
-        Assert.assertEquals(ParseCode.INVALID_ULONG, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.INVALID_ULONG, result.parseResult.parseCode)
     }
 
     @Test

@@ -12,7 +12,7 @@ internal abstract class BaseParser<T : Any> : Parser<T> {
         val rule = getRule(string)
         rule.parseWithResult(0, string, result)
         val stepResult = result.parseResult
-        if (stepResult.getParseCode().isError()) {
+        if (stepResult.isError) {
             throw ParseException(stepResult, string)
         } else {
             return result.data!!
@@ -22,21 +22,21 @@ internal abstract class BaseParser<T : Any> : Parser<T> {
     override fun parseOrThrow(string: CharSequence): Int {
         val rule = getRule(string)
         val result = rule.parse(0, string)
-        if (result.getParseCode().isError()) {
+        if (result.isError) {
             throw ParseException(result, string)
         }
 
-        return result.getSeek()
+        return result.seek
     }
 
     override fun tryParse(string: CharSequence): Int? {
         val rule = getRule(string)
         val result = rule.parse(0, string)
-        if (result.getParseCode().isError()) {
+        if (result.isError) {
             return null
         }
 
-        return result.getSeek()
+        return result.seek
     }
 
     override fun parseWithResult(string: CharSequence): ParseResult<T> {
@@ -48,21 +48,20 @@ internal abstract class BaseParser<T : Any> : Parser<T> {
 
     override fun parse(string: CharSequence): ParseSeekResult {
         val rule = getRule(string)
-        val result = rule.parse(0, string)
-        return ParseSeekResult(stepResult = result)
+        return rule.parse(0, string)
     }
 
     override fun matchOrThrow(string: CharSequence) {
         val rule = getRule(string)
         val result = rule.parse(0, string)
-        if (result.getParseCode().isError()) {
+        if (result.isError) {
             throw ParseException(result, string)
         }
 
-        val seek = result.getSeek()
+        val seek = result.seek
         if (seek != string.length) {
             throw ParseException(
-                result = createStepResult(
+                result = ParseSeekResult(
                     seek = seek,
                     parseCode = ParseCode.WHOLE_STRING_DOES_NOT_MATCH
                 ),

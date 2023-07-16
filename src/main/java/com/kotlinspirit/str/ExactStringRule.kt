@@ -4,10 +4,10 @@ import com.kotlinspirit.core.*
 import com.kotlinspirit.expressive.StringOrRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequence): Long {
+internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequence): ParseSeekResult {
     val tokenLength = token.length
     if (seek + tokenLength > string.length) {
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
         )
@@ -19,9 +19,9 @@ internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequen
             otherOffset = 0,
             length = tokenLength
         )) {
-        createComplete(seek + tokenLength)
+        ParseSeekResult(seek + tokenLength)
     } else {
-        createStepResult(
+        ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.STRING_DOES_NOT_MATCH
         )
@@ -36,7 +36,7 @@ internal fun exactStringParseWithResult(
 ) {
     val tokenLength = token.length
     if (seek + tokenLength > string.length) {
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
         )
@@ -49,10 +49,10 @@ internal fun exactStringParseWithResult(
             otherOffset = 0,
             length = tokenLength
         )) {
-        result.parseResult = createComplete(seek + tokenLength)
+        result.parseResult = ParseSeekResult(seek + tokenLength)
         result.data = token
     } else {
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.STRING_DOES_NOT_MATCH
         )
@@ -60,10 +60,10 @@ internal fun exactStringParseWithResult(
     }
 }
 
-internal fun exactStringReverseParse(seek: Int, string: CharSequence, token: CharSequence): Long {
+internal fun exactStringReverseParse(seek: Int, string: CharSequence, token: CharSequence): ParseSeekResult {
     val tokenLength = token.length
     if (seek + 1 < tokenLength) {
-        return createStepResult(
+        return ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
         )
@@ -75,9 +75,9 @@ internal fun exactStringReverseParse(seek: Int, string: CharSequence, token: Cha
             otherOffset = 0,
             length = tokenLength
         )) {
-        createComplete(seek - tokenLength)
+        ParseSeekResult(seek - tokenLength)
     } else {
-        createStepResult(
+        ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.STRING_DOES_NOT_MATCH
         )
@@ -92,7 +92,7 @@ internal fun exactStringReverseParseWithResult(
 ) {
     val tokenLength = token.length
     if (seek + 1 < tokenLength) {
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.STRING_NOT_ENOUGH_DATA
         )
@@ -105,10 +105,10 @@ internal fun exactStringReverseParseWithResult(
             otherOffset = 0,
             length = tokenLength
         )) {
-        result.parseResult = createComplete(seek - tokenLength)
+        result.parseResult = ParseSeekResult(seek - tokenLength)
         result.data = token
     } else {
-        result.parseResult = createStepResult(
+        result.parseResult = ParseSeekResult(
             seek = seek,
             parseCode = ParseCode.STRING_DOES_NOT_MATCH
         )
@@ -120,7 +120,7 @@ open class ExactStringRule(
     string: CharSequence,
     name: String? = null
 ) : BaseExactStringRule<CharSequence>(string, name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return exactStringParse(seek, string, this.string)
     }
 
@@ -164,8 +164,8 @@ open class ExactStringRule(
 }
 
 class EmptyStringRule(name: String? = null): ExactStringRule("", name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
-        return createComplete(seek)
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
+        return ParseSeekResult(seek)
     }
 
     override fun parseWithResult(
@@ -173,7 +173,7 @@ class EmptyStringRule(name: String? = null): ExactStringRule("", name) {
         string: CharSequence,
         result: ParseResult<CharSequence>
     ) {
-        result.parseResult = createComplete(seek)
+        result.parseResult = ParseSeekResult(seek)
         result.data = ""
     }
 
@@ -181,7 +181,7 @@ class EmptyStringRule(name: String? = null): ExactStringRule("", name) {
         return true
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return parse(seek, string)
     }
 

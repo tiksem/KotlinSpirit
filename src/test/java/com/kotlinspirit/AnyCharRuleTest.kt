@@ -3,7 +3,6 @@ package com.kotlinspirit
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rules.char
-import com.kotlinspirit.core.getSeek
 import org.junit.Assert
 import org.junit.Test
 
@@ -11,13 +10,13 @@ class AnyCharRuleTest {
     @Test
     fun parse() {
         Assert.assertEquals(char.compile().parseOrThrow("a"), 1)
-        Assert.assertEquals(char.reverseParse(0, "a").getSeek(), -1)
+        Assert.assertEquals(char.reverseParse(0, "a").seek, -1)
     }
 
     @Test
     fun parse2() {
         Assert.assertEquals(char.compile().parseOrThrow("awerr"), 1)
-        Assert.assertEquals(char.reverseParse(0, "awerr").getSeek(), -1)
+        Assert.assertEquals(char.reverseParse(0, "awerr").seek, -1)
     }
 
     @Test

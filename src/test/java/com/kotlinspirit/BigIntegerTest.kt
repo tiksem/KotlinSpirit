@@ -68,7 +68,7 @@ class BigIntegerTest {
     fun invalid() {
         val result = ParseResult<BigInteger>()
         bigint.parseWithResult(0, "dsds65537", result)
-        Assert.assertEquals(ParseCode.INVALID_BIG_INTEGER, result.parseResult.getParseCode())
+        Assert.assertEquals(ParseCode.INVALID_BIG_INTEGER, result.parseResult.parseCode)
     }
 
     @Test

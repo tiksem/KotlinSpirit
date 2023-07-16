@@ -13,7 +13,7 @@ class FloatTest {
     fun testInteger() {
         val str = "23423453453456543435453"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -24,7 +24,7 @@ class FloatTest {
     fun testIntegerWithDot() {
         val str = "23423453453456543435453."
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -35,7 +35,7 @@ class FloatTest {
     fun testFloatWithDotAndDigits() {
         val str = "23423453453456543435453.2322332"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -46,7 +46,7 @@ class FloatTest {
     fun testFloatWithE() {
         val str = "23423453453456543435453.2322332e122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -57,7 +57,7 @@ class FloatTest {
     fun testFloatWithEUppercase() {
         val str = "23423453453456543435453.2322332E122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -68,7 +68,7 @@ class FloatTest {
     fun testFloatWithENegative() {
         val str = "23423453453456543435453.2322332e-122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -79,7 +79,7 @@ class FloatTest {
     fun testFloatWithEUppercaseNegative() {
         val str = "23423453453456543435453.2322332E-122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -90,7 +90,7 @@ class FloatTest {
     fun testFloatWithEPlus() {
         val str = "23423453453456543435453.2322332e+122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -101,7 +101,7 @@ class FloatTest {
     fun testFloatWithEUppercasePlus() {
         val str = "23423453453456543435453.2322332E+122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -112,7 +112,7 @@ class FloatTest {
     fun testFloatWithENoFraction() {
         val str = "23423453453456543435453.e122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -123,7 +123,7 @@ class FloatTest {
     fun testFloatWithEUppercaseNoFraction() {
         val str = "23423453453456543435453.E122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -134,7 +134,7 @@ class FloatTest {
     fun testFloatWithENegativeNoFraction() {
         val str = "23423453453456543435453.e-122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -145,7 +145,7 @@ class FloatTest {
     fun testFloatWithEUppercaseNegativeNoFraction() {
         val str = "23423453453456543435453.E-122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -156,7 +156,7 @@ class FloatTest {
     fun testFloatWithEPlusNoFraction() {
         val str = "23423453453456543435453.e+122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -167,7 +167,7 @@ class FloatTest {
     fun testFloatWithEUppercasePlusNoFraction() {
         val str = "23423453453456543435453.E+122"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -178,7 +178,7 @@ class FloatTest {
     fun testIntegerWithE() {
         val str = "23423453453456543435453e5"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -189,7 +189,7 @@ class FloatTest {
     fun testIntegerWithENegative() {
         val str = "23423453453456543435453e-5"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -200,7 +200,7 @@ class FloatTest {
     fun testIntegerWithEUppercase() {
         val str = "23423453453456543435453E5"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -215,7 +215,7 @@ class FloatTest {
             if (expectedValue != r.data) {
                 throw AssertionFailedError("$str parse failed, $expectedValue != ${r.data}")
             }
-            Assert.assertEquals(r.parseResult.getSeek(), str.length)
+            Assert.assertEquals(r.parseResult.seek, str.length)
         }
     }
 
@@ -223,7 +223,7 @@ class FloatTest {
         val r = ParseResult<Float>()
         for (str in strings) {
             float.parseWithResult(0, str, r)
-            Assert.assertEquals(r.parseResult.getParseCode(), ParseCode.INVALID_FLOAT)
+            Assert.assertEquals(r.parseResult.parseCode, ParseCode.INVALID_FLOAT)
         }
     }
 
@@ -255,7 +255,7 @@ class FloatTest {
         val r = ParseResult<Float>()
         val str = "NaN"
         float.parseWithResult(0, str, r)
-        Assert.assertEquals("NaN".length, r.parseResult.getSeek())
+        Assert.assertEquals("NaN".length, r.parseResult.seek)
         Assert.assertTrue(r.data?.isNaN() == true)
     }
 
@@ -263,7 +263,7 @@ class FloatTest {
     fun testIntegerWithENegativeUppercase() {
         val str = "23423453453456543435453E-5"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -274,7 +274,7 @@ class FloatTest {
     fun testIntegerNegative() {
         val str = "-23423453453456543435453"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -285,7 +285,7 @@ class FloatTest {
     fun testIntegerPlus() {
         val str = "+23423453453456543435453"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -296,7 +296,7 @@ class FloatTest {
     fun startedWithDot() {
         val str = ".4343343434"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -307,7 +307,7 @@ class FloatTest {
     fun startedWithDotE() {
         val str = ".4343343434e345"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -318,7 +318,7 @@ class FloatTest {
     fun startedWithDotEnegative() {
         val str = ".4343343434e-345"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -329,7 +329,7 @@ class FloatTest {
     fun notMoreDot() {
         val str = ".4343343.56677"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = ".4343343".length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -340,7 +340,7 @@ class FloatTest {
     fun startsWithDotAndMinus() {
         val str = "-.4343343"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -351,7 +351,7 @@ class FloatTest {
     fun startsWithDotAndPlus() {
         val str = "+.4343343"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -362,7 +362,7 @@ class FloatTest {
     fun testMinusDotError() {
         val str = "-."
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_FLOAT
             )
@@ -373,7 +373,7 @@ class FloatTest {
     fun testMinusDotError2() {
         val str = "-.dhfgdhg"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_FLOAT
             )
@@ -384,7 +384,7 @@ class FloatTest {
     fun testMinusError() {
         val str = "-"
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_FLOAT
             )
@@ -396,7 +396,7 @@ class FloatTest {
         val result = ParseResult<Float>()
         float.parseWithResult(0 , "5.0  ", result)
         Assert.assertEquals(result.data ?: -1.0f, 5.0f, 0.00001f)
-        Assert.assertEquals(result.parseResult.getParseCode(), ParseCode.COMPLETE)
+        Assert.assertEquals(result.parseResult.parseCode, ParseCode.COMPLETE)
         Assert.assertEquals(result.endSeek, "5.0".length)
     }
 
@@ -404,7 +404,7 @@ class FloatTest {
     fun notMoreDotError() {
         val str = ".."
         Assert.assertEquals(
-            float.parse(0, str), createStepResult(
+            float.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_FLOAT
             )

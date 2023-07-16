@@ -1,8 +1,6 @@
 package com.kotlinspirit.expressive
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.ext.debugString
@@ -23,36 +21,36 @@ class SplitRule<T : Any>(
     private inline fun baseParse(
         seek: Int,
         string: CharSequence,
-        parser: (rule: Rule<*>, seek: Int, string: CharSequence) -> Long
-    ): Long {
+        parser: (rule: Rule<*>, seek: Int, string: CharSequence) -> ParseSeekResult
+    ): ParseSeekResult {
         var numberOfSplitItems = 0
         val max = range.last
         var i = seek
         var seekAfterRule = i
         while (numberOfSplitItems < max) {
             val res = parser(r, i, string)
-            if (res.getParseCode().isError()) {
+            if (res.isError) {
                 i = seekAfterRule
                 break
             }
-            seekAfterRule = res.getSeek()
+            seekAfterRule = res.seek
             numberOfSplitItems++
 
             val dividerRes = parser(divider, seekAfterRule, string)
-            if (dividerRes.getParseCode().isError()) {
+            if (dividerRes.isError) {
                 i = seekAfterRule
                 break
             }
-            i = dividerRes.getSeek()
+            i = dividerRes.seek
         }
 
         return if (numberOfSplitItems < range.first) {
-            createStepResult(
+            ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.SPLIT_NOT_ENOUGH_DATA
             )
         } else {
-            createComplete(seek = i)
+            ParseSeekResult(seek = i)
         }
     }
 
@@ -60,7 +58,7 @@ class SplitRule<T : Any>(
         seek: Int,
         string: CharSequence,
         result: ParseResult<List<T>>,
-        parser: (rule: Rule<*>, seek: Int, string: CharSequence) -> Long,
+        parser: (rule: Rule<*>, seek: Int, string: CharSequence) -> ParseSeekResult,
         parserWithResult: (rule: Rule<T>, seek: Int, string: CharSequence, result: ParseResult<T>) -> Unit
     ) {
         val list = ArrayList<T>()
@@ -78,25 +76,25 @@ class SplitRule<T : Any>(
             list.add(itemResult.data ?: throw IllegalStateException("item result should not be null"))
 
             val dividerRes = parser(divider, seekAfterRule, string)
-            if (dividerRes.getParseCode().isError()) {
+            if (dividerRes.isError) {
                 i = seekAfterRule
                 break
             }
-            i = dividerRes.getSeek()
+            i = dividerRes.seek
         }
         result.data = list
 
         result.parseResult = if (list.size < range.first) {
-            createStepResult(
+            ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.SPLIT_NOT_ENOUGH_DATA
             )
         } else {
-            createComplete(seek = i)
+            ParseSeekResult(seek = i)
         }
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return baseParse(
             seek = seek,
             string = string,
@@ -125,10 +123,10 @@ class SplitRule<T : Any>(
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return parse(seek, string).getParseCode().isNotError()
+        return parse(seek, string).isComplete
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return baseParse(
             seek = seek,
             string = string,
@@ -158,7 +156,7 @@ class SplitRule<T : Any>(
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
-        return reverseParse(seek, string).getParseCode().isNotError()
+        return reverseParse(seek, string).isComplete
     }
 
     override val debugNameShouldBeWrapped: Boolean

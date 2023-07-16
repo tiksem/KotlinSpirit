@@ -1,25 +1,24 @@
 package com.kotlinspirit.number
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.getParseCode
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import java.math.BigDecimal
 
 class BigDecimalRule(name: String? = null) : RuleWithDefaultRepeat<BigDecimal>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return FloatParsers.parse(
             seek = seek,
             string = string,
             invalidFloatErrorCode = ParseCode.INVALID_BIG_DECIMAL
         ).let {
-            if (it.getParseCode().isError()) {
+            if (it.isError) {
                 it
             } else {
                 try {
-                    BigDecimal(string.substring(seek, it.getSeek()))
+                    BigDecimal(string.substring(seek, it.seek))
                     it
                 } catch (e: NumberFormatException) {
-                    createStepResult(
+                    ParseSeekResult(
                         seek = seek,
                         parseCode = ParseCode.BIG_DECIMAL_EXPONENT_OVERFLOW
                     )
@@ -31,27 +30,27 @@ class BigDecimalRule(name: String? = null) : RuleWithDefaultRepeat<BigDecimal>(n
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigDecimal>) {
         val r = parse(seek = seek, string = string)
         result.parseResult = r
-        if (r.getParseCode().isError()) {
+        if (r.isError) {
             result.data = null
         } else {
-            result.data = BigDecimal(string.substring(seek, r.getSeek()))
+            result.data = BigDecimal(string.substring(seek, r.seek))
         }
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return FloatParsers.reverseParse(
             seek = seek,
             string = string,
             invalidFloatErrorCode = ParseCode.INVALID_BIG_DECIMAL
         ).let {
-            if (it.getParseCode().isError()) {
+            if (it.isError) {
                 it
             } else {
                 try {
-                    BigDecimal(string.substring(it.getSeek() + 1, seek + 1))
+                    BigDecimal(string.substring(it.seek + 1, seek + 1))
                     it
                 } catch (e: NumberFormatException) {
-                    createStepResult(
+                    ParseSeekResult(
                         seek = seek,
                         parseCode = ParseCode.BIG_DECIMAL_EXPONENT_OVERFLOW
                     )
@@ -63,19 +62,19 @@ class BigDecimalRule(name: String? = null) : RuleWithDefaultRepeat<BigDecimal>(n
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<BigDecimal>) {
         val r = reverseParse(seek = seek, string = string)
         result.parseResult = r
-        if (r.getParseCode().isError()) {
+        if (r.isError) {
             result.data = null
         } else {
-            result.data = BigDecimal(string.substring(r.getSeek() + 1, seek + 1))
+            result.data = BigDecimal(string.substring(r.seek + 1, seek + 1))
         }
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
-        return reverseParse(seek, string).getParseCode().isNotError()
+        return reverseParse(seek, string).isComplete
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return parse(seek, string).getParseCode().isNotError()
+        return parse(seek, string).isComplete
     }
 
     override val debugNameShouldBeWrapped: Boolean

@@ -2,12 +2,11 @@ package com.kotlinspirit.number
 
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
-import com.kotlinspirit.core.createStepResult
-import com.kotlinspirit.core.getParseCode
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 class ByteRule(name: String? = null, private val radix: Int) : RuleWithDefaultRepeat<Byte>(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return IntParsers.parseInt(
             seek = seek,
             string = string,
@@ -16,7 +15,7 @@ class ByteRule(name: String? = null, private val radix: Int) : RuleWithDefaultRe
             outOfBoundsParseCode = ParseCode.BYTE_OUT_OF_BOUNDS,
             onResult = {
                 if (it !in Byte.MIN_VALUE..Byte.MAX_VALUE) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = ParseCode.BYTE_OUT_OF_BOUNDS
                     )
@@ -35,7 +34,7 @@ class ByteRule(name: String? = null, private val radix: Int) : RuleWithDefaultRe
             outOfBoundsParseCode = ParseCode.BYTE_OUT_OF_BOUNDS,
             onResult = {
                 if (it !in Byte.MIN_VALUE..Byte.MAX_VALUE) {
-                    r.parseResult = createStepResult(
+                    r.parseResult = ParseSeekResult(
                         seek = seek,
                         parseCode = ParseCode.BYTE_OUT_OF_BOUNDS
                     )
@@ -48,10 +47,10 @@ class ByteRule(name: String? = null, private val radix: Int) : RuleWithDefaultRe
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return parse(seek, string).getParseCode() == ParseCode.COMPLETE
+        return parse(seek, string).parseCode == ParseCode.COMPLETE
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return IntParsers.reverseParse(
             seek = seek,
             string = string,
@@ -79,7 +78,7 @@ class ByteRule(name: String? = null, private val radix: Int) : RuleWithDefaultRe
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
-        return parse(seek, string).getParseCode() == ParseCode.COMPLETE
+        return parse(seek, string).parseCode == ParseCode.COMPLETE
     }
 
     override fun clone(): ByteRule {

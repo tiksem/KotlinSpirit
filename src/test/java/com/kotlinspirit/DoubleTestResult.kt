@@ -3,7 +3,7 @@ package com.kotlinspirit
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.Rules
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.core.ParseSeekResult
 import org.junit.Assert
 import org.junit.Test
 
@@ -12,7 +12,7 @@ class DoubleTestResult {
         val result = ParseResult<Double>()
         Rules.double.parseWithResult(0, str, result)
         Assert.assertEquals(result.parseResult,
-            createStepResult(
+            ParseSeekResult(
                 seek = str.length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -170,7 +170,7 @@ class DoubleTestResult {
         val result = ParseResult<Double>()
         Rules.double.parseWithResult(0, str, result)
         Assert.assertEquals(result.parseResult,
-            createStepResult(
+            ParseSeekResult(
                 seek = ".4343343".length,
                 parseCode = ParseCode.COMPLETE
             )
@@ -196,7 +196,7 @@ class DoubleTestResult {
         val result = ParseResult<Double>()
         Rules.double.parseWithResult(0, str, result)
         Assert.assertEquals(
-            Rules.double.parse(0, str), createStepResult(
+            Rules.double.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_DOUBLE
             )
@@ -209,7 +209,7 @@ class DoubleTestResult {
         val result = ParseResult<Double>()
         Rules.double.parseWithResult(0, str, result)
         Assert.assertEquals(
-            Rules.double.parse(0, str), createStepResult(
+            Rules.double.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_DOUBLE
             )
@@ -222,7 +222,7 @@ class DoubleTestResult {
         val result = ParseResult<Double>()
         Rules.double.parseWithResult(0, str, result)
         Assert.assertEquals(
-            Rules.double.parse(0, str), createStepResult(
+            Rules.double.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_DOUBLE
             )
@@ -235,7 +235,7 @@ class DoubleTestResult {
         val result = ParseResult<Double>()
         Rules.double.parseWithResult(0, str, result)
         Assert.assertEquals(
-            Rules.double.parse(0, str), createStepResult(
+            Rules.double.parse(0, str), ParseSeekResult(
                 seek = 0,
                 parseCode = ParseCode.INVALID_DOUBLE
             )

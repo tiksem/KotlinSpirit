@@ -1,8 +1,6 @@
 package com.kotlinspirit.replacer
 
 import com.kotlinspirit.core.Rule
-import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.core.isError
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.ext.replaceRanges
 import com.kotlinspirit.ext.toCharSequence
@@ -155,7 +153,7 @@ class Replacer(
     fun replaceIfMatch(seek: Int, string: CharSequence): CharSequence {
         val data = get(string)
         val result = data.rule.parse(seek, string)
-        if (result.getParseCode().isError()) {
+        if (result.isError) {
             return string
         }
 

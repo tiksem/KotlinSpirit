@@ -2,6 +2,7 @@ package com.kotlinspirit.rangeres.base
 
 import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.core.ParseResult
+import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
@@ -11,7 +12,7 @@ internal abstract class BaseRangeResultCharRule(
     val core: RangeResultRuleCore<Char>,
     name: String?
 ) : CharRule(name) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return core.parse(seek, string)
     }
 
@@ -23,7 +24,7 @@ internal abstract class BaseRangeResultCharRule(
         return core.hasMatch(seek, string)
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return core.reverseParse(seek, string)
     }
 

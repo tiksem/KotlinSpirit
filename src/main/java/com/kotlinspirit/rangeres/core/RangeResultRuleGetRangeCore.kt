@@ -1,19 +1,17 @@
 package com.kotlinspirit.rangeres.core
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.getParseCode
-import com.kotlinspirit.core.isNotError
 import com.kotlinspirit.rangeres.ParseRange
 
 internal class RangeResultRuleGetRangeCore<T: Any>(
     rule: Rule<T>,
     val outRange: ParseRange
 ) : RangeResultRuleCore<T>(rule) {
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return rule.parse(seek, string).also {
-            if (it.getParseCode().isNotError()) {
+            if (it.isComplete) {
                 outRange.startSeek = seek
-                outRange.endSeek = it.getSeek()
+                outRange.endSeek = it.seek
             } else {
                 outRange.startSeek = -1
                 outRange.endSeek = -1
@@ -32,10 +30,10 @@ internal class RangeResultRuleGetRangeCore<T: Any>(
         }
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         return rule.reverseParse(seek, string).also {
-            if (it.getParseCode().isNotError()) {
-                outRange.startSeek = it.getSeek() + 1
+            if (it.isComplete) {
+                outRange.startSeek = it.seek + 1
                 outRange.endSeek = seek + 1
             } else {
                 outRange.startSeek = -1

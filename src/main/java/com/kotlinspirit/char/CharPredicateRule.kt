@@ -1,8 +1,6 @@
 package com.kotlinspirit.char
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
 import com.kotlinspirit.repeat.CharPredicateResultRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
@@ -35,18 +33,18 @@ open class CharPredicateRule : CharRule {
         this.eofParseCode = eofParseCode
     }
 
-    override fun parse(seek: Int, string: CharSequence): Long {
+    override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek >= string.length) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = eofParseCode
             )
         }
 
         return if (predicate(string[seek])) {
-            createComplete(seek + 1)
+            ParseSeekResult(seek + 1)
         } else {
-            createStepResult(
+            ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.CHAR_PREDICATE_FAILED
             )
@@ -55,7 +53,7 @@ open class CharPredicateRule : CharRule {
 
     override fun parseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         if (seek >= string.length) {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = eofParseCode
             )
@@ -65,9 +63,9 @@ open class CharPredicateRule : CharRule {
         val ch = string[seek]
         if (predicate(ch)) {
             result.data = ch
-            result.parseResult = createComplete(seek + 1)
+            result.parseResult = ParseSeekResult(seek + 1)
         } else {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.CHAR_PREDICATE_FAILED
             )
@@ -78,18 +76,18 @@ open class CharPredicateRule : CharRule {
         return seek < string.length && predicate(string[seek])
     }
 
-    override fun reverseParse(seek: Int, string: CharSequence): Long {
+    override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek < 0) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = eofParseCode
             )
         }
 
         return if (predicate(string[seek])) {
-            createComplete(seek - 1)
+            ParseSeekResult(seek - 1)
         } else {
-            createStepResult(
+            ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.CHAR_PREDICATE_FAILED
             )
@@ -98,7 +96,7 @@ open class CharPredicateRule : CharRule {
 
     override fun reverseParseWithResult(seek: Int, string: CharSequence, result: ParseResult<Char>) {
         if (seek < 0) {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = eofParseCode
             )
@@ -108,9 +106,9 @@ open class CharPredicateRule : CharRule {
         val ch = string[seek]
         if (predicate(ch)) {
             result.data = ch
-            result.parseResult = createComplete(seek - 1)
+            result.parseResult = ParseSeekResult(seek - 1)
         } else {
-            result.parseResult = createStepResult(
+            result.parseResult = ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.CHAR_PREDICATE_FAILED
             )

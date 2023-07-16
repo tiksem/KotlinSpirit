@@ -1,8 +1,7 @@
 package com.kotlinspirit.number
 
 import com.kotlinspirit.core.ParseCode
-import com.kotlinspirit.core.createComplete
-import com.kotlinspirit.core.createStepResult
+import com.kotlinspirit.core.ParseSeekResult
 
 internal object IntParsers {
     inline fun parseInt(
@@ -12,7 +11,7 @@ internal object IntParsers {
         invalidIntParseCode: Int,
         outOfBoundsParseCode: Int,
         onResult: (Int) -> Unit
-    ): Long {
+    ): ParseSeekResult {
         var negative = false
         var i = seek
         val len = string.length
@@ -26,13 +25,13 @@ internal object IntParsers {
                     negative = true
                     limit = Int.MIN_VALUE
                 } else if (firstChar != '+') {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidIntParseCode
                     )
                 }
                 if (i > len - 2) { // Cannot have lone "+" or "-"
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = invalidIntParseCode
                     )
@@ -50,13 +49,13 @@ internal object IntParsers {
                         i--
                         break
                     } else {
-                        return createStepResult(
+                        return ParseSeekResult(
                             seek = seek,
                             parseCode = invalidIntParseCode
                         )
                     }
                 } else if (result < multmin) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = outOfBoundsParseCode
                     )
@@ -64,7 +63,7 @@ internal object IntParsers {
 
                 result *= radix
                 if (result < limit + digit) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = outOfBoundsParseCode
                     )
@@ -74,15 +73,15 @@ internal object IntParsers {
             onResult(if (negative) result else -result)
 
             return if (hasSign && i < seek + 2) {
-                createStepResult(
+                ParseSeekResult(
                     seek = seek,
                     parseCode = invalidIntParseCode
                 )
             } else {
-                createComplete(i)
+                ParseSeekResult(i)
             }
         } else {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -94,7 +93,7 @@ internal object IntParsers {
         radix: Int,
         string: CharSequence,
         onResult: (Long) -> Unit
-    ): Long {
+    ): ParseSeekResult {
         var negative = false
         var i = seek
         val len = string.length
@@ -108,13 +107,13 @@ internal object IntParsers {
                     negative = true
                     limit = Long.MIN_VALUE
                 } else if (firstChar != '+') {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = ParseCode.INVALID_LONG
                     )
                 }
                 if (i > len - 2) { // Cannot have lone "+" or "-"
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = ParseCode.INVALID_LONG
                     )
@@ -132,20 +131,20 @@ internal object IntParsers {
                         i--
                         break
                     } else {
-                        return createStepResult(
+                        return ParseSeekResult(
                             seek = seek,
                             parseCode = ParseCode.INVALID_LONG
                         )
                     }
                 } else if (result < multmin) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = ParseCode.LONG_OUT_OF_BOUNDS
                     )
                 }
                 result *= radix
                 if (result < limit + digit) {
-                    return createStepResult(
+                    return ParseSeekResult(
                         seek = seek,
                         parseCode = ParseCode.LONG_OUT_OF_BOUNDS
                     )
@@ -155,15 +154,15 @@ internal object IntParsers {
             onResult(if (negative) result else -result)
 
             return if (hasSign && i < seek + 2) {
-                createStepResult(
+                ParseSeekResult(
                     seek = seek,
                     parseCode = ParseCode.INVALID_LONG
                 )
             } else {
-                createComplete(i)
+                ParseSeekResult(i)
             }
         } else {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -176,9 +175,9 @@ internal object IntParsers {
         invalidIntParseCode: Int,
         outOfBoundsParseCode: Int,
         checkOutOfBounds: (Long) -> Boolean
-    ): Long {
+    ): ParseSeekResult {
         if (seek < 0) {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.EOF
             )
@@ -186,7 +185,7 @@ internal object IntParsers {
 
         val ch = string[seek]
         if (ch !in '0'..'9') {
-            return createStepResult(
+            return ParseSeekResult(
                 seek = seek,
                 parseCode = invalidIntParseCode
             )
@@ -202,7 +201,7 @@ internal object IntParsers {
                 in '0'..'9' -> {
                     result += multiplier * (c - '0')
                     if (checkOutOfBounds(result)) {
-                        return createStepResult(
+                        return ParseSeekResult(
                             seek = seek,
                             parseCode = outOfBoundsParseCode
                         )
@@ -211,15 +210,15 @@ internal object IntParsers {
                     --i
                 }
                 '+', '-' -> {
-                    return createComplete(i - 1)
+                    return ParseSeekResult(i - 1)
                 }
                 else -> {
-                    return createComplete(i)
+                    return ParseSeekResult(i)
                 }
             }
         }
 
-        return createComplete(-1)
+        return ParseSeekResult(-1)
     }
 
     inline fun reverseParseWithResult(
@@ -228,12 +227,12 @@ internal object IntParsers {
         invalidIntParseCode: Int,
         outOfBoundsParseCode: Int,
         checkOutOfBounds: (Long) -> Boolean,
-        getResult: (Long?, Long) -> Unit
+        getResult: (Long?, ParseSeekResult) -> Unit
     ) {
         if (seek < 0) {
             getResult(
                 null,
-                createStepResult(
+                ParseSeekResult(
                     seek = seek,
                     parseCode = ParseCode.EOF
                 )
@@ -245,7 +244,7 @@ internal object IntParsers {
         if (ch !in '0'..'9') {
             getResult(
                 null,
-                createStepResult(
+                ParseSeekResult(
                     seek = seek,
                     parseCode = invalidIntParseCode
                 )
@@ -265,7 +264,7 @@ internal object IntParsers {
                     if (checkOutOfBounds(result)) {
                         getResult(
                             null,
-                            createStepResult(
+                            ParseSeekResult(
                                 seek = seek,
                                 parseCode = outOfBoundsParseCode
                             )
@@ -276,11 +275,11 @@ internal object IntParsers {
                     --i
                 }
                 '+' -> {
-                    getResult(result, createComplete(i - 1))
+                    getResult(result, ParseSeekResult(i - 1))
                     return
                 }
                 '-' -> {
-                    getResult(-result, createComplete(i - 1))
+                    getResult(-result, ParseSeekResult(i - 1))
                     return
                 }
                 else -> {
@@ -289,6 +288,6 @@ internal object IntParsers {
             }
         }
 
-        getResult(result, createComplete(i))
+        getResult(result, ParseSeekResult(i))
     }
 }

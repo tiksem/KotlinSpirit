@@ -1,18 +1,18 @@
 package com.kotlinspirit.core
 
 class ParseException(
-    private val result: Long,
+    private val result: ParseSeekResult,
     private val string: CharSequence
 ) : Exception(
-    "Failed to parse token: ${string.subSequence(0, result.getSeek())}, error: ${
-        result.getParseCode().parseCodeToString()
+    "Failed to parse token: ${string.subSequence(0, result.seek)}, error: ${
+        result.parseCodeString
     }"
 ) {
     val errorCode: Int
-        get() = result.getParseCode()
+        get() = result.errorCode
 
     val seek: Int
-        get() = result.getSeek()
+        get() = result.seek
 
     val token: CharSequence
         get() = string.subSequence(0..seek)

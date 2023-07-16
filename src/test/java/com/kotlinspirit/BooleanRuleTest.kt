@@ -18,13 +18,13 @@ class BooleanRuleTest {
     @Test
     fun testTrue() {
         Assert.assertEquals(r.parseGetResultOrThrow("true"), true)
-        Assert.assertEquals(r.parse("trueyo").endSeek, "true".length)
+        Assert.assertEquals(r.parse("trueyo").seek, "true".length)
     }
 
     @Test
     fun testFalse() {
         Assert.assertEquals(r.parseGetResultOrThrow("false"), false)
-        Assert.assertEquals(r.parse("falseyo").endSeek, "false".length)
+        Assert.assertEquals(r.parse("falseyo").seek, "false".length)
     }
 
     @Test

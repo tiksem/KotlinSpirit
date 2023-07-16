@@ -13,7 +13,7 @@ class DiffRuleTest {
     private fun <T : Any> verifyDiffFailed(rule: Rule<T>, str: String, code: Int = ParseCode.DIFF_FAILED) {
         val result = ParseResult<T>()
         rule.parseWithResult(0, str, result)
-        Assert.assertEquals(result.parseResult.getParseCode(), code)
+        Assert.assertEquals(result.parseResult.parseCode, code)
         Assert.assertEquals(result.endSeek, 0)
     }
 

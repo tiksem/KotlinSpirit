@@ -1,14 +1,11 @@
 package com.kotlinspirit.debug
 
-import com.kotlinspirit.core.*
-import com.kotlinspirit.core.getSeek
-import com.kotlinspirit.core.isError
+import com.kotlinspirit.core.ParseCode
+import com.kotlinspirit.core.ParseSeekResult
+import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.parseCodeToString
 import org.json.JSONArray
 import org.json.JSONObject
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
-import java.util.concurrent.ConcurrentHashMap
 
 private const val DEBUG_MAX_TOKEN_LENGTH = 20
 
@@ -42,7 +39,7 @@ class RuleDebugTreeNode(
             if (data != null) {
                 it.put("result", data)
             }
-            if (parseCode.isError()) {
+            if (parseCode != ParseCode.COMPLETE) {
                 var token = string.subSequence(0, startSeek)
                 if (token.length > DEBUG_MAX_TOKEN_LENGTH) {
                     token = string.subSequence(startSeek - DEBUG_MAX_TOKEN_LENGTH, startSeek)
@@ -96,7 +93,7 @@ internal class DebugEngine {
         }
     }
 
-    fun ruleParseEnded(rule: Rule<*>, result: Long, data: Any? = null) {
+    fun ruleParseEnded(rule: Rule<*>, result: ParseSeekResult, data: Any? = null) {
         val seek = this.seek
             ?: throw IllegalStateException("Undefined behaviour, " +
                     "ruleParseEnded was called before parsing was started")
@@ -105,8 +102,8 @@ internal class DebugEngine {
             throw IllegalStateException("Undefined behaviour, ended rule doesn't match started rule")
         }
 
-        seek.endSeek = result.getSeek()
-        seek.parseCode = result.getParseCode()
+        seek.endSeek = result.seek
+        seek.parseCode = result.parseCode
         seek.data = data
         if (seek.parent == null) {
             history.add(seek)
