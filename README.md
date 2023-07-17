@@ -536,13 +536,12 @@ private val xmlRule = object : Grammar<Xml>() {
             name = it.toString()
         }
 
-        val secondTagNameOccurrenceRule = str(name)
-
         val tagName = dynamicRule {
             if (name.isEmpty()) {
                 firstTagNameOccurrenceRule
             } else {
-                secondTagNameOccurrenceRule
+                // Second tagName occurrence
+                str(name)
             }
         }
 
