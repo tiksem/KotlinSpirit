@@ -402,18 +402,22 @@ Callbacks are usually used in Grammar or Repalcer. We will discuss them later.
 Sometimes you need to get a range of your rule's match. You can use getRange and getRangeResult hooks for that. Warning: getRange and getRangeResult are not properly synchronized for multithreading usage. So you need to use them inside Grammar or Replacer. See Thread safety section for a reference. 
 
 getRange accepts ParseRange as a parameter. ParseRange is filled with startSeek and endSeek during parsing, when the rule is succesful. You can create a range using `range()` function. The example shows how to find int in a string and get its range
-```
+```Kotlin
 val range = range()
 val r = (!int).repeat() + int.getRange(range) + (!int).repeat()
 r.compile.match("yoyoyo322323yoyoyo")
+Assert.assertEquals(range.startSeek, "yoyoyo".length)
+Assert.assertEquals(range.endSeek, "yoyoyo322323".length)
 ```
 getRangeResult is the same as getRange, but it also parses a result, so it takes ParseRangeResult. To create ParseRangeResult use `rangeResult()` function.
 
 ```Kotlin
-var name = ""
-var age = -1
-val nameRule = char('A'..'Z') + +char('a'..'z')
-val rule = nameRule { name = it } + '=' + int { age = it }
+val rangeResult = rangeResult()
+val r = (!int).repeat() + int.getRangeResult(rangeResult) + (!int).repeat()
+r.compile.match("yoyoyo322323yoyoyo")
+Assert.assertEquals(rangeResult.data, 322323)
+Assert.assertEquals(rangeResult.startSeek, "yoyoyo".length)
+Assert.assertEquals(rangeResult.endSeek, "yoyoyo322323".length)
 ```
 
 ## Grammars
