@@ -532,19 +532,17 @@ private val xmlRule = object : Grammar<Xml>() {
         get() = Xml(body, name)
 
     override fun defineRule(): Rule<*> {
-        val firstTagNameOccurrence = nonEmptyLatinStr {
+        val firstTagNameOccurrenceRule = nonEmptyLatinStr {
             name = it.toString()
         }
 
-        val secondTagNameOccurrence = dynamicString {
-            name
-        }
+        val secondTagNameOccurrenceRule = str(name)
 
         val tagName = dynamicRule {
             if (name.isEmpty()) {
-                firstTagNameOccurrence
+                firstTagNameOccurrenceRule
             } else {
-                secondTagNameOccurrence
+                secondTagNameOccurrenceRule
             }
         }
 
