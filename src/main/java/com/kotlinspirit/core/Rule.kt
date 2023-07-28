@@ -12,6 +12,7 @@ import com.kotlinspirit.quoted.QuotedRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.str.ExactStringRule
+import com.kotlinspirit.transform.TransformRule
 
 private val DEFAULT_STEP_RESULT = ParseSeekResult(
     seek = 0,
@@ -414,6 +415,13 @@ abstract class Rule<T : Any>(name: String?) {
 
     fun quoted(left: String, right: String): QuotedRule<T> {
         return quoted(str(left), str(right))
+    }
+
+    fun <To : Any> map(transformer: (T) -> To): TransformRule<T, To> {
+        return TransformRule(
+            from = this,
+            transformer = transformer
+        )
     }
 
     abstract fun clone(): Rule<T>

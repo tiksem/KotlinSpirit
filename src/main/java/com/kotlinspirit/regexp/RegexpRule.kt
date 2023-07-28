@@ -7,7 +7,7 @@ class RegexpRule(private val regex: Regex, name: String? = null) : RuleWithDefau
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         val match = regex.matchAt(string, seek)
         if (match != null) {
-            return ParseSeekResult(match.range.last - 1)
+            return ParseSeekResult(match.range.last + 1)
         }
 
         return ParseSeekResult(
@@ -20,7 +20,7 @@ class RegexpRule(private val regex: Regex, name: String? = null) : RuleWithDefau
         val match = regex.matchAt(string, seek)
         result.data = match
         result.parseResult = if (match != null) {
-            ParseSeekResult(match.range.last - 1)
+            ParseSeekResult(match.range.last + 1)
         } else {
             ParseSeekResult(
                 seek = seek,
