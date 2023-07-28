@@ -563,6 +563,18 @@ private val xmlTagBody: Rule<List<Any>> = (xmlRule or (char - char('<', '>')).re
 ```
 Here we use `dynamicRule` to identify if we return a tagName we already remembered during parsing, or use nonEmptyLatinStr to check a tag. If we simply keep the same order as we did in our `Dynamic string rule` example above, the parser will not work for reverse search, used in the prefix rule.
 
+## Regexp rule
+This rule is used to mix regular expressions with KotlinSpirit rules. The rule has `kotlin.text.MatchResult` result.
+```Kotlin
+val ipAddressRule = regexp("((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)")
+val name = char('A'..'Z') + +char('a'..'z')
+val ipAddressNamePair = ipAddressRule + "->" + name
+val parser = ipAddressNamePair.compile()
+parser.matches("127.0.0.1->Jhon") // true
+```
+#### Warning
+Be careful with using $ and ^ operators, usually. Regexp rule always check the regex to match from the current seek during parsing process and it uses `matchesAt` method of `kotlin.text.Regex`
+
 # Building advanced replacers
 Sometimes you need to create some advanced replace logic, so Parser repalce functions don't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements with groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integers, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
 ```Kotlin
