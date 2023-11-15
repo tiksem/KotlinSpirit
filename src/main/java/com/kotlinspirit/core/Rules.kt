@@ -117,6 +117,8 @@ object Rules {
 
     val char = AnyCharRule()
     val digit = char('0'..'9')
+    val latin = char('a'..'z', 'A'..'Z')
+    val latinOrDigit = char('a'..'z', 'A'..'Z', '0'..'9')
     val space: CharPredicateRule = charIf {
         it.isWhitespace()
     }
@@ -212,6 +214,18 @@ object Rules {
     val float = FloatRule()
 
     fun oneOf(vararg strings: CharSequence): RuleWithDefaultRepeat<CharSequence> {
+        val withoutEmptyStrings = strings.filter {
+            it.isNotEmpty()
+        }
+
+        return if (withoutEmptyStrings.size == strings.size) {
+            OneOfStringRule(withoutEmptyStrings)
+        } else {
+            OptionalRule(OneOfStringRule(withoutEmptyStrings.shuffled()))
+        }
+    }
+
+    fun oneOf(strings: Collection<CharSequence>): RuleWithDefaultRepeat<CharSequence> {
         val withoutEmptyStrings = strings.filter {
             it.isNotEmpty()
         }

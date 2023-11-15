@@ -14,6 +14,10 @@ internal fun Int.parseCodeToString(): String {
         ParseCode.ULONG_OUT_OF_BOUNDS -> "ULONG_OUT_OF_BOUNDS"
         ParseCode.INVALID_BYTE -> "INVALID_BYTE"
         ParseCode.INVALID_UBYTE -> "INVALID_UBYTE"
+        ParseCode.INVALID_SHORT -> "INVALID_SHORT"
+        ParseCode.INVALID_USHORT -> "INVALID_USHORT"
+        ParseCode.SHORT_OUT_OF_BOUNDS -> "SHORT_OUT_OF_BOUNDS"
+        ParseCode.USHORT_OUT_OF_BOUNDS -> "USHORT_OUT_OF_BOUNDS"
         ParseCode.DIFF_FAILED -> "DIFF_FAILED"
         ParseCode.CHAR_PREDICATE_FAILED -> "CHAR_PREDICATE_FAILED"
         ParseCode.STRING_NOT_ENOUGH_DATA -> "STRING_NOT_ENOUGH_DATA"
@@ -33,6 +37,8 @@ internal fun Int.parseCodeToString(): String {
         ParseCode.NO_EOF -> "NO_EOF"
         ParseCode.BOOLEAN_NO_MATCH -> "BOOLEAN_NO_MATCH"
         ParseCode.REGEX_NO_MATCH -> "REGEX_NO_MATCH"
+        ParseCode.SPLIT_NOT_ENOUGH_DATA -> "SPLIT_NOT_ENOUGH_DATA"
+        
         else -> if (this > ParseCode.PREFIX_NOT_SATISFIED) {
             "PREFIX_NOT_SATISFIED_" + (this - ParseCode.PREFIX_NOT_SATISFIED).parseCodeToString()
         } else {
