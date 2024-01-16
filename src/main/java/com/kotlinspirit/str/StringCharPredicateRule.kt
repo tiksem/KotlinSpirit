@@ -5,8 +5,6 @@ import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.ext.moveSeekReverseUntilDontMatch
 import com.kotlinspirit.ext.moveSeekUntilDontMatch
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
-import kotlin.math.max
-import kotlin.math.min
 
 open class StringCharPredicateRule(
     private val predicate: (Char) -> Boolean,

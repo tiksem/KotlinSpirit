@@ -2,7 +2,6 @@ package com.kotlinspirit.char
 
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
-import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.ParseSeekResult
 
 open class ExactCharRule(

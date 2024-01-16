@@ -2,7 +2,6 @@ package com.kotlinspirit.str
 
 import com.kotlinspirit.core.*
 import com.kotlinspirit.expressive.StringOrRule
-import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
 internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequence): ParseSeekResult {
     val tokenLength = token.length

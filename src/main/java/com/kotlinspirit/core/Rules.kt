@@ -8,6 +8,7 @@ import com.kotlinspirit.dynamic.DynamicRule
 import com.kotlinspirit.dynamic.DynamicStringRule
 import com.kotlinspirit.eof.EofRule
 import com.kotlinspirit.expressive.*
+import com.kotlinspirit.group.GroupRule
 import com.kotlinspirit.number.*
 import com.kotlinspirit.regexp.RegexpRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
@@ -254,6 +255,10 @@ object Rules {
 
     fun regexp(pattern: Regex): RegexpRule {
         return RegexpRule(pattern)
+    }
+
+    fun <T : Any> group(sequenceRule: SequenceRule): GroupRule<T> {
+        return GroupRule(rules = sequenceRule.toRulesList())
     }
 }
 

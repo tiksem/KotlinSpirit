@@ -98,4 +98,24 @@ class SequenceRule(
     override fun repeat(): Rule<List<CharSequence>> {
         return super.repeat()
     }
+
+    private fun toRulesList(out: MutableList<Rule<*>>) {
+        appendRule(a, out)
+        appendRule(b, out)
+    }
+
+    private fun appendRule(rule: Rule<*>, out: MutableList<Rule<*>>) {
+        if (rule is SequenceRule) {
+            toRulesList(out)
+        } else {
+            out.add(rule)
+        }
+    }
+
+    // Unwraps sequence rule recursively into a list of rules
+    internal fun toRulesList(): List<Rule<*>> {
+        return mutableListOf<Rule<*>>().also {
+            toRulesList(it)
+        }
+    }
 }

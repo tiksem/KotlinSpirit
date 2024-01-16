@@ -2,7 +2,6 @@ package com.kotlinspirit.rangeres.base
 
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.ParseSeekResult
-import com.kotlinspirit.core.Rule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
