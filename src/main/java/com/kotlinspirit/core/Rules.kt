@@ -16,7 +16,7 @@ import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
-import java.util.OptionalDouble
+import com.kotlinspirit.str.oneof.OneOfStringRuleCaseInsensetive
 import kotlin.math.absoluteValue
 
 object Rules {
@@ -234,6 +234,30 @@ object Rules {
             OneOfStringRule(withoutEmptyStrings)
         } else {
             OptionalRule(OneOfStringRule(withoutEmptyStrings.shuffled()))
+        }
+    }
+
+    fun caseInsensitiveOneOf(vararg strings: CharSequence): RuleWithDefaultRepeat<CharSequence> {
+        val withoutEmptyStrings = strings.filter {
+            it.isNotEmpty()
+        }
+
+        return if (withoutEmptyStrings.size == strings.size) {
+            OneOfStringRuleCaseInsensetive(withoutEmptyStrings)
+        } else {
+            OptionalRule(OneOfStringRuleCaseInsensetive(withoutEmptyStrings.shuffled()))
+        }
+    }
+
+    fun caseInsensitiveOneOf(strings: Collection<CharSequence>): RuleWithDefaultRepeat<CharSequence> {
+        val withoutEmptyStrings = strings.filter {
+            it.isNotEmpty()
+        }
+
+        return if (withoutEmptyStrings.size == strings.size) {
+            OneOfStringRuleCaseInsensetive(withoutEmptyStrings)
+        } else {
+            OptionalRule(OneOfStringRuleCaseInsensetive(withoutEmptyStrings.shuffled()))
         }
     }
 
