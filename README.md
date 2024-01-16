@@ -18,7 +18,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.1.5"
+implementation "com.github.tiksem:KotlinSpirit:1.1.6"
 ```
 
 # Creating a simple parser
@@ -88,6 +88,12 @@ Matches one of the strings from a given list. The rule is always greedy so it tr
 oneOf(vararg strings: CharSequence)
 ```
 Example: `oneOf("Jhon", "Ivan", "Bin")` matches one of the names.
+
+### OneOf case insensitive string rule
+Matches one of the strings from a given list, ignoring case. The rule is always greedy so it tries to match as long string as possible from the given list
+```Kotlin
+caseInsensitiveOneOf(vararg strings: CharSequence)
+```
 
 #### Performance note:
 The search is optimized by using `TernarySearchTree` for matching strings. To maximize the performance try to order the strings in oneOf to be NOT sorted, this will keep `TernarySearchTree` more balanced.
