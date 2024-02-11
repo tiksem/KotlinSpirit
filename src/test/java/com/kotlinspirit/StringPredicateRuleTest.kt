@@ -1,6 +1,7 @@
 package com.kotlinspirit
 
 import com.kotlinspirit.core.Rules.char
+import com.kotlinspirit.core.Rules.nonEmptyLatinStr
 import com.kotlinspirit.core.Rules.str
 import org.junit.Assert
 import org.junit.Test
@@ -31,5 +32,10 @@ class StringPredicateRuleTest {
 
         rule.compile().matchOrThrow("   \n\n123\n\n\n\n  ")
         Assert.assertEquals("123", result);
+    }
+
+    @Test
+    fun testNonEmptyLatinStr1() {
+        Assert.assertEquals(nonEmptyLatinStr.compile().parseGetResultOrThrow("userId"), "userId")
     }
 }

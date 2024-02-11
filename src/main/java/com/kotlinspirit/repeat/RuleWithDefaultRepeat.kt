@@ -1,6 +1,7 @@
 package com.kotlinspirit.repeat
 
 import com.kotlinspirit.core.Rule
+import com.kotlinspirit.core.RuleWithDefaultSequenceBehavior
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.rangeres.callbacks.RangeResultCallbacksRuleDefaultRepeat
@@ -8,7 +9,7 @@ import com.kotlinspirit.rangeres.result.RangeResultRuleCallbacksResultDefaultRep
 import com.kotlinspirit.rangeres.result.RangeResultRuleResultDefaultRepeat
 import com.kotlinspirit.rangeres.simple.RangeResultRuleDefaultRepeat
 
-abstract class RuleWithDefaultRepeat<T : Any>(name: String?) : Rule<T>(name) {
+abstract class RuleWithDefaultRepeat<T : Any>(name: String?) : RuleWithDefaultSequenceBehavior<T>(name) {
     override fun repeat(): Rule<List<T>> {
         return RepeatRule(rule = this, range = 0..Int.MAX_VALUE)
     }

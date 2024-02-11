@@ -93,6 +93,18 @@ internal class DebugRule<T : Any>(
         throw UnsupportedOperationException("Method is not supported by DebugRule")
     }
 
+    override fun plus(rule: Rule<*>): Rule<*> {
+        return this.rule + rule
+    }
+
+    override fun plus(char: Char): Rule<*> {
+        return this.rule + char
+    }
+
+    override fun plus(string: String): Rule<*> {
+        return this.rule + string
+    }
+
     override val debugNameShouldBeWrapped: Boolean
         get() = rule.debugNameShouldBeWrapped
 

@@ -11,6 +11,8 @@ import com.kotlinspirit.ext.quote
 import com.kotlinspirit.quoted.QuotedRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
+import com.kotlinspirit.result.ResultInSequenceRuleWrapper
+import com.kotlinspirit.result.ResultSequenceRule
 import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.transform.TransformRule
 
@@ -181,26 +183,34 @@ abstract class Rule<T : Any>(name: String?) {
      * Returns a rule, that
      * Matches this rule followed by the passed rule
      */
-    operator fun plus(rule: Rule<*>): SequenceRule {
-        val c = this
-        return SequenceRule(c, rule)
-    }
+    abstract operator fun plus(rule: Rule<*>): Rule<*>
 
     /**
      * Returns a rule, that
      * Matches this rule followed by the char
      */
-    operator fun plus(char: Char): SequenceRule {
-        return SequenceRule(this, ExactCharRule(char))
+    abstract operator fun plus(char: Char): Rule<*>
+
+    /**
+     * Returns a rule, that
+     * Matches this rule followed by the string
+     */
+    abstract operator fun plus(string: String): Rule<*>
+
+    /**
+     * Returns a rule, that
+     * Matches this rule followed by the string
+     */
+    operator fun <OtherT : Any> plus(rule: ResultSequenceRule<OtherT>): ResultSequenceRule<OtherT> {
+        return ResultSequenceRule(a = this, b = rule, aIsResultRule = false)
     }
 
     /**
      * Returns a rule, that
      * Matches this rule followed by the string
      */
-    operator fun plus(string: String): SequenceRule {
-        val c = this
-        return SequenceRule(c, ExactStringRule(string))
+    operator fun <OtherT : Any> plus(rule: ResultInSequenceRuleWrapper<OtherT>): ResultSequenceRule<OtherT> {
+        return ResultSequenceRule(a = this, b = rule, aIsResultRule = false)
     }
 
     /**
@@ -415,6 +425,10 @@ abstract class Rule<T : Any>(name: String?) {
 
     fun quoted(left: String, right: String): QuotedRule<T> {
         return quoted(str(left), str(right))
+    }
+
+    fun asResult(): ResultInSequenceRuleWrapper<T> {
+        return ResultInSequenceRuleWrapper(wrappedRule = this)
     }
 
     fun <To : Any> map(transformer: (T) -> To): TransformRule<T, To> {

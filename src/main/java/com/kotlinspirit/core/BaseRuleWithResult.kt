@@ -4,7 +4,7 @@ abstract class BaseRuleWithResult<T : Any>(
     protected val rule: Rule<T>,
     protected val callback: (T) -> Unit,
     name: String?,
-) : Rule<T>(name) {
+) : RuleWithDefaultSequenceBehavior<T>(name) {
     private val result = ParseResult<T>()
 
     private fun postParse(result: ParseResult<T>) {

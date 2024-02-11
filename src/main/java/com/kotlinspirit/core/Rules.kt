@@ -207,8 +207,8 @@ object Rules {
         return StringCharPredicateRule(predicate)
     }
 
-    val latinStr = str('A'..'B', 'a'..'z')
-    val nonEmptyLatinStr = nonEmptyStr('A'..'B', 'a'..'z')
+    val latinStr = str('A'..'Z', 'a'..'z')
+    val nonEmptyLatinStr = nonEmptyStr('A'..'Z', 'a'..'z')
 
     val double = DoubleRule()
     val float = FloatRule()

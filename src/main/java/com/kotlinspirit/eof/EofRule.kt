@@ -4,7 +4,7 @@ import com.kotlinspirit.core.*
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 
-class EofRule(name: String? = null) : Rule<Unit>(name) {
+class EofRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name) {
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek == string.length) {
             return ParseSeekResult(seek)

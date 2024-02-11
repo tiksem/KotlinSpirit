@@ -68,7 +68,7 @@ class CharResultRule(
         get() = rule.debugNameShouldBeWrapped
 }
 
-abstract class CharRule(name: String?) : Rule<Char>(name) {
+abstract class CharRule(name: String?) : RuleWithDefaultSequenceBehavior<Char>(name) {
     override fun minus(rule: Rule<*>): CharDiffRule {
         return CharDiffRule(main = this, diff = rule)
     }
