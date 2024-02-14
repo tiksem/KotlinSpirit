@@ -459,6 +459,17 @@ val personRule = object : Grammar<Person>() {
 ```
 Note: `toRule` is used to convert the grammar to a rule.
 
+## Groups
+
+Groups are simplified and less flexible replacements for grammars for simple use cases. With `group` operator you can spescify which rule is responsible for setting the result of the expression. The result of the group rule is always the result of a rule marked with `asResult()` call. Let's consider we want to parse unsigned int literal, 124454u. It contains u suffix. To create a parser for that spesific case you can use grammar and override `defineRule` with uint + 'u' expression. And there is nothing wrong with this solution. However let's try to implement this unsigned int literal parser using `group`.
+
+```Kotlin
+val unsignedIntLiteralRule = group(uint.asResult() + 'u')
+val parser = unsignedIntLiteralRule.compile()
+parser.parseGetResultOrThrow("434334u") // 434334
+```
+Note: The expression inside group should contain sequence built using + operator and it should cotnain only a single `asResult()` call.
+
 ## Dynamic string rule
 This rule is usually used to remember some token during the parsing process, the result of the rule is `CharSequence`
 
