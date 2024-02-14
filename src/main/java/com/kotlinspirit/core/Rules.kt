@@ -11,6 +11,8 @@ import com.kotlinspirit.expressive.*
 import com.kotlinspirit.number.*
 import com.kotlinspirit.regexp.RegexpRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
+import com.kotlinspirit.result.GroupSequenceRule
+import com.kotlinspirit.result.ResultSequenceRule
 import com.kotlinspirit.str.EmptyStringRule
 import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
@@ -278,6 +280,10 @@ object Rules {
 
     fun regexp(pattern: Regex): RegexpRule {
         return RegexpRule(pattern)
+    }
+
+    fun <T : Any> group(resultSequenceRule: ResultSequenceRule<T>): GroupSequenceRule<T> {
+        return GroupSequenceRule<T>(rule = resultSequenceRule)
     }
 }
 

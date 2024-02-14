@@ -2,6 +2,8 @@ package com.kotlinspirit
 
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.digit
+import com.kotlinspirit.core.Rules.group
+import com.kotlinspirit.core.Rules.int
 import com.kotlinspirit.core.Rules.nonEmptyLatinStr
 import com.kotlinspirit.core.Rules.uint
 import org.junit.Assert
@@ -62,5 +64,13 @@ class ResultSequenceRuleTest {
         val argNumberRule = digit % ',' + char(':') + uint.asResult() + char(':')
         val parser = argNumberRule.compile()
         Assert.assertEquals(parser.parseGetResultOrThrow("3,4,5,1:345:"), 345.toUInt())
+    }
+
+    @Test
+    fun testGroup() {
+        val sqlArgRule = group(char(':') + nonEmptyLatinStr.asResult())
+        val rule = int + sqlArgRule
+        val parser = rule.compile()
+        Assert.assertEquals(parser.parseGetResultOrThrow("456:userId").toString(), "456:userId")
     }
 }
