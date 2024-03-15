@@ -310,6 +310,24 @@ fun CharSequence.parse(rule: Rule<*>): Int? {
     }
 }
 
+fun CharSequence.split(rule: Rule<*>): List<CharSequence> {
+    val ranges = findAllRanges(rule)
+    if (ranges.isEmpty()) {
+        return listOf(this)
+    }
+
+    var begin = 0
+    val result = ArrayList<CharSequence>(ranges.size + 1)
+
+    for (range in ranges) {
+        result.add(subSequence(begin, range.startSeek))
+        begin = range.endSeek
+    }
+
+    result.add(subSequence(begin, length))
+    return result
+}
+
 fun CharSequence.count(rule: Rule<*>): Int {
     var count = 0
     var i = 0
@@ -379,22 +397,4 @@ internal fun CharSequence.indexOfChar(char: Char, startIndex: Int, endIndex: Int
     }
 
     return -1
-}
-
-internal fun CharSequence.split(rule: Rule<*>): List<CharSequence> {
-    val ranges = findAllRanges(rule)
-    if (ranges.isEmpty()) {
-        return listOf(this)
-    }
-
-    var begin = 0
-    val result = ArrayList<CharSequence>(ranges.size + 1)
-
-    for (range in ranges) {
-        result.add(subSequence(begin, range.startSeek))
-        begin = range.endSeek
-    }
-
-    result.add(subSequence(begin, length))
-    return result
 }
