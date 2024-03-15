@@ -145,4 +145,8 @@ internal abstract class BaseParser<T : Any> : Parser<T> {
     override fun count(string: CharSequence): Int {
         return string.count(getRule(string))
     }
+
+    override fun split(string: CharSequence): List<CharSequence> {
+        return string.split(getRule(string))
+    }
 }

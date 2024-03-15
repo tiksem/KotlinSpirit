@@ -38,6 +38,8 @@ interface Parser<T : Any> {
 
     fun count(string: CharSequence): Int
 
+    fun split(string: CharSequence): List<CharSequence>
+
     fun getDebugTree(): RuleDebugTreeNode? {
         return null
     }
