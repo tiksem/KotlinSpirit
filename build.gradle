@@ -49,3 +49,7 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+kotlin {
+    jvmToolchain(17)
+}
