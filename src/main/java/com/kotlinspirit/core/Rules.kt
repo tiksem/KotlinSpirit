@@ -215,27 +215,27 @@ object Rules {
     val double = DoubleRule()
     val float = FloatRule()
 
-    fun oneOf(vararg strings: CharSequence): RuleWithDefaultRepeat<CharSequence> {
+    fun oneOf(vararg strings: CharSequence, skipper: Rule<*>? = null): RuleWithDefaultRepeat<CharSequence> {
         val withoutEmptyStrings = strings.filter {
             it.isNotEmpty()
         }
 
         return if (withoutEmptyStrings.size == strings.size) {
-            OneOfStringRule(withoutEmptyStrings)
+            OneOfStringRule(withoutEmptyStrings, skipper)
         } else {
-            OptionalRule(OneOfStringRule(withoutEmptyStrings.shuffled()))
+            OptionalRule(OneOfStringRule(withoutEmptyStrings.shuffled(), skipper))
         }
     }
 
-    fun oneOf(strings: Collection<CharSequence>): RuleWithDefaultRepeat<CharSequence> {
+    fun oneOf(strings: Collection<CharSequence>, skipper: Rule<*>? = null): RuleWithDefaultRepeat<CharSequence> {
         val withoutEmptyStrings = strings.filter {
             it.isNotEmpty()
         }
 
         return if (withoutEmptyStrings.size == strings.size) {
-            OneOfStringRule(withoutEmptyStrings)
+            OneOfStringRule(withoutEmptyStrings, skipper)
         } else {
-            OptionalRule(OneOfStringRule(withoutEmptyStrings.shuffled()))
+            OptionalRule(OneOfStringRule(withoutEmptyStrings.shuffled(), skipper))
         }
     }
 
@@ -251,15 +251,15 @@ object Rules {
         }
     }
 
-    fun caseInsensitiveOneOf(strings: Collection<CharSequence>): RuleWithDefaultRepeat<CharSequence> {
+    fun caseInsensitiveOneOf(strings: Collection<CharSequence>, skipper: Rule<*>? = null): RuleWithDefaultRepeat<CharSequence> {
         val withoutEmptyStrings = strings.filter {
             it.isNotEmpty()
         }
 
         return if (withoutEmptyStrings.size == strings.size) {
-            OneOfStringRuleCaseInsensetive(withoutEmptyStrings)
+            OneOfStringRuleCaseInsensetive(withoutEmptyStrings, skipper)
         } else {
-            OptionalRule(OneOfStringRuleCaseInsensetive(withoutEmptyStrings.shuffled()))
+            OptionalRule(OneOfStringRuleCaseInsensetive(withoutEmptyStrings.shuffled(), skipper))
         }
     }
 

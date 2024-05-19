@@ -3,7 +3,7 @@ package com.kotlinspirit.str.oneof
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
-internal class TernarySearchTreeCaseInsensitive {
+internal open class TernarySearchTreeCaseInsensitive {
     class Node(
         val char: Char
     ) {
@@ -91,14 +91,14 @@ internal class TernarySearchTreeCaseInsensitive {
         when {
             ch == nodeCh -> {
                 if (node.isEndOfWord) {
-                    val moreSearch = parse(node.eq ?: return seek + 1, seek + 1, string)
+                    val moreSearch = parse(node.eq ?: return seek + 1, moveSeekToTheNextChar(seek, string), string)
                     return if (moreSearch >= 0) {
                         moreSearch
                     } else {
                         seek + 1
                     }
                 } else {
-                    return parse(node.eq ?: return -1, seek + 1, string)
+                    return parse(node.eq ?: return -1, moveSeekToTheNextChar(seek, string), string)
                 }
             }
             ch < nodeCh -> {
@@ -120,14 +120,14 @@ internal class TernarySearchTreeCaseInsensitive {
         when {
             ch == nodeCh -> {
                 if (node.isEndOfWord) {
-                    val moreSearch = parse(node.eq ?: return seek - 1, seek - 1, string)
+                    val moreSearch = parse(node.eq ?: return seek - 1, moveSeekToThePrevChar(seek, string), string)
                     return if (moreSearch >= -1) {
                         moreSearch
                     } else {
                         seek - 1
                     }
                 } else {
-                    return parse(node.eq ?: return -2, seek - 1, string)
+                    return parse(node.eq ?: return -2, moveSeekToThePrevChar(seek, string), string)
                 }
             }
             ch < nodeCh -> {
@@ -151,7 +151,7 @@ internal class TernarySearchTreeCaseInsensitive {
                 if (node.isEndOfWord) {
                     return true
                 } else {
-                    return hasMatch(node.eq ?: return false, seek + 1, string)
+                    return hasMatch(node.eq ?: return false, moveSeekToTheNextChar(seek, string), string)
                 }
             }
             ch < nodeCh -> {
@@ -175,7 +175,7 @@ internal class TernarySearchTreeCaseInsensitive {
                 if (node.isEndOfWord) {
                     return true
                 } else {
-                    return hasMatch(node.eq ?: return false, seek - 1, string)
+                    return hasMatch(node.eq ?: return false, moveSeekToThePrevChar(seek, string), string)
                 }
             }
             ch < nodeCh -> {
@@ -193,5 +193,13 @@ internal class TernarySearchTreeCaseInsensitive {
 
     fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
         return reverseHasMatch(root, seek, string)
+    }
+
+    protected open fun moveSeekToTheNextChar(seek: Int, string: CharSequence): Int {
+        return seek+1
+    }
+
+    protected open fun moveSeekToThePrevChar(seek: Int, string: CharSequence): Int {
+        return seek-1
     }
 }

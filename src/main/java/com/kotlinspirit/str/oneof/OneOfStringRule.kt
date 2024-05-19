@@ -3,17 +3,39 @@ package com.kotlinspirit.str.oneof
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.ParseSeekResult
+import com.kotlinspirit.core.Rule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class OneOfStringRule internal constructor(private val strings: List<CharSequence>, name: String? = null) :
+class OneOfStringRule internal constructor(
+    private val strings: List<CharSequence>,
+    private val skipper: Rule<*>?,
+    name: String? = null
+) :
     RuleWithDefaultRepeat<CharSequence>(name) {
 
-    private val tree = TernarySearchTree(strings)
+    private val tree = if (skipper == null) {
+        TernarySearchTree(strings)
+    } else {
+        object : TernarySearchTree(strings) {
+            override fun moveSeekToTheNextChar(seek: Int, string: CharSequence): Int {
+                return skipper.parse(seek + 1, string).seek
+            }
+        }
+    }
     // Reverse search is rarely used, that's why make it lazy to perform reversed search on when it's needed
     private val reversedTree by lazy(lock = this) {
-        TernarySearchTree(strings.map {
+        val reversedStrings = strings.map {
             it.reversed()
-        })
+        }
+        if (skipper == null) {
+            TernarySearchTree(reversedStrings)
+        } else {
+            object : TernarySearchTree(reversedStrings) {
+                override fun moveSeekToThePrevChar(seek: Int, string: CharSequence): Int {
+                    return skipper.reverseParse(seek - 1, string).seek
+                }
+            }
+        }
     }
 
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
@@ -92,14 +114,18 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
     }
 
     override fun clone(): OneOfStringRule {
-        return this
+        return if (skipper == null) {
+            this
+        } else {
+            OneOfStringRule(strings, skipper.clone(), name)
+        }
     }
 
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
     override fun name(name: String): OneOfStringRule {
-        return OneOfStringRule(strings, name)
+        return OneOfStringRule(strings, skipper, name)
     }
 
     override val defaultDebugName: String
@@ -110,6 +136,6 @@ class OneOfStringRule internal constructor(private val strings: List<CharSequenc
         }
 
     override fun isThreadSafe(): Boolean {
-        return true
+        return this.skipper?.isThreadSafe() != false
     }
 }

@@ -3,17 +3,37 @@ package com.kotlinspirit.str.oneof
 import com.kotlinspirit.core.ParseCode
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.ParseSeekResult
+import com.kotlinspirit.core.Rule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-class OneOfStringRuleCaseInsensetive internal constructor(private val strings: List<CharSequence>, name: String? = null) :
-    RuleWithDefaultRepeat<CharSequence>(name) {
-
-    private val tree = TernarySearchTreeCaseInsensitive(strings)
+class OneOfStringRuleCaseInsensetive internal constructor(
+    private val strings: List<CharSequence>,
+    private val skipper: Rule<*>? = null,
+    name: String? = null
+) : RuleWithDefaultRepeat<CharSequence>(name) {
+    private val tree = if (skipper == null) {
+        TernarySearchTreeCaseInsensitive(strings)
+    } else {
+        object : TernarySearchTreeCaseInsensitive(strings) {
+            override fun moveSeekToTheNextChar(seek: Int, string: CharSequence): Int {
+                return skipper.parse(seek + 1, string).seek
+            }
+        }
+    }
     // Reverse search is rarely used, that's why make it lazy to perform reversed search on when it's needed
     private val reversedTree by lazy(lock = this) {
-        TernarySearchTreeCaseInsensitive(strings.map {
+        val reversedStrings = strings.map {
             it.reversed()
-        })
+        }
+        if (skipper == null) {
+            TernarySearchTreeCaseInsensitive(reversedStrings)
+        } else {
+            object : TernarySearchTreeCaseInsensitive(reversedStrings) {
+                override fun moveSeekToThePrevChar(seek: Int, string: CharSequence): Int {
+                    return skipper.reverseParse(seek - 1, string).seek
+                }
+            }
+        }
     }
 
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
@@ -91,15 +111,11 @@ class OneOfStringRuleCaseInsensetive internal constructor(private val strings: L
         return reversedTree.reverseHasMatch(seek, string)
     }
 
-    override fun clone(): OneOfStringRuleCaseInsensetive {
-        return this
-    }
-
     override val debugNameShouldBeWrapped: Boolean
         get() = false
 
     override fun name(name: String): OneOfStringRuleCaseInsensetive {
-        return OneOfStringRuleCaseInsensetive(strings, name)
+        return OneOfStringRuleCaseInsensetive(strings, skipper, name)
     }
 
     override val defaultDebugName: String
@@ -110,6 +126,14 @@ class OneOfStringRuleCaseInsensetive internal constructor(private val strings: L
         }
 
     override fun isThreadSafe(): Boolean {
-        return true
+        return skipper?.isThreadSafe() != false
+    }
+
+    override fun clone(): OneOfStringRuleCaseInsensetive {
+        return if (skipper == null) {
+            this
+        } else {
+            OneOfStringRuleCaseInsensetive(strings, skipper.clone(), name)
+        }
     }
 }
