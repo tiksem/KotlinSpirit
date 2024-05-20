@@ -37,7 +37,6 @@ repositories {
 }
 
 dependencies {
-    implementation files('libs/fastutil-core-8.5.8.jar')
     implementation 'org.json:json:20220924'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20180813'
@@ -51,5 +50,5 @@ test {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(11)
 }
