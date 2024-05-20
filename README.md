@@ -89,10 +89,27 @@ oneOf(vararg strings: CharSequence)
 ```
 Example: `oneOf("Jhon", "Ivan", "Bin")` matches one of the names.
 
-### OneOf case insensitive string rule
+#### OneOf case insensitive string rule
 Matches one of the strings from a given list, ignoring case. The rule is always greedy so it tries to match as long string as possible from the given list
 ```Kotlin
 caseInsensitiveOneOf(vararg strings: CharSequence)
+```
+#### Skipper
+KotlinSpirit adds an additional ability to parse more complicated cases by detecting words in text, where characters are divided by spesific delimiters, using skipper in your OneOf rule.
+Let's imagine we want to detect and replace banned words with an empty string.
+```Kotlin
+val bannedWordsRule = caseInsensitiveOneOf(strings = listOf('slave', 'blood', 'murder', 'drugs')) // Without using a skipper
+val parser = bannedWordsRule.compile()
+val text = "I want to drink your blood dirty slave, I will teach you how to commit a murder and buy some drugs!"
+parser.repalceAll(text, "") // This will return 'I want to drink your  dirty , I will teach you how to commit a  and buy some !'
+
+// Let's try to modify our words a little bit, so the example doesn't work
+val text = "I want to drink your b-l-o-o-d dirty sla**ve, I will teach you how to commit a m-u-r-d-e-r and buy some d-r*u-gs!"
+// To make it work now we have to add a skipper. This will make sure all the characters are divided by this skipper
+val skipper = (space or char('*',',','-','.','\'','"')).repeat()
+val bannedWordsRule = caseInsensitiveOneOf(strings = listOf('slave', 'blood', 'murder', 'drugs'), skipper = skipper)
+val parser = bannedWordsRule.compile()
+parser.repalceAll(text, "") // This will return 'I want to drink your  dirty , I will teach you how to commit a  and buy some !'
 ```
 
 #### Performance note:
