@@ -38,6 +38,7 @@ internal fun Int.parseCodeToString(): String {
         ParseCode.BOOLEAN_NO_MATCH -> "BOOLEAN_NO_MATCH"
         ParseCode.REGEX_NO_MATCH -> "REGEX_NO_MATCH"
         ParseCode.SPLIT_NOT_ENOUGH_DATA -> "SPLIT_NOT_ENOUGH_DATA"
+        ParseCode.NOT_START_OF_LINE -> "NOT_START_OF_LINE"
         
         else -> if (this > ParseCode.PREFIX_NOT_SATISFIED) {
             "PREFIX_NOT_SATISFIED_" + (this - ParseCode.PREFIX_NOT_SATISFIED).parseCodeToString()

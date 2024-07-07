@@ -3,6 +3,7 @@ plugins {
     id 'java-library'
     id 'org.jetbrains.kotlin.jvm' version '1.9.10'
     id 'maven-publish'
+    id 'org.jetbrains.kotlin.jvm' version '2.0.0'
 }
 
 publishing {
@@ -43,6 +44,7 @@ dependencies {
     testImplementation 'org.skyscreamer:jsonassert:1.5.1'
 
     testRuntimeOnly('org.junit.vintage:junit-vintage-engine:5.9.0')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 test {
@@ -51,4 +53,14 @@ test {
 
 kotlin {
     jvmToolchain(11)
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }

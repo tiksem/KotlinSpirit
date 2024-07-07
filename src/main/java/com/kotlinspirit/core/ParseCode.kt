@@ -37,5 +37,6 @@ object ParseCode {
     const val NO_EOF = 33
     const val BOOLEAN_NO_MATCH = 34
     const val REGEX_NO_MATCH = 35
+    const val NOT_START_OF_LINE = 36
     const val PREFIX_NOT_SATISFIED = 3000
 }

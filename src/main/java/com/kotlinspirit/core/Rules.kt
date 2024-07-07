@@ -13,6 +13,7 @@ import com.kotlinspirit.regexp.RegexpRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.result.GroupSequenceRule
 import com.kotlinspirit.result.ResultSequenceRule
+import com.kotlinspirit.start.SolRule
 import com.kotlinspirit.str.EmptyStringRule
 import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
@@ -272,6 +273,7 @@ object Rules {
     }
 
     val eof = EofRule()
+    val sol = SolRule()
     val boolean = BooleanRule()
 
     fun regexp(pattern: String): RegexpRule {
