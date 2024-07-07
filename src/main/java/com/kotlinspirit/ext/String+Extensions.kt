@@ -1,6 +1,8 @@
 package com.kotlinspirit.ext
 
 import com.kotlinspirit.core.*
+import com.kotlinspirit.core.Rules.eof
+import com.kotlinspirit.core.Rules.group
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 
@@ -300,12 +302,56 @@ fun <T : Any> CharSequence.parseWithResult(rule: Rule<T>): T? {
     return result.data
 }
 
+fun <T : Any> CharSequence.parsePrefixOrThrow(rule: Rule<T>): T {
+    val result = ParseResult<T>()
+    rule.parseWithResult(0, this, result)
+    if (result.isError) {
+        throw ParseException(result.parseResult, this)
+    }
+
+    return result.data!!
+}
+
+fun <T : Any> CharSequence.parseWhole(rule: Rule<T>): T? {
+    val result = ParseResult<T>()
+    rule.parseWithResult(0, this, result)
+    if (result.isError) {
+        return null
+    }
+
+    if (result.endSeek != length) {
+        return null
+    }
+
+    return result.data
+}
+
+fun <T : Any> CharSequence.parseWholeOrThrow(rule: Rule<T>): T {
+    val result = ParseResult<T>()
+    group(rule.asResult() + eof).parseWithResult(0, this, result)
+    if (result.isError) {
+        throw ParseException(result.parseResult, this)
+    }
+
+    return result.data!!
+}
+
 fun CharSequence.parse(rule: Rule<*>): Int? {
     return rule.parse(0, this).let {
         if (it.isComplete) {
             it.seek
         } else {
             null
+        }
+    }
+}
+
+fun CharSequence.parseOrThrow(rule: Rule<*>): Int {
+    return rule.parse(0, this).let {
+        if (it.isComplete) {
+            it.seek
+        } else {
+            throw ParseException(it, this)
         }
     }
 }

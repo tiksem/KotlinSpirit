@@ -197,11 +197,11 @@ object Rules {
         )
     }
 
-    fun str(string: String): ExactStringRule {
+    fun str(string: String, ignoreCase: Boolean = false): ExactStringRule {
         return if (string.isEmpty()) {
             EmptyStringRule()
         } else {
-            ExactStringRule(string)
+            ExactStringRule(ignoreCase = ignoreCase, string)
         }
     }
 

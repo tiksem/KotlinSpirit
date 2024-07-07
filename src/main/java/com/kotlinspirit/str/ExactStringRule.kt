@@ -2,9 +2,13 @@ package com.kotlinspirit.str
 
 import com.kotlinspirit.core.*
 import com.kotlinspirit.expressive.StringOrRule
-import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 
-internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequence): ParseSeekResult {
+internal fun exactStringParse(
+    seek: Int,
+    string: CharSequence,
+    token: CharSequence,
+    ignoreCase: Boolean
+): ParseSeekResult {
     val tokenLength = token.length
     if (seek + tokenLength > string.length) {
         return ParseSeekResult(
@@ -17,6 +21,7 @@ internal fun exactStringParse(seek: Int, string: CharSequence, token: CharSequen
             thisOffset = seek,
             other = token,
             otherOffset = 0,
+            ignoreCase = ignoreCase,
             length = tokenLength
         )) {
         ParseSeekResult(seek + tokenLength)
@@ -32,7 +37,8 @@ internal fun exactStringParseWithResult(
     seek: Int,
     string: CharSequence,
     result: ParseResult<CharSequence>,
-    token: CharSequence
+    token: CharSequence,
+    ignoreCase: Boolean
 ) {
     val tokenLength = token.length
     if (seek + tokenLength > string.length) {
@@ -47,7 +53,8 @@ internal fun exactStringParseWithResult(
             thisOffset = seek,
             other = token,
             otherOffset = 0,
-            length = tokenLength
+            length = tokenLength,
+            ignoreCase = ignoreCase
         )) {
         result.parseResult = ParseSeekResult(seek + tokenLength)
         result.data = token
@@ -60,7 +67,12 @@ internal fun exactStringParseWithResult(
     }
 }
 
-internal fun exactStringReverseParse(seek: Int, string: CharSequence, token: CharSequence): ParseSeekResult {
+internal fun exactStringReverseParse(
+    seek: Int,
+    string: CharSequence,
+    token: CharSequence,
+    ignoreCase: Boolean
+): ParseSeekResult {
     val tokenLength = token.length
     if (seek + 1 < tokenLength) {
         return ParseSeekResult(
@@ -73,6 +85,7 @@ internal fun exactStringReverseParse(seek: Int, string: CharSequence, token: Cha
             thisOffset = seek - tokenLength + 1,
             other = token,
             otherOffset = 0,
+            ignoreCase = ignoreCase,
             length = tokenLength
         )) {
         ParseSeekResult(seek - tokenLength)
@@ -117,11 +130,12 @@ internal fun exactStringReverseParseWithResult(
 }
 
 open class ExactStringRule(
+    private val ignoreCase: Boolean = false,
     string: CharSequence,
     name: String? = null
 ) : BaseExactStringRule<CharSequence>(string, name) {
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
-        return exactStringParse(seek, string, this.string)
+        return exactStringParse(seek, string, this.string, ignoreCase)
     }
 
     override fun parseWithResult(
@@ -131,7 +145,8 @@ open class ExactStringRule(
             seek = seek,
             string = string,
             token = this.string,
-            result = result
+            result = result,
+            ignoreCase = ignoreCase
         )
     }
 
@@ -145,7 +160,7 @@ open class ExactStringRule(
     }
 
     override infix fun or(string: String): StringOrRule {
-        return StringOrRule(this, ExactStringRule(string))
+        return StringOrRule(this, ExactStringRule(ignoreCase, string))
     }
 
     override fun clone(): ExactStringRule {
@@ -156,14 +171,14 @@ open class ExactStringRule(
         get() = false
 
     override fun name(name: String): ExactStringRule {
-        return ExactStringRule(string, name)
+        return ExactStringRule(ignoreCase, string, name)
     }
 
     override val defaultDebugName: String
-        get() = "str:$string"
+        get() = "${if (ignoreCase) "istr" else "str"}:$string"
 }
 
-class EmptyStringRule(name: String? = null): ExactStringRule("", name) {
+class EmptyStringRule(name: String? = null): ExactStringRule(ignoreCase = false,"", name) {
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         return ParseSeekResult(seek)
     }

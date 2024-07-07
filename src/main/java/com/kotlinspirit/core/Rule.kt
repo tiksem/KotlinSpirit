@@ -13,7 +13,7 @@ import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 import com.kotlinspirit.result.ResultInSequenceRuleWrapper
 import com.kotlinspirit.result.ResultSequenceRule
-import com.kotlinspirit.str.ExactStringRule
+import com.kotlinspirit.safe.ThreadSafeRule
 import com.kotlinspirit.transform.TransformRule
 
 private val DEFAULT_STEP_RESULT = ParseSeekResult(
@@ -453,6 +453,14 @@ abstract class Rule<T : Any>(name: String?) {
     abstract fun isThreadSafe(): Boolean
 
     abstract fun name(name: String): Rule<T>
+
+    fun safe(): Rule<T> {
+        return if (isThreadSafe()) {
+            this
+        } else {
+            ThreadSafeRule(originalRule = this)
+        }
+    }
 
     internal open fun debug(engine: DebugEngine): DebugRule<T> {
         return DebugRule(rule = this, engine = engine)
