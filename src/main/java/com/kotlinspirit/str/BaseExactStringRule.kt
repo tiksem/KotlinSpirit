@@ -8,7 +8,7 @@ abstract class BaseExactStringRule<T : Any>(
     name: String? = null
 ) : RuleWithDefaultRepeat<T>(name) {
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
-        return exactStringParse(seek, string, this.string)
+        return exactStringParse(seek, string, this.string, false)
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
@@ -21,7 +21,7 @@ abstract class BaseExactStringRule<T : Any>(
     }
 
     override fun reverseParse(seek: Int, string: CharSequence): ParseSeekResult {
-        return exactStringReverseParse(seek, string, this.string)
+        return exactStringReverseParse(seek, string, this.string, false)
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {

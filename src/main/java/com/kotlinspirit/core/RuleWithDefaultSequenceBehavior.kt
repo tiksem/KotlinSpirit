@@ -28,6 +28,6 @@ abstract class RuleWithDefaultSequenceBehavior<T : Any>(name: String? = null) : 
      */
     override operator fun plus(string: String): SequenceRule {
         val c = this
-        return SequenceRule(c, ExactStringRule(string))
+        return SequenceRule(c, ExactStringRule(false, string))
     }
 }

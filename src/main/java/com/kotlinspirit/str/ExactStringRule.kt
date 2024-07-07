@@ -57,7 +57,11 @@ internal fun exactStringParseWithResult(
             ignoreCase = ignoreCase
         )) {
         result.parseResult = ParseSeekResult(seek + tokenLength)
-        result.data = token
+        result.data = if (ignoreCase) {
+            string.subSequence(seek, seek + token.length)
+        } else {
+            token
+        }
     } else {
         result.parseResult = ParseSeekResult(
             seek = seek,

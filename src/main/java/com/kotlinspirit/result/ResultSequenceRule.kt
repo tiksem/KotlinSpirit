@@ -122,7 +122,7 @@ class ResultSequenceRule<T : Any>(
     }
 
     override fun plus(string: String): Rule<*> {
-        return this + ExactStringRule(string)
+        return this + ExactStringRule(false, string)
     }
 
     override fun clone(): ResultSequenceRule<T> {

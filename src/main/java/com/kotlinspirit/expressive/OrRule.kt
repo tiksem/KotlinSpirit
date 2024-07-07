@@ -101,7 +101,7 @@ class StringOrRule(a: Rule<CharSequence>, b: Rule<CharSequence>, name: String? =
     }
 
     override fun or(string: String): StringOrRule {
-        return this or ExactStringRule(string)
+        return this or ExactStringRule(false, string)
     }
 
     infix fun or(a: ExactStringRule): StringOrRule {

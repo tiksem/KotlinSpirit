@@ -46,7 +46,7 @@ class ResultInSequenceRuleWrapper<T : Any>(
     }
 
     override fun plus(string: String): Rule<*> {
-        return this + ExactStringRule(string)
+        return this + ExactStringRule(false, string)
     }
 
     override fun repeat(): Rule<*> {

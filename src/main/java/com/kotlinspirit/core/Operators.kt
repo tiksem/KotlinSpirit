@@ -34,21 +34,21 @@ fun Char.requiresPrefix(rule: Rule<*>): RequiresPrefixRule<Char> {
 }
 
 infix fun String.or(rule: ExactStringRule): OrRule<CharSequence> {
-    return ExactStringRule(this) or rule
+    return ExactStringRule(false, this) or rule
 }
 
 infix fun String.or(rule: String): OrRule<CharSequence> {
-    return ExactStringRule(this) or ExactStringRule(rule)
+    return ExactStringRule(false, this) or ExactStringRule(false, rule)
 }
 
 infix fun String.or(rule: Rule<*>): AnyOrRule {
-    return ExactStringRule(this) or rule
+    return ExactStringRule(false, this) or rule
 }
 
 fun String.expectsSuffix(rule: Rule<*>): SuffixExpectationRule<CharSequence> {
-    return SuffixExpectationRule(ExactStringRule(this), rule)
+    return SuffixExpectationRule(ExactStringRule(false, this), rule)
 }
 
 fun String.requiresPrefix(rule: Rule<*>): RequiresPrefixRule<CharSequence> {
-    return RequiresPrefixRule(bodyRule = ExactStringRule(this), prefixRule = rule)
+    return RequiresPrefixRule(bodyRule = ExactStringRule(false, this), prefixRule = rule)
 }

@@ -16,7 +16,8 @@ class DynamicStringRule(
         return exactStringParse(
             seek = seek,
             string = string,
-            token = stringProvider()
+            token = stringProvider(),
+            ignoreCase = false
         )
     }
 
@@ -25,7 +26,8 @@ class DynamicStringRule(
             seek = seek,
             string = string,
             token = stringProvider(),
-            result = result
+            result = result,
+            ignoreCase = false
         )
     }
 
@@ -43,7 +45,8 @@ class DynamicStringRule(
         return exactStringReverseParse(
             seek = seek,
             string = string,
-            token = stringProvider()
+            token = stringProvider(),
+            ignoreCase = false
         )
     }
 
