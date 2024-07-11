@@ -221,6 +221,10 @@ object Rules {
             it.isNotEmpty()
         }
 
+        if (withoutEmptyStrings.isEmpty()) {
+            return char.failIf { true }.asString()
+        }
+
         return if (withoutEmptyStrings.size == strings.size) {
             OneOfStringRule(withoutEmptyStrings, skipper)
         } else {
@@ -231,6 +235,10 @@ object Rules {
     fun oneOf(strings: Collection<CharSequence>, skipper: Rule<*>? = null): RuleWithDefaultRepeat<CharSequence> {
         val withoutEmptyStrings = strings.filter {
             it.isNotEmpty()
+        }
+
+        if (withoutEmptyStrings.isEmpty()) {
+            return char.failIf { true }.asString()
         }
 
         return if (withoutEmptyStrings.size == strings.size) {
@@ -245,6 +253,10 @@ object Rules {
             it.isNotEmpty()
         }
 
+        if (withoutEmptyStrings.isEmpty()) {
+            return char.failIf { true }.asString()
+        }
+
         return if (withoutEmptyStrings.size == strings.size) {
             OneOfStringRuleCaseInsensetive(withoutEmptyStrings)
         } else {
@@ -255,6 +267,10 @@ object Rules {
     fun caseInsensitiveOneOf(strings: Collection<CharSequence>, skipper: Rule<*>? = null): RuleWithDefaultRepeat<CharSequence> {
         val withoutEmptyStrings = strings.filter {
             it.isNotEmpty()
+        }
+
+        if (withoutEmptyStrings.isEmpty()) {
+            return char.failIf { true }.asString()
         }
 
         return if (withoutEmptyStrings.size == strings.size) {
