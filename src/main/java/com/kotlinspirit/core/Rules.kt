@@ -6,14 +6,14 @@ import com.kotlinspirit.char.CharPredicateData
 import com.kotlinspirit.char.CharPredicates
 import com.kotlinspirit.dynamic.DynamicRule
 import com.kotlinspirit.dynamic.DynamicStringRule
-import com.kotlinspirit.eof.EofRule
+import com.kotlinspirit.eof.EndRule
 import com.kotlinspirit.expressive.*
 import com.kotlinspirit.number.*
 import com.kotlinspirit.regexp.RegexpRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.result.GroupSequenceRule
 import com.kotlinspirit.result.ResultSequenceRule
-import com.kotlinspirit.start.SolRule
+import com.kotlinspirit.start.StartRule
 import com.kotlinspirit.str.EmptyStringRule
 import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.str.StringCharPredicateRangeRule
@@ -272,8 +272,8 @@ object Rules {
         return DynamicRule(name = null, ruleFactory = ruleFactory)
     }
 
-    val eof = EofRule()
-    val sol = SolRule()
+    val end = EndRule()
+    val start = StartRule()
     val boolean = BooleanRule()
 
     fun regexp(pattern: String): RegexpRule {

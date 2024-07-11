@@ -4,7 +4,7 @@ import com.kotlinspirit.core.*
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 
-class SolRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name) {
+class StartRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name) {
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek != 0) {
             return ParseSeekResult(
@@ -78,7 +78,7 @@ class SolRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name
         throw UnsupportedOperationException("getRangeResult is not supported for sol rule")
     }
 
-    override fun clone(): SolRule {
+    override fun clone(): StartRule {
         return this
     }
 
@@ -87,7 +87,7 @@ class SolRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name
     }
 
     override fun name(name: String): Rule<Unit> {
-        return SolRule(name)
+        return StartRule(name)
     }
 
     override val debugNameShouldBeWrapped: Boolean

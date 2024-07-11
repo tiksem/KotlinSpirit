@@ -37,6 +37,7 @@ interface Parser<T : Any> {
     fun endsWith(string: CharSequence): Boolean
 
     fun count(string: CharSequence): Int
+    fun contains(string: CharSequence): Boolean
 
     fun split(string: CharSequence): List<CharSequence>
 

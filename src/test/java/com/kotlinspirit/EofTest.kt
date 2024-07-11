@@ -1,6 +1,6 @@
 package com.kotlinspirit
 
-import com.kotlinspirit.core.Rules.eof
+import com.kotlinspirit.core.Rules.end
 import com.kotlinspirit.core.Rules.int
 import org.junit.Assert
 import org.junit.Test
@@ -8,7 +8,7 @@ import org.junit.Test
 class EofTest {
     @Test
     fun testInteger() {
-        val r = int + eof
+        val r = int + end
         val p = r.compile()
         Assert.assertEquals(p.matches("4343344334"), false) // out of bounds
         Assert.assertEquals(p.matches("434334433"), true)
@@ -18,7 +18,7 @@ class EofTest {
 
     @Test
     fun testEmptyString() {
-        val r = eof
+        val r = end
         val p = r.compile()
         Assert.assertEquals(p.matches("dsds"), false)
         Assert.assertEquals(p.matches(""), true)

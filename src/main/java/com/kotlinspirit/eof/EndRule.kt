@@ -4,7 +4,7 @@ import com.kotlinspirit.core.*
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
 
-class EofRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name) {
+class EndRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name) {
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
         if (seek == string.length) {
             return ParseSeekResult(seek)
@@ -91,7 +91,7 @@ class EofRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name
         throw UnsupportedOperationException("getRangeResult is not supported for eof rule")
     }
 
-    override fun clone(): EofRule {
+    override fun clone(): EndRule {
         return this
     }
 
@@ -99,8 +99,8 @@ class EofRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name
         return true
     }
 
-    override fun name(name: String): EofRule {
-        return EofRule(name);
+    override fun name(name: String): EndRule {
+        return EndRule(name);
     }
 
     override val debugNameShouldBeWrapped: Boolean

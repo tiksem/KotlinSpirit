@@ -1,7 +1,7 @@
 package com.kotlinspirit.ext
 
 import com.kotlinspirit.core.*
-import com.kotlinspirit.core.Rules.eof
+import com.kotlinspirit.core.Rules.end
 import com.kotlinspirit.core.Rules.group
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
@@ -328,7 +328,7 @@ fun <T : Any> CharSequence.parseWhole(rule: Rule<T>): T? {
 
 fun <T : Any> CharSequence.parseWholeOrThrow(rule: Rule<T>): T {
     val result = ParseResult<T>()
-    group(rule.asResult() + eof).parseWithResult(0, this, result)
+    group(rule.asResult() + end).parseWithResult(0, this, result)
     if (result.isError) {
         throw ParseException(result.parseResult, this)
     }
@@ -393,6 +393,18 @@ fun CharSequence.count(rule: Rule<*>): Int {
     }
 
     return count
+}
+
+fun CharSequence.contains(rule: Rule<*>): Boolean {
+    var i = 0
+    while (i < length) {
+        if (rule.hasMatch(i, this)) {
+            return true
+        }
+        i++
+    }
+
+    return false
 }
 
 internal inline fun CharSequence.all(startIndex: Int, endIndex: Int, predicate: (Char) -> Boolean): Boolean {
