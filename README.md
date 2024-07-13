@@ -18,7 +18,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.2.1"
+implementation "com.github.tiksem:KotlinSpirit:1.2.4"
 ```
 
 # Creating a simple parser
@@ -66,7 +66,7 @@ Mathches true or false
 boolean
 ```
 ## String rules
-`str(string: String)` Matches an exact string. For example `str("Sun")`
+`str(string: String, ignoreCase: Boolean = false)` Matches an exact string. For example `str("Sun")`
 
 All the string rules below have similar signatures as char rules and they match 0 or more characters. 
 Generally speaking those rules are always successful.
@@ -247,14 +247,25 @@ val namesString: CharSequence = names.compile.parseGetResultOrThrow("JhonIvanAbd
 ```
 In this example we get the list of names as a string. However if we don't use `asString()`, names will have List<CharSequence> result.
 
-## Eof rule
-Eof indicates the end of input. If the end of input is reached the rule is successful but fails otherwise.
+## End rule
+End indicates the end of input. If the end of input is reached the rule is successful but fails otherwise.
 #### Example:
 ```Kotlin
-val intPrefixRule = int + !eof
+val intPrefixRule = int + !end
 val parser = intPrefixRule.compile()
 parser.matches("123abc") // true
 parser.matches("123") // false
+parser.matches("123.34") // true
+```
+
+## Start rule
+Start indicates the beginning of the input. If the seek is at the beginning of the inputthe rule is successful but fails otherwise.
+#### Example:
+```Kotlin
+val intPrefixRule = start + int
+val parser = intPrefixRule.compile()
+parser.matches("123abc") // true
+parser.matches("a123") // false
 parser.matches("123.34") // true
 ```
 
