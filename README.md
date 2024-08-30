@@ -397,6 +397,16 @@ fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String
 ```
 Here `int % ','` is created once. And we use the same rule from different threads. It's unsafe unless `(int % ',').isThreadSafe()` returns true.
 
+### Using safe()
+A new alternative of creating a thread-safe rule without compiling it into a parser is using `safe()` method that returns a thread-safe rule. It invokes `rule.isThreadSafe()` internally and makes the rule thread-safe if required.
+```Kotlin
+val ints = (int % ',').safe()
+fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String>): CharSequence {
+    return string.replaceAll(ints) { ides -> ides.joinToString(".") { id -> namesMap[id] ?: "error" } }
+}
+```
+
+
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recursion here.
 
@@ -673,7 +683,6 @@ Assert.assertEquals(
 )
 ```
 In the example Repalcer takes Replace builder as an argument. The builder returns Replace object, containing the rule and another builder as the second argument, where we discribe how the replacement process goes.
-
 
 # Thread safety
 A compiled parser is completely thread-safe, you can access it from different threads at the same time. And it's lock-free as well. However if you use callbacks or getRange or getRangeResult in your rule, there are some edge cases you should consider. Callbacks and getRange hooks are not synchronized, so they might be called from different threads, when you call your parser functions from different threads. But it's totally safe to use callbacks or getRange or getRangeResult in Grammar or Replacer, because a copy of your Grammar/Replace is created for each thread.
