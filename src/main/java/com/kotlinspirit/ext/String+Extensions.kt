@@ -192,6 +192,14 @@ fun <T : Any> CharSequence.findFirst(rule: Rule<T>): T? {
     return null
 }
 
+fun <T : Any> CharSequence.findLast(rule: Rule<T>): T? {
+    rule.findLastSuccessfulResult(this) { _, result ->
+        return result.data
+    }
+
+    return null
+}
+
 fun <T : Any> CharSequence.findFirstResult(rule: Rule<T>): ParseRangeResult<T>? {
     rule.findFirstSuccessfulResult(this) { start, result ->
         return ParseRangeResult(data = result.data, startSeek = start, endSeek = result.endSeek)

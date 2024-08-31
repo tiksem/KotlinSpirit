@@ -12,6 +12,28 @@ open class ParseRange internal constructor(
     internal open fun copy(): ParseRange {
         return ParseRange(startSeek, endSeek)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ParseRange
+
+        if (startSeek != other.startSeek) return false
+        if (endSeek != other.endSeek) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = startSeek
+        result = 31 * result + endSeek
+        return result
+    }
+
+    override fun toString(): String {
+        return "[$startSeek,$endSeek)"
+    }
 }
 
 class ParseRangeResult<T: Any> internal constructor(

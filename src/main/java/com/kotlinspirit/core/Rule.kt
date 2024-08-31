@@ -108,6 +108,26 @@ abstract class Rule<T : Any>(name: String?) {
         return false
     }
 
+    internal inline fun findLastSuccessfulResult(string: CharSequence, callback: (Int, ParseResult<T>) -> Unit): Boolean {
+        var seek = string.length - 1
+        val result = ParseResult<T>()
+        do {
+            reverseParseWithResult(seek, string, result)
+            if (!result.isError && result.data != null) {
+                callback(seek, result)
+                return true
+            }
+            val newSeek = result.endSeek
+            if (newSeek == seek) {
+                seek--
+            } else {
+                seek = newSeek
+            }
+        } while (seek >= 0)
+
+        return false
+    }
+
     internal inline fun findSuccessfulRanges(string: CharSequence, callback: (Int, Int) -> Unit) {
         var seek = 0
         val length = string.length

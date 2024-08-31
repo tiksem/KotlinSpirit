@@ -8,7 +8,10 @@ import com.kotlinspirit.dynamic.DynamicRule
 import com.kotlinspirit.dynamic.DynamicStringRule
 import com.kotlinspirit.eof.EndRule
 import com.kotlinspirit.expressive.*
+import com.kotlinspirit.json.JsonArrayRule
+import com.kotlinspirit.json.JsonObjectRule
 import com.kotlinspirit.number.*
+import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.regexp.RegexpRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.result.GroupSequenceRule
@@ -20,6 +23,7 @@ import com.kotlinspirit.str.StringCharPredicateRangeRule
 import com.kotlinspirit.str.StringCharPredicateRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
 import com.kotlinspirit.str.oneof.OneOfStringRuleCaseInsensetive
+import com.kotlinspirit.transform.TransformRule
 import kotlin.math.absoluteValue
 
 object Rules {
@@ -303,6 +307,9 @@ object Rules {
     fun <T : Any> group(resultSequenceRule: ResultSequenceRule<T>): GroupSequenceRule<T> {
         return GroupSequenceRule<T>(rule = resultSequenceRule)
     }
+
+    val jsonObject = JsonObjectRule()
+    val jsonArray = JsonArrayRule()
 }
 
 fun Regex.toRule(): RegexpRule {
