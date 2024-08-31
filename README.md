@@ -630,6 +630,34 @@ parser.matches("127.0.0.1->Jhon") // true
 #### Warning
 Be careful with using $ and ^ operators, usually. Regexp rule always check the regex to match from the current seek during parsing process and it uses `matchesAt` method of `kotlin.text.Regex`
 
+## JSON rules
+The result of these rule is ParseRange object containing startSeek and endSeek of the match. There are `jsonObject` and `jsonArray` rules.
+Here are some examples:
+```Kotlin
+val jsonStringObject = """text { "key": "value", "array": [1, 2, 3], "nested": { "a": true } } some other text """
+Assert.assertEquals(jsonStringObject.findFirst(jsonObject), ParseRange(jsonStringObject.indexOf('{'), jsonStringObject.lastIndexOf('}') + 1))
+```
+```Kotlin
+val jsonStringArray = """text [ { "key": "value" }, { "key2": "value2" } ] some other text """
+Assert.assertEquals(jsonStringArray.findFirst(jsonArray), ParseRange(jsonStringArray.indexOf('['), jsonStringArray.lastIndexOf(']') + 1))
+```
+### Factory functions
+Sometimes ParseRange is not so convenient to get parse results from JSON objects and arrays. Here are some factory methods that help.
+```Kotlin
+fun <To : Any> jsonObject(mapper: (CharSequence) -> To): TransformRule<CharSequence, To>
+fun <To : Any> jsonArray(mapper: (CharSequence) -> To): TransformRule<CharSequence, To>
+```
+Here is an example of creating orgJson rules
+```Kotlin
+val orgJsonObjectRule = jsonObject {
+    JSONObject(it.toString())
+}
+
+val orgJsonArrayRule = jsonArray {
+    JSONArray(it.toString())
+}
+```
+
 # Building advanced replacers
 Sometimes you need to create some advanced replace logic, so Parser repalce functions don't handle it. KotlinSpirit provides Replacer. It has similar functionality to regular expressions replacements with groups. To describe the functionality of Replacer let's discuss an example: We want to replace a string containing a list of Name LastName, followed by a list of integers, separated by ','. We want to repalce Name and LastName with initials and multiply all the integers twice. Let's create Repalcer for it.
 ```Kotlin
