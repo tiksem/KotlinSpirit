@@ -310,6 +310,14 @@ object Rules {
 
     val jsonObject = JsonObjectRule()
     val jsonArray = JsonArrayRule()
+
+    fun <To : Any> jsonObject(mapper: (CharSequence) -> To): TransformRule<CharSequence, To> {
+        return jsonObject.asString().map(mapper)
+    }
+
+    fun <To : Any> jsonArray(mapper: (CharSequence) -> To): TransformRule<CharSequence, To> {
+        return jsonArray.asString().map(mapper)
+    }
 }
 
 fun Regex.toRule(): RegexpRule {
