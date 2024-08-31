@@ -166,6 +166,14 @@ fun CharSequence.findFirstRange(rule: Rule<*>): ParseRange? {
     return null
 }
 
+fun CharSequence.findLastRange(rule: Rule<*>): ParseRange? {
+    rule.findLastSuccessfulSeek(this) { start, end ->
+        return ParseRange(start, end)
+    }
+
+    return null
+}
+
 fun <T : Any> CharSequence.findAll(rule: Rule<T>): List<T> {
     val result = ArrayList<T>()
     rule.findSuccessfulResults(this) { start, end, r ->
@@ -208,8 +216,24 @@ fun <T : Any> CharSequence.findFirstResult(rule: Rule<T>): ParseRangeResult<T>? 
     return null
 }
 
+fun <T : Any> CharSequence.findLastResult(rule: Rule<T>): ParseRangeResult<T>? {
+    rule.findLastSuccessfulResult(this) { start, result ->
+        return ParseRangeResult(data = result.data, startSeek = result.endSeek + 1, endSeek = start + 1)
+    }
+
+    return null
+}
+
 fun CharSequence.replaceFirst(rule: Rule<*>, replacement: CharSequence): CharSequence {
     rule.findFirstSuccessfulSeek(this) { start, end ->
+        return replaceRange(start until end, replacement)
+    }
+
+    return this
+}
+
+fun CharSequence.replaceLast(rule: Rule<*>, replacement: CharSequence): CharSequence {
+    rule.findLastSuccessfulSeek(this) { start, end ->
         return replaceRange(start until end, replacement)
     }
 
