@@ -631,7 +631,7 @@ parser.matches("127.0.0.1->Jhon") // true
 Be careful with using $ and ^ operators, usually. Regexp rule always check the regex to match from the current seek during parsing process and it uses `matchesAt` method of `kotlin.text.Regex`
 
 ## JSON rules
-The result of these rule is ParseRange object containing startSeek and endSeek of the match. There are `jsonObject` and `jsonArray` rules.
+The result of these rules is ParseRange object containing startSeek and endSeek of the match. There are `jsonObject` and `jsonArray` rules.
 Here are some examples:
 ```Kotlin
 val jsonStringObject = """text { "key": "value", "array": [1, 2, 3], "nested": { "a": true } } some other text """
