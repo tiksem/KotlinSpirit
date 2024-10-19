@@ -439,6 +439,16 @@ fun CharSequence.contains(rule: Rule<*>): Boolean {
     return false
 }
 
+fun CharSequence.substringBefore(rule: Rule<*>): String? {
+    val index = indexOf(rule) ?: return null
+    return substring(0, index)
+}
+
+fun CharSequence.substringAfter(rule: Rule<*>): String? {
+    val index = parse(rule) ?: return null
+    return substring(index, length)
+}
+
 internal inline fun CharSequence.all(startIndex: Int, endIndex: Int, predicate: (Char) -> Boolean): Boolean {
     var i = startIndex
     while (i < endIndex) {
