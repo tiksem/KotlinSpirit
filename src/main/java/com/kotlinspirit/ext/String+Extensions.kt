@@ -444,8 +444,18 @@ fun CharSequence.substringBefore(rule: Rule<*>): String? {
     return substring(0, index)
 }
 
+fun CharSequence.substringBeforeLast(rule: Rule<*>): String? {
+    val index = lastIndexOfShortestMatch(rule) ?: return null
+    return substring(0, index)
+}
+
 fun CharSequence.substringAfter(rule: Rule<*>): String? {
-    val index = parse(rule) ?: return null
+    val index = findFirstRange(rule)?.endSeek ?: return null
+    return substring(index, length)
+}
+
+fun CharSequence.substringAfterLast(rule: Rule<*>): String? {
+    val index = findLastRange(rule)?.endSeek ?: return null
     return substring(index, length)
 }
 
