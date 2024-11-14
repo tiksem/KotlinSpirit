@@ -18,7 +18,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.2.5"
+implementation "com.github.tiksem:KotlinSpirit:1.2.8"
 ```
 
 # Creating a simple parser
@@ -507,6 +507,17 @@ val parser = unsignedIntLiteralRule.compile()
 parser.parseGetResultOrThrow("434334u") // 434334
 ```
 Note: The expression inside group should contain sequence built using + operator and it should cotnain only a single `asResult()` call.
+
+### withSuffix withPrefix
+These are factory methods that create simple groups with prefix and suffix.
+```
+rule.withSuffix(suffix) -> group(rule.asResult() + suffix)
+rule.withPrefix(prefix) -> group(prefix + rule.asResult())
+```
+Let's rewrite our example above with `withSuffix` method.
+```Kotlin
+val unsignedIntLiteralRule = uint.withSuffix('u')
+```
 
 ## Dynamic string rule
 This rule is usually used to remember some token during the parsing process, the result of the rule is `CharSequence`
