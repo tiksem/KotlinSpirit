@@ -1,6 +1,9 @@
 package com.kotlinspirit.json
 
 import com.kotlinspirit.ext.CharStack
+import com.kotlinspirit.ext.binarySearchContains
+
+private val allowedFloatChars = charArrayOf('.', 'e', 'E', '+', '-').sortedArray()
 
 internal class ReverseJsonParser {
     private var index: Int = 0
@@ -34,7 +37,7 @@ internal class ReverseJsonParser {
     // Helper function to parse a JSON number (in reverse)
     private fun parseNumber(string: CharSequence): Boolean {
         if (index < 0 || (string[index] !in '0'..'9' && string[index] != '-')) return false
-        while (index >= 0 && (string[index].isDigit() || string[index] in listOf('.', 'e', 'E', '+', '-'))) {
+        while (index >= 0 && (string[index].isDigit() || allowedFloatChars.binarySearchContains(string[index]))) {
             index--
         }
         return true

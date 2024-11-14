@@ -1,8 +1,11 @@
 package com.kotlinspirit.json
 
 import com.kotlinspirit.ext.CharStack
+import com.kotlinspirit.ext.binarySearchContains
 
-class JsonParser {
+private val allowedFloatChars = charArrayOf('.', 'e', 'E', '+', '-').sortedArray()
+
+internal class JsonParser {
     private var index: Int = 0
     private val objectStack = CharStack()  // Stack for managing nested objects
     private val arrayStack = CharStack()   // Stack for managing nested arrays
@@ -34,7 +37,7 @@ class JsonParser {
     // Helper function to parse a JSON number
     private fun parseNumber(string: CharSequence): Boolean {
         if (index >= string.length || (string[index] !in '0'..'9' && string[index] != '-')) return false
-        while (index < string.length && (string[index].isDigit() || string[index] in listOf('.', 'e', 'E', '+', '-'))) {
+        while (index < string.length && (string[index].isDigit() || allowedFloatChars.binarySearchContains(string[index]))) {
             index++
         }
         return true

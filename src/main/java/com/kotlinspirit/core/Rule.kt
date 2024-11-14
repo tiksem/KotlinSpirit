@@ -4,6 +4,7 @@ import com.kotlinspirit.*
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.char.ExactCharRule
+import com.kotlinspirit.core.Rules.group
 import com.kotlinspirit.debug.DebugEngine
 import com.kotlinspirit.debug.DebugRule
 import com.kotlinspirit.expressive.*
@@ -11,6 +12,7 @@ import com.kotlinspirit.ext.quote
 import com.kotlinspirit.quoted.QuotedRule
 import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.rangeres.ParseRangeResult
+import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.result.ResultInSequenceRuleWrapper
 import com.kotlinspirit.result.ResultSequenceRule
 import com.kotlinspirit.safe.ThreadSafeRule
@@ -449,6 +451,14 @@ abstract class Rule<T : Any>(name: String?) {
 
     fun asResult(): ResultInSequenceRuleWrapper<T> {
         return ResultInSequenceRuleWrapper(wrappedRule = this)
+    }
+
+    fun withSuffix(suffix: Rule<*>): RuleWithDefaultRepeat<T> {
+        return group(asResult() + suffix)
+    }
+
+    fun withPrefix(prefix: Rule<*>): RuleWithDefaultRepeat<T> {
+        return group(prefix + asResult())
     }
 
     fun <To : Any> map(transformer: (T) -> To): TransformRule<T, To> {
