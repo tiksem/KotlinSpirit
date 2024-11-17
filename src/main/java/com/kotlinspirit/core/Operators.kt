@@ -6,10 +6,20 @@ import com.kotlinspirit.char.CharPredicateRule
 import com.kotlinspirit.char.CharRule
 import com.kotlinspirit.char.ExactCharRule
 import com.kotlinspirit.expressive.*
+import com.kotlinspirit.result.ResultInSequenceRuleWrapper
+import com.kotlinspirit.result.ResultSequenceRule
 import com.kotlinspirit.str.ExactStringRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
 
 operator fun Char.plus(rule: Rule<*>): SequenceRule {
+    return ExactCharRule(this) + rule
+}
+
+operator fun <T : Any> Char.plus(rule: ResultSequenceRule<T>): ResultSequenceRule<T> {
+    return ExactCharRule(this) + rule
+}
+
+operator fun <T : Any> Char.plus(rule: ResultInSequenceRuleWrapper<T>): ResultSequenceRule<T> {
     return ExactCharRule(this) + rule
 }
 

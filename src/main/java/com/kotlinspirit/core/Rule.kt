@@ -70,7 +70,7 @@ abstract class Rule<T : Any>(name: String?) {
             } else {
                 seek = newSeek
             }
-        } while (seek < length)
+        } while (seek < length + 1)
 
         return false
     }
@@ -459,6 +459,22 @@ abstract class Rule<T : Any>(name: String?) {
 
     fun withPrefix(prefix: Rule<*>): RuleWithDefaultRepeat<T> {
         return group(prefix + asResult())
+    }
+
+    fun withSuffix(suffix: Char): RuleWithDefaultRepeat<T> {
+        return group(asResult() + suffix)
+    }
+
+    fun withPrefix(prefix: Char): RuleWithDefaultRepeat<T> {
+        return group(prefix + asResult())
+    }
+
+    fun withSuffix(suffix: String): RuleWithDefaultRepeat<T> {
+        return group(asResult() + suffix)
+    }
+
+    fun withPrefix(prefix: String): RuleWithDefaultRepeat<T> {
+        return group(str(prefix) + asResult())
     }
 
     fun <To : Any> map(transformer: (T) -> To): TransformRule<T, To> {

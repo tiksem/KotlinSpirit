@@ -41,11 +41,11 @@ class ResultInSequenceRuleWrapper<T : Any>(
         return ResultSequenceRule(a = this, b = rule, aIsResultRule = true)
     }
 
-    override fun plus(char: Char): Rule<*> {
+    override fun plus(char: Char): ResultSequenceRule<T> {
         return this + ExactCharRule(char)
     }
 
-    override fun plus(string: String): Rule<*> {
+    override fun plus(string: String): ResultSequenceRule<T> {
         return this + ExactStringRule(false, string)
     }
 

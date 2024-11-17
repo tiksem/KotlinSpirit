@@ -2,6 +2,7 @@ package com.kotlinspirit
 
 import com.kotlinspirit.core.Rules.end
 import com.kotlinspirit.core.Rules.int
+import com.kotlinspirit.ext.substringBefore
 import org.junit.Assert
 import org.junit.Test
 
@@ -23,5 +24,10 @@ class EofTest {
         Assert.assertEquals(p.matches("dsds"), false)
         Assert.assertEquals(p.matches(""), true)
         Assert.assertEquals(p.indexOf(""), 0)
+    }
+
+    @Test
+    fun substringTest() {
+        Assert.assertEquals("hello!".substringBefore(end).toString(), "hello!")
     }
 }
