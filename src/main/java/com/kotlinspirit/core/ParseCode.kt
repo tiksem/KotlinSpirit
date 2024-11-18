@@ -39,6 +39,7 @@ object ParseCode {
     const val REGEX_NO_MATCH = 35
     const val NOT_START_OF_LINE = 36
     const val INVALID_JSON_OBJECT = 37
-    const val INVALID_JSON_ARRAY = 37
+    const val INVALID_JSON_ARRAY = 38
+    const val AFTER_FIRST_RULE_MATCH_NOT_FOUND = 39
     const val PREFIX_NOT_SATISFIED = 3000
 }

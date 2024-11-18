@@ -10,8 +10,8 @@ import com.kotlinspirit.eof.EndRule
 import com.kotlinspirit.expressive.*
 import com.kotlinspirit.json.JsonArrayRule
 import com.kotlinspirit.json.JsonObjectRule
+import com.kotlinspirit.move.AfterFirstMatchOfRule
 import com.kotlinspirit.number.*
-import com.kotlinspirit.rangeres.ParseRange
 import com.kotlinspirit.regexp.RegexpRule
 import com.kotlinspirit.repeat.RuleWithDefaultRepeat
 import com.kotlinspirit.result.GroupSequenceRule
@@ -317,6 +317,14 @@ object Rules {
 
     fun <To : Any> jsonArray(mapper: (CharSequence) -> To): TransformRule<CharSequence, To> {
         return jsonArray.asString().map(mapper)
+    }
+
+    fun skipUntil(rule: Rule<*>): Rule<*> {
+        return (char - rule).repeat() + rule
+    }
+
+    fun <T : Any> moveAfterFirstMatchOf(rule: Rule<T>): AfterFirstMatchOfRule<T> {
+        return AfterFirstMatchOfRule(rule)
     }
 }
 

@@ -183,6 +183,24 @@ fun <T : Any> CharSequence.findAll(rule: Rule<T>): List<T> {
     return result
 }
 
+private fun CharSequence.removeRanges(ranges: List<ParseRange>): CharSequence {
+    if (ranges.isEmpty()) return this
+
+    val stringBuilder = StringBuilder()
+    var currentIndex = 0
+
+    // Build the result by skipping the ranges
+    for (range in ranges) {
+        stringBuilder.append(this, currentIndex, range.startSeek)
+        currentIndex = range.endSeek
+    }
+
+    // Append any remaining part of the string after the last range
+    stringBuilder.append(this, currentIndex, this.length)
+
+    return stringBuilder
+}
+
 fun CharSequence.findAllRanges(rule: Rule<*>): List<ParseRange> {
     val result = ArrayList<ParseRange>()
     rule.findSuccessfulRanges(this) { start, end ->
@@ -457,6 +475,29 @@ fun CharSequence.substringAfter(rule: Rule<*>): String? {
 fun CharSequence.substringAfterLast(rule: Rule<*>): String? {
     val index = findLastRange(rule)?.endSeek ?: return null
     return substring(index, length)
+}
+
+enum class DuplicateRemovalPolicy {
+    KEEP_FIRST, KEEP_LAST
+}
+
+fun CharSequence.removeDuplicates(
+    rule: Rule<*>,
+    policy: DuplicateRemovalPolicy = DuplicateRemovalPolicy.KEEP_FIRST
+): CharSequence {
+    val ranges = findAllRanges(rule)
+    if (ranges.isEmpty()) {
+        return this
+    }
+
+    return when (policy) {
+        DuplicateRemovalPolicy.KEEP_FIRST -> {
+            removeRanges(ranges = ranges.subList(1, ranges.size))
+        }
+        DuplicateRemovalPolicy.KEEP_LAST -> {
+            removeRanges(ranges = ranges.subList(0, ranges.size - 1))
+        }
+    }
 }
 
 internal inline fun CharSequence.all(startIndex: Int, endIndex: Int, predicate: (Char) -> Boolean): Boolean {
