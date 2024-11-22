@@ -34,7 +34,7 @@ object ParseCode {
     const val INVALID_BIG_INTEGER = 30
     const val INVALID_BIG_DECIMAL = 31
     const val BIG_DECIMAL_EXPONENT_OVERFLOW = 32
-    const val NO_EOF = 33
+    const val NO_END_FOUND = 33
     const val BOOLEAN_NO_MATCH = 34
     const val REGEX_NO_MATCH = 35
     const val NOT_START_OF_LINE = 36

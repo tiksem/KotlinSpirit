@@ -34,7 +34,7 @@ internal fun Int.parseCodeToString(): String {
         ParseCode.BIG_DECIMAL_EXPONENT_OVERFLOW -> "BIG_DECIMAL_EXPONENT_OVERFLOW"
         ParseCode.BYTE_OUT_OF_BOUNDS -> "BYTE_OUT_OF_BOUNDS"
         ParseCode.UBYTE_OUT_OF_BOUNDS -> "UBYTE_OUT_OF_BOUNDS"
-        ParseCode.NO_EOF -> "NO_EOF"
+        ParseCode.NO_END_FOUND -> "NO_END_FOUND"
         ParseCode.BOOLEAN_NO_MATCH -> "BOOLEAN_NO_MATCH"
         ParseCode.REGEX_NO_MATCH -> "REGEX_NO_MATCH"
         ParseCode.SPLIT_NOT_ENOUGH_DATA -> "SPLIT_NOT_ENOUGH_DATA"

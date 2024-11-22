@@ -4,6 +4,7 @@ import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.double
 import com.kotlinspirit.core.Rules.space
+import com.kotlinspirit.ext.findAll
 import com.kotlinspirit.grammar.Grammar
 import org.junit.Assert
 import org.junit.Test
@@ -60,6 +61,10 @@ class MathExpressionParserTest {
             Assert.assertEquals(r.parseGetResultOrThrow("1.2 * 2.0"), 2.4, 0.0001)
             Assert.assertEquals(r.parseGetResultOrThrow("(1.2 * 2.0) + (3.4 - 1.2)"), 4.6, 0.0001)
             Assert.assertEquals(r.parseGetResultOrThrow("3.4 + ((1.2 * 2.0) + (3.4 - 1.2))"), 8.0, 0.0001)
+
+            val values = "5 + 10 (1.2 * 2.0) + (3.4 - 1.2)".findAll(expression.safe())
+            Assert.assertEquals(values[0], 15.0, 0.0001)
+            Assert.assertEquals(values[1], 4.6, 0.0001)
         }
     }
 }

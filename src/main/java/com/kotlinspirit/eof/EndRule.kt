@@ -6,13 +6,13 @@ import com.kotlinspirit.rangeres.ParseRangeResult
 
 class EndRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name) {
     override fun parse(seek: Int, string: CharSequence): ParseSeekResult {
-        if (seek == string.length) {
+        if (seek >= string.length) {
             return ParseSeekResult(seek)
         }
 
         return ParseSeekResult(
             seek = seek,
-            parseCode = ParseCode.NO_EOF
+            parseCode = ParseCode.NO_END_FOUND
         )
     }
 
@@ -33,7 +33,7 @@ class EndRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name
 
         return ParseSeekResult(
             seek = seek,
-            parseCode = ParseCode.NO_EOF
+            parseCode = ParseCode.NO_END_FOUND
         )
     }
 
@@ -52,7 +52,7 @@ class EndRule(name: String? = null) : RuleWithDefaultSequenceBehavior<Unit>(name
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return seek == string.length
+        return seek >= string.length
     }
 
     override fun repeat(): Rule<*> {
