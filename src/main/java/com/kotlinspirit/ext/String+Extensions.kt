@@ -486,7 +486,7 @@ fun CharSequence.removeDuplicates(
     policy: DuplicateRemovalPolicy = DuplicateRemovalPolicy.KEEP_FIRST
 ): CharSequence {
     val ranges = findAllRanges(rule)
-    if (ranges.isEmpty()) {
+    if (ranges.size < 2) {
         return this
     }
 
