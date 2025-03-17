@@ -497,6 +497,10 @@ val personRule = object : Grammar<Person>() {
 ```
 Note: `toRule` is used to convert the grammar to a rule.
 
+### Cloning Grammer
+
+Base Grammar class has an internal implementation of clone() method that is enough for most use cases. Clone is used internally to resolve recursive parsing and for multithreading synchronization. In some cases when the internal implementation is not enough you could override the clone() method for your own use case.
+
 ## Groups
 
 Groups are simplified and less flexible replacements for grammars for simple use cases. With `group` operator you can spescify which rule is responsible for setting the result of the expression. The result of the group rule is always the result of a rule marked with `asResult()` call. Let's consider we want to parse unsigned int literal, 124454u. It contains u suffix. To create a parser for that spesific case you can use grammar and override `defineRule` with uint + 'u' expression. And there is nothing wrong with this solution. However let's try to implement this unsigned int literal parser using `group`.
