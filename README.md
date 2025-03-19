@@ -18,7 +18,7 @@ repositories {
 
 Add the following dependency into your `build.gradle` file dependencies section
 ```
-implementation "com.github.tiksem:KotlinSpirit:1.3.2"
+implementation "com.github.tiksem:KotlinSpirit:1.3.3"
 ```
 
 # Creating a simple parser
@@ -113,9 +113,9 @@ parser.repalceAll(text, "") // This will return 'I want to drink your  dirty , I
 ```
 
 #### Performance note:
-The search is optimized by using `TernarySearchTree` for matching strings. To maximize the performance try to order the strings in oneOf to be NOT sorted, this will keep `TernarySearchTree` more balanced.
+The search is optimized by using balanced `TernarySearchTree` for matching strings.
 
-Also it's more effective to use or operator for small sequence of strings with minimum repeted substrings. So the example above could be written as:
+And it's more effective to use or operator for small sequence of strings with minimum repeted substrings. So the example above could be written as:
 ```Kotlin
 str("Jhon") or "Ivan" or "Bin"
 ```
