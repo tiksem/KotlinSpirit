@@ -17,37 +17,59 @@ internal open class TernarySearchTree {
     private val root: Node
 
     constructor(strings: List<CharSequence>) {
-        this.strings = strings
+        this.strings = strings.map { it.toString() }.sorted()
         if (strings.isEmpty()) {
             throw IllegalArgumentException("strings should not be empty")
         }
 
-        val firstString = strings[0]
-        if (firstString.isEmpty()) {
+        // Make sure there’s no empty string
+        if (strings[0].isEmpty()) {
             throw IllegalStateException("String could not be empty")
         }
 
-        root = Node(
-            char = firstString[0]
-        )
+        // Build a list of strings in “balanced insertion” order:
+        val balancedList = mutableListOf<CharSequence>()
+        balancedOrder(this.strings, 0, strings.size - 1, balancedList)
 
-        strings.forEach {
-            if (it.isNotEmpty()) {
-                insert(root, 0, it)
-            } else {
+        // The first in balancedList becomes our root node
+        root = Node(balancedList[0][0])
+        insert(root, 0, balancedList[0])
+
+        // Insert the rest in balanced order, reusing insert
+        for (i in 1 until balancedList.size) {
+            val s = balancedList[i]
+            if (s.isEmpty()) {
                 throw IllegalStateException("String could not be empty")
             }
+            insert(root, 0, s)
         }
     }
 
-    private constructor(root: Node, strings: List<CharSequence>) {
+    // Helper constructor used elsewhere
+    private constructor(root: Node, strings: List<String>) {
         this.strings = strings
         this.root = root
     }
 
+    /**
+     * Recursively pick middle element to ensure
+     * a more balanced insertion order.
+     */
+    private fun balancedOrder(
+        strings: List<CharSequence>,
+        start: Int,
+        end: Int,
+        result: MutableList<CharSequence>
+    ) {
+        if (start > end) return
+        val mid = (start + end) / 2
+        result.add(strings[mid])
+        balancedOrder(strings, start, mid - 1, result)
+        balancedOrder(strings, mid + 1, end, result)
+    }
+
     private fun insert(node: Node, begin: Int, word: CharSequence) {
         val ch = word[begin]
-
         if (node.char == ch) {
             if (begin == word.length - 1) {
                 node.isEndOfWord = true
@@ -146,19 +168,19 @@ internal open class TernarySearchTree {
 
         val ch = string[seek]
         val nodeCh = node.char
-        when {
+        return when {
             ch == nodeCh -> {
                 if (node.isEndOfWord) {
-                    return true
+                    true
                 } else {
-                    return hasMatch(node.eq ?: return false, moveSeekToTheNextChar(seek, string), string)
+                    hasMatch(node.eq ?: return false, moveSeekToTheNextChar(seek, string), string)
                 }
             }
             ch < nodeCh -> {
-                return hasMatch(node.left ?: return false, seek, string)
+                hasMatch(node.left ?: return false, seek, string)
             }
             else -> {
-                return hasMatch(node.right ?: return false, seek, string)
+                hasMatch(node.right ?: return false, seek, string)
             }
         }
     }
@@ -170,19 +192,19 @@ internal open class TernarySearchTree {
 
         val ch = string[seek]
         val nodeCh = node.char
-        when {
+        return when {
             ch == nodeCh -> {
                 if (node.isEndOfWord) {
-                    return true
+                    true
                 } else {
-                    return hasMatch(node.eq ?: return false, moveSeekToThePrevChar(seek, string), string)
+                    hasMatch(node.eq ?: return false, moveSeekToThePrevChar(seek, string), string)
                 }
             }
             ch < nodeCh -> {
-                return hasMatch(node.left ?: return false, seek, string)
+                hasMatch(node.left ?: return false, seek, string)
             }
             else -> {
-                return hasMatch(node.right ?: return false, seek, string)
+                hasMatch(node.right ?: return false, seek, string)
             }
         }
     }
@@ -196,10 +218,10 @@ internal open class TernarySearchTree {
     }
 
     protected open fun moveSeekToTheNextChar(seek: Int, string: CharSequence): Int {
-        return seek+1
+        return seek + 1
     }
 
     protected open fun moveSeekToThePrevChar(seek: Int, string: CharSequence): Int {
-        return seek-1
+        return seek - 1
     }
 }
