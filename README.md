@@ -512,6 +512,29 @@ parser.parseGetResultOrThrow("434334u") // 434334
 ```
 Note: The expression inside group should contain sequence built using + operator and it should cotnain only a single `asResult()` call.
 
+## Transforming rule results using map
+
+Each rule has `map` function to transfer results, similar to Collection `map` function Kotlin has. Let's consider roman numbers rule as an example
+
+```Kotlin
+private val romanToInt = mapOf(
+    "I" to 1, "II" to 2, "III" to 3, "IV" to 4, "V" to 5, "VI" to 6, "VII" to 7, "VIII" to 8, "IX" to 9, "X" to 10,
+    "XI" to 11, "XII" to 12, "XIII" to 13, "XIV" to 14, "XV" to 15, "XVI" to 16, "XVII" to 17, "XVIII" to 18, "XIX" to 19, "XX" to 20,
+    "XXI" to 21, "XXII" to 22, "XXIII" to 23, "XXIV" to 24, "XXV" to 25, "XXVI" to 26, "XXVII" to 27, "XXVIII" to 28, "XXIX" to 29, "XXX" to 30,
+    "XXXI" to 31, "XXXII" to 32, "XXXIII" to 33, "XXXIV" to 34, "XXXV" to 35, "XXXVI" to 36, "XXXVII" to 37, "XXXVIII" to 38, "XXXIX" to 39, "XL" to 40,
+    "XLI" to 41, "XLII" to 42, "XLIII" to 43, "XLIV" to 44, "XLV" to 45, "XLVI" to 46, "XLVII" to 47, "XLVIII" to 48, "XLIX" to 49, "L" to 50,
+    "LI" to 51, "LII" to 52, "LIII" to 53, "LIV" to 54, "LV" to 55, "LVI" to 56, "LVII" to 57, "LVIII" to 58, "LIX" to 59, "LX" to 60,
+    "LXI" to 61, "LXII" to 62, "LXIII" to 63, "LXIV" to 64, "LXV" to 65, "LXVI" to 66, "LXVII" to 67, "LXVIII" to 68, "LXIX" to 69, "LXX" to 70,
+    "LXXI" to 71, "LXXII" to 72, "LXXIII" to 73, "LXXIV" to 74, "LXXV" to 75, "LXXVI" to 76, "LXXVII" to 77, "LXXVIII" to 78, "LXXIX" to 79, "LXXX" to 80,
+    "LXXXI" to 81, "LXXXII" to 82, "LXXXIII" to 83, "LXXXIV" to 84, "LXXXV" to 85, "LXXXVI" to 86, "LXXXVII" to 87, "LXXXVIII" to 88, "LXXXIX" to 89, "XC" to 90,
+    "XCI" to 91, "XCII" to 92, "XCIII" to 93, "XCIV" to 94, "XCV" to 95, "XCVI" to 96, "XCVII" to 97, "XCVIII" to 98, "XCIX" to 99, "C" to 100
+)
+
+val romanNumberRule = oneOf(romanToInt.keys).map {
+    romanToInt[it.toString()] ?: error("Unexpected roman number: $it")
+}
+```
+
 ### withSuffix withPrefix
 These are factory methods that create simple groups with prefix and suffix.
 ```
