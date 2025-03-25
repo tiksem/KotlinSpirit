@@ -530,7 +530,7 @@ private val romanToInt = mapOf(
     "XCI" to 91, "XCII" to 92, "XCIII" to 93, "XCIV" to 94, "XCV" to 95, "XCVI" to 96, "XCVII" to 97, "XCVIII" to 98, "XCIX" to 99, "C" to 100
 )
 
-val romanNumberRule = oneOf(romanToInt.keys).map {
+val romanNumberRule: Rule<Int> = oneOf(romanToInt.keys).map {
     romanToInt[it.toString()] ?: error("Unexpected roman number: $it")
 }
 ```
