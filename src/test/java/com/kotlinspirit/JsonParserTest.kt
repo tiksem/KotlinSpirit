@@ -7,7 +7,6 @@ import com.kotlinspirit.core.Rules.int
 import com.kotlinspirit.core.Rules.lazy
 import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.core.plus
-import com.kotlinspirit.expressive.LazyRule
 import com.kotlinspirit.grammar.Grammar
 import com.kotlinspirit.grammar.nestedResult
 import org.json.JSONObject
@@ -21,7 +20,7 @@ private val skipper = str {
     it.isWhitespace()
 }.name("skipper")
 
-private val value: LazyRule<Any> = lazy {
+private val value: Rule<Any> = lazy {
     jsonString or double or jsonObject or jsonArray
 }.name("value")
 

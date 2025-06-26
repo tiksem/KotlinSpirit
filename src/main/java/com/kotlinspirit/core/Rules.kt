@@ -8,6 +8,7 @@ import com.kotlinspirit.dynamic.DynamicRule
 import com.kotlinspirit.dynamic.DynamicStringRule
 import com.kotlinspirit.eof.EndRule
 import com.kotlinspirit.expressive.*
+import com.kotlinspirit.grammar.Grammar
 import com.kotlinspirit.json.JsonArrayRule
 import com.kotlinspirit.json.JsonObjectRule
 import com.kotlinspirit.move.AfterFirstMatchOfRule
@@ -26,9 +27,28 @@ import com.kotlinspirit.str.oneof.OneOfStringRuleCaseInsensetive
 import com.kotlinspirit.transform.TransformRule
 import kotlin.math.absoluteValue
 
+private class LazyGrammar<T : Any>(private val ruleProvider: () -> Rule<T>) : Grammar<T>() {
+    private var _result: T? = null
+    override val result: T
+        get() = _result ?: throw IllegalStateException(
+            "Result is not set. Rule was not parsed yet."
+        )
+
+    override fun defineRule(): Rule<*> {
+        val rule = ruleProvider()
+        return rule.invoke {
+            _result = it
+        }
+    }
+
+    override fun resetResult() {
+        _result = null
+    }
+}
+
 object Rules {
-    fun <T : Any> lazy(ruleProvider: () -> Rule<T>): LazyRule<T> {
-        return LazyRule(ruleProvider)
+    fun <T : Any> lazy(ruleProvider: () -> Rule<T>): Rule<T> {
+        return LazyGrammar(ruleProvider).toRule()
     }
 
     val int = IntRule(radix = 10)

@@ -88,11 +88,21 @@ open class GrammarRule<T : Any>(
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
-        TODO("Not yet implemented")
+        val grammar = pullGrammar()
+        return try {
+            grammar.initRule().reverseHasMatch(seek, string)
+        } finally {
+            returnGrammar(grammar)
+        }
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
-        return pullGrammar().initRule().hasMatch(seek, string)
+        val grammar = pullGrammar()
+        return try {
+            grammar.initRule().hasMatch(seek, string)
+        } finally {
+            returnGrammar(grammar)
+        }
     }
 
     override val debugNameShouldBeWrapped: Boolean
