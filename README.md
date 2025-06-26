@@ -410,12 +410,12 @@ fun replaceIdesWithNamesSplittedByDots(string: String, namesMap: Map<Int, String
 # Recursive expressions
 Let's consider that there is a case: rule `a` could point to rule `b` and rule `b` could point to rule `a`. Or even rule `a` points to rule `a`. So we get a recursion here.
 
-Let's discuss a real-time example. We want to parse a mathematic expression like 5 + (34 + 48).
+Let's discuss a real-time example. We want to parse a mathematic expression like 5+(34+48).
 ```Kotlin
 val operator = char('+', '-', '*', '/')
-val value = expressionInBrackets or double
-val expression = value + operator + value
-val expressionInBrackets = expression.quoted('(', ')')
+val value = (expressionInBrackets or double) % operator
+val expressionInBrackets: Rule<*> = value.quoted('(', ')')
+val parser = value.compile()
 ```
 Looks clear. However, if you try to run it you will get StackOverflow error. Let's see how we can solve it.
 
@@ -423,9 +423,9 @@ Looks clear. However, if you try to run it you will get StackOverflow error. Let
 Let's rewrite our above example using lazy rules. Lazy rules are rules, computed at runtime.
 ```Kotlin
 val operator = char('+', '-', '*', '/')
-val value = lazy { expressionInBrackets or double }
-val expression = value + operator + value
-val expressionInBrackets = expression.quoted('(', ')')
+val value = Rules.lazy { (expressionInBrackets or double) % operator }
+val expressionInBrackets: Rule<*> = value.quoted('(', ')')
+val parser = value.compile()
 ```
 Ok we fixed StackOverflow error here. But let's move further and figure out how we can create rules with custom results and resolve recursive issues as well.
 
@@ -500,6 +500,83 @@ Note: `toRule` is used to convert the grammar to a rule.
 ### Cloning Grammer
 
 Base Grammar class has an internal implementation of clone() method that is enough for most use cases. Clone is used internally to resolve recursive parsing and for multithreading synchronization. In some cases when the internal implementation is not enough you could override the clone() method for your own use case.
+
+### Recursive parsing of mathematic expressions using Grammar
+
+Let's rewrite our Rules.lazy example above using Grammar
+
+```Kotlin
+private val operator = char('+', '-', '*', '/')
+
+private val value = object : Grammar<Double>() {
+    private val numbers = ArrayList<Double>()
+    private val operators = StringBuilder()
+    override val result: Double
+        get() {
+            if (numbers.isEmpty()) return 0.0
+
+            // First pass: evaluate * and /, collect intermediate results
+            val compressedNumbers = ArrayList<Double>()
+            val compressedOperators = ArrayList<Char>()
+
+            var acc = numbers[0]
+            for (i in operators.indices) {
+                val op = operators[i]
+                val next = numbers[i + 1]
+
+                when (op) {
+                    '*' -> acc *= next
+                    '/' -> acc /= next
+                    else -> {
+                        // Push current result and save the low-precedence op
+                        compressedNumbers.add(acc)
+                        compressedOperators.add(op)
+                        acc = next
+                    }
+                }
+            }
+            compressedNumbers.add(acc) // push the last accumulated number
+
+            // Second pass: evaluate + and -
+            var result = compressedNumbers[0]
+            for (i in compressedOperators.indices) {
+                val op = compressedOperators[i]
+                val next = compressedNumbers[i + 1]
+                result = when (op) {
+                    '+' -> result + next
+                    '-' -> result - next
+                    else -> throw IllegalArgumentException("Unexpected operator: $op")
+                }
+            }
+
+            return result
+        }
+
+    override fun defineRule(): Rule<*> {
+        return (expressionInBrackets or double).invoke {
+            numbers.add(it)
+        } % operator.invoke {
+            operators.append(it)
+        }
+    }
+
+    override fun resetResult() {
+        numbers.clear()
+        operators.clear()
+    }
+}.toRule()
+
+private val expressionInBrackets: Rule<Double> = value.quoted('(', ')')
+val mathExpressionParser = value.compile()
+
+Assert.assertEquals(mathExpressionParser.tryParse("(1+2)*5"), "(1+2)*5".length)
+Assert.assertEquals(mathExpressionParser.tryParse("1"), "1".length)
+Assert.assertEquals(mathExpressionParser.tryParse("(1/4)+(4/5)*(1/3*(12+7+(5*2)))"), "(1/4)+(4/5)*(1/3*(12+7+(5*2)))".length)
+
+Assert.assertEquals(mathExpressionParser.parseGetResultOrThrow("(1+2)*5"), 15.0, 0.001)
+Assert.assertEquals(mathExpressionParser.parseGetResultOrThrow("1"), 1.0, 0.001)
+Assert.assertEquals(mathExpressionParser.parseGetResultOrThrow("(1/4)+(4/5)*(1/3*(12+7+(5*2)))"), 7.9833, 0.001)
+```
 
 ## Groups
 
