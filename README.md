@@ -497,7 +497,7 @@ val personRule = object : Grammar<Person>() {
 ```
 Note: `toRule` is used to convert the grammar to a rule.
 
-### Cloning Grammer
+### Cloning Grammar
 
 Base Grammar class has an internal implementation of clone() method that is enough for most use cases. Clone is used internally to resolve recursive parsing and for multithreading synchronization. In some cases when the internal implementation is not enough you could override the clone() method for your own use case.
 
