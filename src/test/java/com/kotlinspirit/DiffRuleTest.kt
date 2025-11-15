@@ -6,6 +6,7 @@ import com.kotlinspirit.core.Rules.digit
 import com.kotlinspirit.core.Rules.int
 import com.kotlinspirit.core.Rules.space
 import com.kotlinspirit.core.Rules.str
+import com.kotlinspirit.core.Rules.uint
 import org.junit.Assert
 import org.junit.Test
 
@@ -85,5 +86,18 @@ class DiffRuleTest {
         Assert.assertEquals(p.tryParse("abcd/edssdds**4/**/"), "abcd*edssdds**4".length)
         Assert.assertEquals(p.tryParse("/*3434*/"), null)
         Assert.assertEquals(p.tryParse("/**/"), null)
+    }
+
+    @Test
+    fun ipAddressTest() {
+        val ipAddress = (uint(0.toUInt()..255.toUInt()) - (char('0') + +digit))
+            .split('.', 4)
+        val parser = ipAddress.compile()
+
+        Assert.assertTrue(parser.matches("0.0.0.0"))
+
+        val reverseParser = "yo".requiresPrefix(ipAddress).compile()
+
+        Assert.assertEquals(reverseParser.findFirst("0.0.0.0yo"), "yo")
     }
 }

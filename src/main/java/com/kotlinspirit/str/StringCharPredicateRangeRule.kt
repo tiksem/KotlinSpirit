@@ -51,6 +51,11 @@ open class StringCharPredicateRangeRule(
     }
 
     override fun hasMatch(seek: Int, string: CharSequence): Boolean {
+        val charsCount = string.length - seek
+        if (charsCount < range.first) {
+            return false
+        }
+
         return string.all(
             startIndex = seek,
             endIndex = min(seek + range.first, string.length),
@@ -94,6 +99,10 @@ open class StringCharPredicateRangeRule(
     }
 
     override fun reverseHasMatch(seek: Int, string: CharSequence): Boolean {
+        if (seek < range.first) {
+            return false
+        }
+
         return string.all(
             startIndex = max(0, seek - range.first + 1),
             endIndex = seek + 1,

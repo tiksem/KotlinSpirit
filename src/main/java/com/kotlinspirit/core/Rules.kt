@@ -160,6 +160,20 @@ object Rules {
         )
     }
 
+    fun char(inString: String): CharPredicateRule {
+        if (inString.isEmpty()) {
+            throw IllegalArgumentException("Input string cannot be empty")
+        }
+
+        if (inString.length == 1) {
+            return ExactCharRule(inString[0])
+        }
+
+        return CharPredicateRule(
+            CharPredicateData(chars = inString.toCharArray())
+        )
+    }
+
     fun char(vararg ranges: CharRange): CharPredicateRule {
         return CharPredicateRule(
             CharPredicateData(ranges)
