@@ -101,7 +101,7 @@ Let's imagine we want to detect and replace banned words with an empty string.
 val bannedWordsRule = caseInsensitiveOneOf(strings = listOf('slave', 'blood', 'murder', 'drugs')) // Without using a skipper
 val parser = bannedWordsRule.compile()
 val text = "I want to drink your blood dirty slave, I will teach you how to commit a murder and buy some drugs!"
-parser.repalceAll(text, "") // This will return 'I want to drink your  dirty , I will teach you how to commit a  and buy some !'
+parser.replaceAll(text, "") // This will return 'I want to drink your  dirty , I will teach you how to commit a  and buy some !'
 
 // Let's try to modify our words a little bit, so the example doesn't work
 val text = "I want to drink your b-l-o-o-d dirty sla**ve, I will teach you how to commit a m-u-r-d-e-r and buy some d-r*u-gs!"
@@ -109,7 +109,7 @@ val text = "I want to drink your b-l-o-o-d dirty sla**ve, I will teach you how t
 val skipper = (space or char('*',',','-','.','\'','"')).repeat()
 val bannedWordsRule = caseInsensitiveOneOf(strings = listOf('slave', 'blood', 'murder', 'drugs'), skipper = skipper)
 val parser = bannedWordsRule.compile()
-parser.repalceAll(text, "") // This will return 'I want to drink your  dirty , I will teach you how to commit a  and buy some !'
+parser.replaceAll(text, "") // This will return 'I want to drink your  dirty , I will teach you how to commit a  and buy some !'
 ```
 
 #### Performance note:
