@@ -13,7 +13,6 @@ private fun internalParse(seek: Int, string: CharSequence, main: Rule<*>, diff: 
         mainRes
     } else {
         if (diff.hasMatch(seek, string)) {
-            diff.hasMatch(seek, string)
             return ParseSeekResult(
                 seek = seek,
                 parseCode = ParseCode.DIFF_FAILED
