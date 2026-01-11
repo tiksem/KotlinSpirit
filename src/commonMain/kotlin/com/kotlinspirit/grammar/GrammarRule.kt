@@ -1,5 +1,6 @@
 package com.kotlinspirit.grammar
 
+import com.kotlinspirit.core.Clearable
 import com.kotlinspirit.core.ParseResult
 import com.kotlinspirit.core.ParseSeekResult
 import com.kotlinspirit.core.Rule
@@ -47,7 +48,8 @@ open class GrammarRule<T : Any, Data>(
         }
     }
 
-    private fun returnGrammar() {
+    private fun returnGrammar(grammar: Grammar<Data>) {
+        (grammar.data as? Clearable)?.clear()
         stackSeek--
     }
 
@@ -60,7 +62,7 @@ open class GrammarRule<T : Any, Data>(
         try {
             return grammar.defineRule(defineRule).parser(seek, string)
         } finally {
-            returnGrammar()
+            returnGrammar(grammar)
         }
     }
 
@@ -78,7 +80,7 @@ open class GrammarRule<T : Any, Data>(
                 result.data = getResult(grammar.data)
             }
         } finally {
-            returnGrammar()
+            returnGrammar(grammar)
         }
     }
 
@@ -113,7 +115,7 @@ open class GrammarRule<T : Any, Data>(
         return try {
             grammar.defineRule(defineRule).reverseHasMatch(seek, string)
         } finally {
-            returnGrammar()
+            returnGrammar(grammar)
         }
     }
 
@@ -122,7 +124,7 @@ open class GrammarRule<T : Any, Data>(
         return try {
             grammar.defineRule(defineRule).hasMatch(seek, string)
         } finally {
-            returnGrammar()
+            returnGrammar(grammar)
         }
     }
 
@@ -144,7 +146,7 @@ open class GrammarRule<T : Any, Data>(
                     defineRule(it).debug(engine)
                 },
                 getResult,
-                name
+                name = name
             ).debug(engine),
             engine = engine
         )

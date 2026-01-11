@@ -1,18 +1,23 @@
 package com.kotlinspirit
 
+import com.kotlinspirit.core.Box
+import com.kotlinspirit.core.NullBox
 import com.kotlinspirit.core.Rules.boolean
+import com.kotlinspirit.core.Rules.grammar
 import com.kotlinspirit.core.Rules.str
-import com.kotlinspirit.grammar.nestedResult
 import org.junit.Assert
 import org.junit.Test
 
 class BooleanRuleTest {
     private val r = boolean.compile()
-    private val reverseR = nestedResult(
-        nested = boolean,
-        entire = {
-            str("yo").requiresPrefix(it)
-        }
+    private val reverseR = grammar(
+        defineRule = { result ->
+            str("yo").requiresPrefix(
+                boolean { result.value = it }
+            )
+        },
+        getResult = { it.value },
+        dataFactory = { Box(false) }
     ).compile()
 
     @Test

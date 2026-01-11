@@ -1,12 +1,13 @@
 package com.kotlinspirit
 
+import com.kotlinspirit.core.Clearable
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.dynamicString
 import com.kotlinspirit.core.Rules.dynamicRule
+import com.kotlinspirit.core.Rules.grammar
 import com.kotlinspirit.core.Rules.nonEmptyLatinStr
 import com.kotlinspirit.core.Rules.str
-import com.kotlinspirit.grammar.Grammar
 import org.junit.Assert
 import org.junit.Test
 
@@ -15,24 +16,28 @@ private data class Xml(
     val name: String
 )
 
-private val xmlRule = object : Grammar<Xml>() {
-    private var name = ""
-    private var body = emptyList<Any>()
+private data class XmlData(
+    var name: String = "",
+    val body: MutableList<Any> = mutableListOf()
+) : Clearable {
+    override fun clear() {
+        body.clear()
+    }
+}
 
-    override val result: Xml
-        get() = Xml(body, name)
-
-    override fun defineRule(): Rule<*> {
+private val xmlRule = grammar(
+    dataFactory = { XmlData() },
+    defineRule = { data ->
         val firstTagNameOccurrence = nonEmptyLatinStr {
-            name = it.toString()
+            data.name = it.toString()
         }
 
         val secondTagNameOccurrence = dynamicString {
-            name
+            data.name
         }
 
         val tagName = dynamicRule {
-            if (name.isEmpty()) {
+            if (data.name.isEmpty()) {
                 firstTagNameOccurrence
             } else {
                 secondTagNameOccurrence
@@ -43,15 +48,14 @@ private val xmlRule = object : Grammar<Xml>() {
 
         val closedTag = str("</") + tagName + '>'
 
-        return openingTag + xmlTagBody {
-            body = it
+        openingTag + xmlTagBody {
+            data.body.addAll(it)
         } + closedTag
+    },
+    getResult = {
+        Xml(body = it.body.toList(), name = it.name)
     }
-
-    override fun resetResult() {
-        name = ""
-    }
-}.toRule()
+)
 
 private val xmlTagBody: Rule<List<Any>> = (xmlRule or (char - char('<', '>')).repeat()).repeat()
 

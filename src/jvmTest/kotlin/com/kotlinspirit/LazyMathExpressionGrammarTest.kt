@@ -1,71 +1,76 @@
 package com.kotlinspirit
 
+import com.kotlinspirit.core.Clearable
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.double
-import com.kotlinspirit.grammar.Grammar
+import com.kotlinspirit.core.Rules.grammar
 import org.junit.Assert
 import org.junit.Test
 
 private val operator = char('+', '-', '*', '/')
 
-private val value = object : Grammar<Double>() {
-    private val numbers = ArrayList<Double>()
-    private val operators = StringBuilder()
-    override val result: Double
-        get() {
-            if (numbers.isEmpty()) return 0.0
-
-            // First pass: evaluate * and /, collect intermediate results
-            val compressedNumbers = ArrayList<Double>()
-            val compressedOperators = ArrayList<Char>()
-
-            var acc = numbers[0]
-            for (i in operators.indices) {
-                val op = operators[i]
-                val next = numbers[i + 1]
-
-                when (op) {
-                    '*' -> acc *= next
-                    '/' -> acc /= next
-                    else -> {
-                        // Push current result and save the low-precedence op
-                        compressedNumbers.add(acc)
-                        compressedOperators.add(op)
-                        acc = next
-                    }
-                }
-            }
-            compressedNumbers.add(acc) // push the last accumulated number
-
-            // Second pass: evaluate + and -
-            var result = compressedNumbers[0]
-            for (i in compressedOperators.indices) {
-                val op = compressedOperators[i]
-                val next = compressedNumbers[i + 1]
-                result = when (op) {
-                    '+' -> result + next
-                    '-' -> result - next
-                    else -> throw IllegalArgumentException("Unexpected operator: $op")
-                }
-            }
-
-            return result
-        }
-
-    override fun defineRule(): Rule<*> {
-        return (expressionInBrackets or double).invoke {
-            numbers.add(it)
-        } % operator.invoke {
-            operators.append(it)
-        }
-    }
-
-    override fun resetResult() {
+private class ValueData(
+    val numbers: ArrayList<Double> = ArrayList(),
+    val operators: StringBuilder = StringBuilder()
+) : Clearable {
+    override fun clear() {
         numbers.clear()
         operators.clear()
     }
-}.toRule()
+}
+
+private val value = grammar(
+    dataFactory = { ValueData() },
+    defineRule = { data ->
+        (expressionInBrackets or double).invoke {
+            data.numbers.add(it)
+        } % operator.invoke {
+            data.operators.append(it)
+        }
+    },
+    getResult = {
+        if (it.numbers.isEmpty()) {
+            return@grammar 0.0
+        }
+
+        // First pass: evaluate * and /, collect intermediate results
+        val compressedNumbers = ArrayList<Double>()
+        val compressedOperators = ArrayList<Char>()
+
+        var acc = it.numbers[0]
+        for (i in it.operators.indices) {
+            val op = it.operators[i]
+            val next = it.numbers[i + 1]
+
+            when (op) {
+                '*' -> acc *= next
+                '/' -> acc /= next
+                else -> {
+                    // Push current result and save the low-precedence op
+                    compressedNumbers.add(acc)
+                    compressedOperators.add(op)
+                    acc = next
+                }
+            }
+        }
+        compressedNumbers.add(acc) // push the last accumulated number
+
+        // Second pass: evaluate + and -
+        var result = compressedNumbers[0]
+        for (i in compressedOperators.indices) {
+            val op = compressedOperators[i]
+            val next = compressedNumbers[i + 1]
+            result = when (op) {
+                '+' -> result + next
+                '-' -> result - next
+                else -> throw IllegalArgumentException("Unexpected operator: $op")
+            }
+        }
+
+        result
+    }
+)
 
 private val expressionInBrackets: Rule<Double> = value.quoted('(', ')')
 private val parser = value.compile()

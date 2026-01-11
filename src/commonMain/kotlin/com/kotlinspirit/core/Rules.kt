@@ -25,15 +25,28 @@ import com.kotlinspirit.str.StringCharPredicateRule
 import com.kotlinspirit.str.oneof.OneOfStringRule
 import com.kotlinspirit.str.oneof.OneOfStringRuleCaseInsensetive
 import com.kotlinspirit.transform.TransformRule
+import kotlin.math.abs
 
-private class LazyBox<T>(
+interface Clearable {
+    fun clear()
+}
+
+class NullBox<T>(
     var value: T?
+) : Clearable {
+    override fun clear() {
+        value = null
+    }
+}
+
+class Box<T>(
+    var value: T
 )
 
 object Rules {
     fun <T : Any> lazy(ruleProvider: () -> Rule<T>): Rule<T> {
         return grammar(
-            dataFactory = { LazyBox<T>(null) },
+            dataFactory = { NullBox<T>(null) },
             defineRule = {
                 val rule = ruleProvider()
                 rule.invoke { value ->
@@ -124,11 +137,11 @@ object Rules {
     }
 
     fun float(value: Float, delta: Float = 0.0f): RuleWithDefaultRepeat<Float> {
-        return float.failIf { it != value && (it - value).absoluteValue > delta }
+        return float.failIf { it != value && abs(it - value) > delta }
     }
 
     fun double(value: Double, delta: Double): RuleWithDefaultRepeat<Double> {
-        return double.failIf { it != value && (it - value).absoluteValue > delta }
+        return double.failIf { it != value && abs(it - value) > delta }
     }
 
     fun float(range: ClosedRange<Float>): RuleWithDefaultRepeat<Float> {

@@ -3,52 +3,48 @@ package com.kotlinspirit
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.double
+import com.kotlinspirit.core.Rules.grammar
 import com.kotlinspirit.core.Rules.space
 import com.kotlinspirit.ext.findAll
-import com.kotlinspirit.grammar.Grammar
 import org.junit.Assert
 import org.junit.Test
 import java.lang.IllegalStateException
 
 private val skipper = space.repeat()
 
-private val expression: Rule<Double> = object : Grammar<Double>() {
-    private var sign = 'x'
-    private var a = 0.0
-    private var b = 0.0
+private class ExpressionData {
+    var sign: Char = 'x'
+    var a: Double = 0.0
+    var b: Double = 0.0
+}
 
-    override val result: Double
-        get() {
-            return when (sign) {
-                '+' -> a + b
-                '-' -> a - b
-                '*' -> a * b
-                '/' -> a / b
-                else -> throw IllegalStateException("Invalid sign")
-            }
-        }
-
-    override fun defineRule(): Rule<*> {
+private val expression = grammar(
+    dataFactory = { ExpressionData() },
+    defineRule = { data ->
         val sign = char('+', '-', '*', '/').invoke {
-            this.sign = it
+            data.sign = it
         }
 
-        return skipper + (double or expressionInBrackets) {
-            a = it
+        skipper + (double or expressionInBrackets).invoke {
+            data.a = it
         } + skipper + sign + skipper + (double or expressionInBrackets) {
-            b = it
+            data.b = it
         } + skipper
+    },
+    getResult = {
+        val a = it.a
+        val b = it.b
+        when (it.sign) {
+            '+' -> a + b
+            '-' -> a - b
+            '*' -> a * b
+            '/' -> a / b
+            else -> throw IllegalStateException("Invalid sign")
+        }
     }
+)
 
-    override fun resetResult() {
-        super.resetResult()
-        a = 0.0
-        b = 0.0
-        sign = 'x'
-    }
-}.toRule()
-
-private val expressionInBrackets = expression.quoted('(', ')')
+private val expressionInBrackets: Rule<Double> = expression.quoted('(', ')')
 
 class MathExpressionParserTest {
     @Test

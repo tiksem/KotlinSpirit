@@ -1,13 +1,14 @@
 package com.kotlinspirit
 
+import com.kotlinspirit.core.Clearable
 import com.kotlinspirit.core.Rule
 import com.kotlinspirit.core.Rules.char
 import com.kotlinspirit.core.Rules.double
+import com.kotlinspirit.core.Rules.grammar
 import com.kotlinspirit.core.Rules.int
 import com.kotlinspirit.core.Rules.lazy
 import com.kotlinspirit.core.Rules.str
 import com.kotlinspirit.core.plus
-import com.kotlinspirit.grammar.Grammar
 import com.kotlinspirit.grammar.nestedResult
 import org.json.JSONObject
 import org.junit.Assert
@@ -24,41 +25,46 @@ private val value: Rule<Any> = lazy {
     jsonString or double or jsonObject or jsonArray
 }.name("value")
 
-private val jsonObject = object : Grammar<Map<String, Any>>() {
-    private var key: String = ""
-    private var value: Any? = null
-    override var result = LinkedHashMap<String, Any>()
-        private set
-
-    override fun resetResult() {
-        result = LinkedHashMap()
-        key = ""
+private class JsonObjectData(
+    var key: String = "",
+    var value: Any? = null,
+    val result: LinkedHashMap<String, Any> = LinkedHashMap()
+) : Clearable {
+    override fun clear() {
         value = null
+        result.clear()
     }
+}
 
-    private fun onKeyOrValueSet() {
-        val value = this.value
-        if (value != null && key.isNotEmpty()) {
-            result[key] = value
-            this.value = null
-            key = ""
+private val jsonObject = grammar(
+    dataFactory = { JsonObjectData() },
+    defineRule = { data ->
+        fun onKeyOrValueSet() {
+            val value = data.value
+            if (value != null && data.key.isNotEmpty()) {
+                data.result[data.key] = value
+                data.value = null
+                data.key = ""
+            }
         }
-    }
 
-    override fun defineRule(): Rule<*> {
         val jsonPair = skipper + jsonString {
-            key = it.toString().replace("\\\"", "\"")
+            data.key = it.toString().replace("\\\"", "\"")
             onKeyOrValueSet()
         } + skipper + ':' + skipper + value {
-            value = it
+            data.value = it
             onKeyOrValueSet()
         } + skipper
-        return char('{') + skipper + jsonPair.split(
+
+        char('{') + skipper + jsonPair.split(
             divider = ',',
             range = 0..Int.MAX_VALUE
         ) + '}'
-    }
-}.toRule().name("object")
+    },
+    getResult = {
+        it.result
+    },
+).name("object")
 
 private val jsonArray = value.split(char(',').quoted(skipper), 0..Int.MAX_VALUE)
     .quoted('[' + skipper, skipper + ']').name("array")
